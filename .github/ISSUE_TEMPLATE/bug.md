@@ -1,9 +1,9 @@
 ---
 name: Bug
 about: Use this template for reporting bugs.
-title: "[DATE]: [FEATURE NAME]"
 labels: bug
 ---
+
 ### Description
 
 We have identified a bug in [Feature Name], which is impacting [User Persona].
