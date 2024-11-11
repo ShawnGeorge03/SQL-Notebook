@@ -1,9 +1,8 @@
 ---
 name: Task
 about: Use this template for describing new tasks.
-title: "[FEATURE NAME]"
-labels: feature
 ---
+
 ### Description
 
 A detailed description of the task, including any relevant context, requirements, and constraints.
