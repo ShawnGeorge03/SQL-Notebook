@@ -7,6 +7,10 @@ settings:
 importers:
 
   .:
+    dependencies:
+      '@electric-sql/pglite':
+        specifier: ^0.2.12
+        version: 0.2.12
     devDependencies:
       '@sveltejs/adapter-auto':
         specifier: ^3.0.0
@@ -78,6 +82,9 @@ packages:
   '@ampproject/remapping@2.3.0':
     resolution: {integrity: sha512-30iZtAPgz+LTIYoeivqYo853f02jBYSd5uGnGpkFV0M3xOt9aN73erkgYAmZU43x4VfqcnLxW9Kpg3R5LC4YYw==}
     engines: {node: '>=6.0.0'}
+
+  '@electric-sql/pglite@0.2.12':
+    resolution: {integrity: sha512-J/X42ujcoFEbOkgRyoNqZB5qcqrnJRWVlwpH3fKYoJkTz49N91uAK/rDSSG/85WRas9nC9mdV4FnMTxnQWE/rw==}
 
   '@esbuild/aix-ppc64@0.21.5':
     resolution: {integrity: sha512-1SDgH6ZSPTlggy1yI6+Dbkiz8xzpHJEVAlF/AM1tHPLsf5STom9rwtjE4hKAF20FfXXNTFqEYXyJNWh1GiZedQ==}
@@ -1500,6 +1507,8 @@ snapshots:
     dependencies:
       '@jridgewell/gen-mapping': 0.3.5
       '@jridgewell/trace-mapping': 0.3.25
+
+  '@electric-sql/pglite@0.2.12': {}
 
   '@esbuild/aix-ppc64@0.21.5':
     optional: true
