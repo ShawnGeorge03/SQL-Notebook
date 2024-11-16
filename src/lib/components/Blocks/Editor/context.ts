@@ -1,11 +1,13 @@
 import { getContext, setContext } from 'svelte';
 import { writable, type Writable } from 'svelte/store';
 
-export interface EditorConfig {
+type EditorConfig = {
     lineNumbers: boolean;
     highlightWhitespace: boolean;
     highlightTrailingWhitespace: boolean;
 }
+
+type Context = Writable<EditorConfig>;
 
 export function setEditorConfig() {
     const editorConfig = writable<EditorConfig>({
@@ -17,5 +19,5 @@ export function setEditorConfig() {
 }
 
 export function getEditorConfig() {
-    return getContext<Writable<EditorConfig>>('editorConfig')
+    return getContext<Context>('editorConfig')
 }
