@@ -6,28 +6,32 @@
 	import { EditorView } from "@codemirror/view";
 
     interface BlockProps {
-        class?: string
+        class?: string;
+        content: string;
     }
 
     let view: EditorView;
     let parent: HTMLDivElement;
 
-    let { class: className }: BlockProps = $props();
-
-    function createEditorState() {
-        return EditorState.create({
-            doc: "Hi there, from the Block Component",
-        })
-    }
+    let { class: className, content = $bindable("") }: BlockProps = $props();
 
     onMount(() => {
         view = new EditorView({
             parent,
-            state: createEditorState()
+            state: EditorState.create({
+                doc: content,
+                extensions: [
+                    EditorView.updateListener.of(e => {
+                        // TODO: Debounce
+                        if (e.docChanged)
+                            content = e.state.doc.toString();
+                    })
+                ]
+            }),
         });
 
         () => view.destroy();
-    })
+    });
 </script>
 
 {#if browser}
