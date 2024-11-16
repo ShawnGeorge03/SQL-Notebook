@@ -40,6 +40,7 @@
     }
 
     let view: EditorView;
+    // svelte-ignore non_reactive_update
     let parent: HTMLDivElement;
     const editorConfig = getEditorConfig();
 
