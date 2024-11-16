@@ -5,8 +5,14 @@
 	import { EditorState } from "@codemirror/state";
 	import { EditorView } from "@codemirror/view";
 
+    interface BlockProps {
+        class?: string
+    }
+
     let view: EditorView;
     let parent: HTMLDivElement;
+
+    let { class: className }: BlockProps = $props();
 
     function createEditorState() {
         return EditorState.create({
@@ -25,9 +31,9 @@
 </script>
 
 {#if browser}
-    <div bind:this={parent}></div>
+    <div class={className} bind:this={parent}></div>
 {:else}
-    <div class="scm-waiting">
+    <div class="scm-waiting {className}">
         <div class="scm-waiting__loading scm-loading">
             <div class="scm-loading__spinner"></div>
             <p class="scm-loading__text">Loading editor...</p>
