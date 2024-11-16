@@ -1,7 +1,7 @@
 <script lang="ts">
 
-	import Block from "$lib/components/Block.svelte";
-	import { getEditorConfig, setEditorConfig } from "$lib/components/context";
+	import { getEditorConfig, setEditorConfig } from "$lib/components/Blocks/Editor/context";
+	import Editor from "$lib/components/Blocks/Editor/index.svelte";
 
 	let content = $state("Hey there, this from the \\blocks");
 
@@ -32,7 +32,7 @@
 
 
 <div class="m-36 min-h-screen">
-	<Block bind:content />
+	<Editor bind:content />
 	<p class="whitespace-pre-wrap">{content}</p>
 	<div class="mt-10 flex items-center justify-center gap-10">
 		<button
