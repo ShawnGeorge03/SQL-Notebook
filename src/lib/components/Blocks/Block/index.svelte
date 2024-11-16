@@ -33,7 +33,12 @@
     import { getEditorConfig } from "./context";
     import { debounce } from "./utils";
 
-    interface BlockProps {
+    export interface BaseBlockProps {
+        content: string;
+        class?: string;
+    }
+
+    interface BlockProps extends BaseBlockProps {
         content: string;
         class?: string;
 		customExtensions?: Extension[];

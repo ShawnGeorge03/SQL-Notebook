@@ -1,7 +1,7 @@
 <script lang="ts">
 
-	import { getEditorConfig, setEditorConfig } from "$lib/components/Blocks/Editor/context";
-	import Editor from "$lib/components/Blocks/Editor/index.svelte";
+	import { getEditorConfig, setEditorConfig } from "$lib/components/Blocks/Block/context";
+	import Editor from "$lib/components/Blocks/Block/index.svelte";
 
 	let content = $state("Hey there, this from the \\blocks");
 
