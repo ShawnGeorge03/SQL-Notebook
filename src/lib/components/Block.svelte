@@ -1,37 +1,114 @@
 <script lang="ts">
+    import { browser } from "$app/environment";
     import { onMount } from "svelte";
 
-	import { browser } from "$app/environment";
-	import { EditorState } from "@codemirror/state";
-	import { EditorView } from "@codemirror/view";
+    import {
+    	autocompletion,
+    	closeBrackets,
+    	closeBracketsKeymap,
+    	completionKeymap
+    } from '@codemirror/autocomplete';
+    import { defaultKeymap, history, historyKeymap } from '@codemirror/commands';
+    import {
+    	bracketMatching,
+    	defaultHighlightStyle,
+    	foldGutter,
+    	foldKeymap,
+    	indentOnInput,
+    	syntaxHighlighting
+    } from '@codemirror/language';
+    import { EditorState, StateEffect, type Extension } from "@codemirror/state";
+    import {
+    	EditorView,
+    	crosshairCursor,
+    	drawSelection,
+    	dropCursor,
+    	highlightActiveLine,
+    	highlightTrailingWhitespace,
+    	highlightWhitespace,
+    	keymap,
+    	lineNumbers,
+    	rectangularSelection
+    } from '@codemirror/view';
+    import { getEditorConfig } from "./context";
+    import { debounce } from "./utils";
 
     interface BlockProps {
-        class?: string;
         content: string;
+        class?: string;
+		customExtensions?: Extension[];
     }
 
     let view: EditorView;
     let parent: HTMLDivElement;
+    const editorConfig = getEditorConfig();
 
-    let { class: className, content = $bindable("") }: BlockProps = $props();
+    let { class: className, content = $bindable(""), customExtensions = [] }: BlockProps = $props();
+
+    const updateContent = debounce((lines: string[]) => {
+        content = lines.join('');
+     }, 100, true);
+
+    const BASE_EXTENSIONS = [
+        EditorView.updateListener.of(e => {
+            if (e.docChanged) {
+                const lines: string[] = [];
+
+                for (const line of e.state.doc.iter())
+                    lines.push(line.toString());
+
+                updateContent(lines);
+            }
+        }),
+        EditorView.lineWrapping,
+        history(),
+        foldGutter(),
+		drawSelection(),
+		dropCursor(),
+        EditorState.allowMultipleSelections.of(true),
+        indentOnInput(),
+        syntaxHighlighting(defaultHighlightStyle, { fallback: true }),
+        bracketMatching(),
+        closeBrackets(),
+        autocompletion(),
+        rectangularSelection(),
+        crosshairCursor(),
+        highlightActiveLine(),
+        ...customExtensions,
+        keymap.of([
+				...closeBracketsKeymap,
+				...defaultKeymap,
+				...historyKeymap,
+				...foldKeymap,
+				...completionKeymap
+			])
+    ]
 
     onMount(() => {
         view = new EditorView({
             parent,
             state: EditorState.create({
                 doc: content,
-                extensions: [
-                    EditorView.updateListener.of(e => {
-                        // TODO: Debounce
-                        if (e.docChanged)
-                            content = e.state.doc.toString();
-                    })
-                ]
+                extensions: [...BASE_EXTENSIONS]
             }),
         });
 
         () => view.destroy();
     });
+
+    editorConfig.subscribe(config => {
+        if (view) {
+			view.dispatch({
+				effects: StateEffect.reconfigure.of([
+					...BASE_EXTENSIONS,
+					config.lineNumbers ? lineNumbers() : [],
+                    config.highlightWhitespace ? highlightWhitespace() : [],
+					config.highlightTrailingWhitespace ? highlightTrailingWhitespace() : []
+				])
+			});
+        }
+    })
+
 </script>
 
 {#if browser}
