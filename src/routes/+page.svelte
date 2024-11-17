@@ -32,9 +32,9 @@
 
 	const close = async () => {
 		await db.close();
-		result+= '>> Successfully closed DB\n';
+		result += '>> Successfully closed DB\n';
 		console.log(result);
-		query = ""
+		query = '';
 	};
 
 	onMount(async () => {
@@ -42,7 +42,7 @@
 			db = new DatabaseContext();
 			db.setStrategy(new PostgreSQL('SvelteDB', {}));
 
-			loadChinook()
+			loadChinook();
 		} catch (e) {
 			result += (e instanceof Error ? e.message : 'Failed to initialize database') + '\n';
 		}
@@ -68,8 +68,8 @@
 		editorConfig.update((config) => ({
 			...config,
 			highlightTrailingWhitespace: !config.highlightTrailingWhitespace
-	}));
-};
+		}));
+	};
 </script>
 
 <div class="m-36 min-h-screen">
@@ -116,23 +116,25 @@
 		<p>Code Editor Settings</p>
 		<div class="flex items-center justify-center gap-10">
 			<button
-			class="cursor-pointer rounded border-none bg-cyan-700 px-4 py-2 text-white hover:bg-cyan-900"
-			onclick={() => updateLineNumbers()}
+				class="cursor-pointer rounded border-none bg-cyan-700 px-4 py-2 text-white hover:bg-cyan-900"
+				onclick={() => updateLineNumbers()}
 			>
 				{$editorConfig.lineNumbers ? 'Remove line numbers' : 'Add line numbers'}
 			</button>
-		<button
-			class="cursor-pointer rounded border-none bg-cyan-700 px-4 py-2 text-white hover:bg-cyan-900"
-			onclick={() => updateHighlightWhitespace()}
-		>
-			{$editorConfig.highlightWhitespace ? 'Unhighlight Whitespace' : 'Highlight Whitespace'}
-		</button>
-		<button
-			class="cursor-pointer rounded border-none bg-cyan-700 px-4 py-2 text-white hover:bg-cyan-900"
-			onclick={() => updateHighlightTrailingWhitespace()}
-		>
-			{$editorConfig.highlightTrailingWhitespace ? 'Unhighlight Trailing Whitespace' : 'Highlight Trailing Whitespace'}
-		</button>
+			<button
+				class="cursor-pointer rounded border-none bg-cyan-700 px-4 py-2 text-white hover:bg-cyan-900"
+				onclick={() => updateHighlightWhitespace()}
+			>
+				{$editorConfig.highlightWhitespace ? 'Unhighlight Whitespace' : 'Highlight Whitespace'}
+			</button>
+			<button
+				class="cursor-pointer rounded border-none bg-cyan-700 px-4 py-2 text-white hover:bg-cyan-900"
+				onclick={() => updateHighlightTrailingWhitespace()}
+			>
+				{$editorConfig.highlightTrailingWhitespace
+					? 'Unhighlight Trailing Whitespace'
+					: 'Highlight Trailing Whitespace'}
+			</button>
 		</div>
 	</div>
 </div>
