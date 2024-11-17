@@ -99,11 +99,7 @@
             }),
         });
 
-        () => view.destroy();
-    });
-
-    editorConfig.subscribe(config => {
-        if (view) {
+        const unsubscribe = editorConfig.subscribe(config => {
 			view.dispatch({
 				effects: StateEffect.reconfigure.of([
 					...extensions,
@@ -112,8 +108,15 @@
 					config.highlightTrailingWhitespace ? highlightTrailingWhitespace() : []
 				])
 			});
+        });
+
+        () => {
+            unsubscribe();
+            view.destroy();
         }
-    })
+    });
+
+
 
 </script>
 
