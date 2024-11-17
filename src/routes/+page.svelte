@@ -1,8 +1,12 @@
 <script lang="ts">
+	import { getEditorConfig, setEditorConfig } from '$lib/components/Blocks/Block/context';
+	import CodeBlock from '$lib/components/Blocks/CodeBlock.svelte';
 	import { DatabaseContext } from '$lib/db';
 	import { PostgreSQL } from '$lib/db/psql';
 	import type { PGlite } from '@electric-sql/pglite';
 	import { onMount } from 'svelte';
+
+	setEditorConfig();
 
 	let db: DatabaseContext<PGlite>;
 
@@ -37,53 +41,98 @@
 		try {
 			db = new DatabaseContext();
 			db.setStrategy(new PostgreSQL('SvelteDB', {}));
+
+			loadChinook()
 		} catch (e) {
 			result += (e instanceof Error ? e.message : 'Failed to initialize database') + '\n';
 		}
 	});
+
+	const editorConfig = getEditorConfig();
+
+	const updateLineNumbers = () => {
+		editorConfig.update((config) => ({
+			...config,
+			lineNumbers: !config.lineNumbers
+		}));
+	};
+
+	const updateHighlightWhitespace = () => {
+		editorConfig.update((config) => ({
+			...config,
+			highlightWhitespace: !config.highlightWhitespace
+		}));
+	};
+
+	const updateHighlightTrailingWhitespace = () => {
+		editorConfig.update((config) => ({
+			...config,
+			highlightTrailingWhitespace: !config.highlightTrailingWhitespace
+	}));
+};
 </script>
 
 <div class="m-36 min-h-screen">
 	<div class="flex flex-col">
 		<label for="query">Input:</label>
-		<textarea
-			id="query"
-			name="query"
-			rows={5}
-			cols={40}
-			placeholder="Enter query and see what happens..."
-			class="h-32"
-			bind:value={query}
-		></textarea>
+		<CodeBlock type="psql" bind:content={query} />
 	</div>
 	<div class="mt-8">
 		<p>Result:</p>
 		<div class="h-36 overflow-y-scroll whitespace-pre-wrap bg-gray-300">{result}</div>
 	</div>
-	<div class="mt-10 flex items-center justify-center gap-10">
+
+	<div class="mt-10">
+		<p>Database Settings</p>
+		<div class="flex items-center justify-center gap-10">
+			<button
+				class="cursor-pointer rounded border-none bg-cyan-700 px-4 py-2 text-white hover:bg-cyan-900"
+				onclick={() => initDB()}
+			>
+				Connect to DB
+			</button>
+			<button
+				class="cursor-pointer rounded border-none bg-cyan-700 px-4 py-2 text-white hover:bg-cyan-900"
+				onclick={() => loadChinook()}
+			>
+				Load Chinook
+			</button>
+			<button
+				class="cursor-pointer rounded border-none bg-cyan-700 px-4 py-2 text-white hover:bg-cyan-900"
+				onclick={() => runQuery()}
+			>
+				Run Query
+			</button>
+			<button
+				class="cursor-pointer rounded border-none bg-cyan-700 px-4 py-2 text-white hover:bg-cyan-900"
+				onclick={() => close()}
+			>
+				Close DB
+			</button>
+		</div>
+	</div>
+
+	<div class="mt-10">
+		<p>Code Editor Settings</p>
+		<div class="flex items-center justify-center gap-10">
+			<button
+			class="cursor-pointer rounded border-none bg-cyan-700 px-4 py-2 text-white hover:bg-cyan-900"
+			onclick={() => updateLineNumbers()}
+			>
+				{$editorConfig.lineNumbers ? 'Remove line numbers' : 'Add line numbers'}
+			</button>
 		<button
 			class="cursor-pointer rounded border-none bg-cyan-700 px-4 py-2 text-white hover:bg-cyan-900"
-			onclick={() => initDB()}
+			onclick={() => updateHighlightWhitespace()}
 		>
-			Connect to DB
+			{$editorConfig.highlightWhitespace ? 'Unhighlight Whitespace' : 'Highlight Whitespace'}
 		</button>
 		<button
 			class="cursor-pointer rounded border-none bg-cyan-700 px-4 py-2 text-white hover:bg-cyan-900"
-			onclick={() => loadChinook()}
+			onclick={() => updateHighlightTrailingWhitespace()}
 		>
-			Load Chinook
+			{$editorConfig.highlightTrailingWhitespace ? 'Unhighlight Trailing Whitespace' : 'Highlight Trailing Whitespace'}
 		</button>
-		<button
-			class="cursor-pointer rounded border-none bg-cyan-700 px-4 py-2 text-white hover:bg-cyan-900"
-			onclick={() => runQuery()}
-		>
-			Run Query
-		</button>
-		<button
-			class="cursor-pointer rounded border-none bg-cyan-700 px-4 py-2 text-white hover:bg-cyan-900"
-			onclick={() => close()}
-		>
-			Close DB
-		</button>
+		</div>
 	</div>
 </div>
