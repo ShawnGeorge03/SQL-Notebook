@@ -116,8 +116,15 @@
         }
     });
 
-
-
+    $effect(() => {
+        if (content !== view.state.doc.toString()) {
+            view.dispatch({
+                changes: {
+                    from: 0, to: view.state.doc.length, insert: content
+                }
+            })
+        }
+    });
 </script>
 
 {#if browser}
