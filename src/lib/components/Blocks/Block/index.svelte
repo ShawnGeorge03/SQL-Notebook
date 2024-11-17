@@ -55,7 +55,7 @@
         content = lines.join('');
      }, 100, true);
 
-    const BASE_EXTENSIONS = [
+    const extensions = [
         EditorView.updateListener.of(e => {
             if (e.docChanged) {
                 const lines: string[] = [];
@@ -95,7 +95,7 @@
             parent,
             state: EditorState.create({
                 doc: content,
-                extensions: [...BASE_EXTENSIONS]
+                extensions
             }),
         });
 
@@ -106,7 +106,7 @@
         if (view) {
 			view.dispatch({
 				effects: StateEffect.reconfigure.of([
-					...BASE_EXTENSIONS,
+					...extensions,
 					config.lineNumbers ? lineNumbers() : [],
                     config.highlightWhitespace ? highlightWhitespace() : [],
 					config.highlightTrailingWhitespace ? highlightTrailingWhitespace() : []
