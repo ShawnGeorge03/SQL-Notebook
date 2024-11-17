@@ -17,4 +17,7 @@
 
 </script>
 
-<Editor class={className} {content} {customExtensions} />
+<!-- The additional attributes of autocomplete, autocorrect, autocapitalize, and spellcheck
+are to ensure that Grammarly and others like it would not cause issue to this component
+Source: https://stackoverflow.com/questions/254712/disable-spell-checking-on-html-textfields   -->
+<Editor autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" class={className} {content} {customExtensions} />
