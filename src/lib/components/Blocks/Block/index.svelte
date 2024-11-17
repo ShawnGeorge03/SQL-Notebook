@@ -20,6 +20,7 @@
     import { EditorState, StateEffect, type Extension } from "@codemirror/state";
     import {
     	EditorView,
+    	ViewUpdate,
     	crosshairCursor,
     	drawSelection,
     	dropCursor,
@@ -31,7 +32,6 @@
     	rectangularSelection
     } from '@codemirror/view';
     import { getEditorConfig } from "./context";
-    import { debounce } from "./utils";
 
     export interface BaseBlockProps {
         content: string;
@@ -51,19 +51,14 @@
 
     let { class: className, content = $bindable(""), customExtensions = [] }: BlockProps = $props();
 
-    const updateContent = debounce((lines: string[]) => {
-        content = lines.join('');
-     }, 100, true);
-
     const extensions = [
-        EditorView.updateListener.of(e => {
+        EditorView.updateListener.of((e: ViewUpdate) => {
             if (e.docChanged) {
                 const lines: string[] = [];
 
-                for (const line of e.state.doc.iter())
-                    lines.push(line.toString());
+                for (const line of e.state.doc.iter()) lines.push(line.toString());
 
-                updateContent(lines);
+                content = lines.join('');
             }
         }),
         EditorView.lineWrapping,
