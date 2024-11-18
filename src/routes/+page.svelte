@@ -39,8 +39,6 @@
 		try {
 			db = new DatabaseContext();
 			db.setStrategy(new PostgreSQL('SvelteDB', {}));
-
-			loadChinook();
 		} catch (e) {
 			result += (e instanceof Error ? e.message : 'Failed to initialize database') + '\n';
 		}
