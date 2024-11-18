@@ -11,15 +11,6 @@
 		"format": "prettier --write .",
 		"lint": "prettier --check . && eslint ."
 	},
-	"dependencies": {
-		"@codemirror/autocomplete": "^6.18.3",
-		"@codemirror/commands": "^6.7.1",
-		"@codemirror/lang-sql": "^6.8.0",
-		"@codemirror/language": "^6.10.3",
-		"@codemirror/state": "^6.4.1",
-		"@codemirror/view": "^6.34.3",
-		"@electric-sql/pglite": "^0.2.12"
-	},
 	"devDependencies": {
 		"@sveltejs/adapter-auto": "^3.0.0",
 		"@sveltejs/kit": "^2.0.0",
