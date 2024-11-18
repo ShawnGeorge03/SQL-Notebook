@@ -12,4 +12,25 @@ export const editorConfig = writable<EditorConfig>({
 	highlightTrailingWhitespace: false
 });
 
+export const updateLineNumbers = () => {
+	editorConfig.update((config) => ({
+		...config,
+		lineNumbers: !config.lineNumbers
+	}));
+};
+
+export const updateHighlightWhitespace = () => {
+	editorConfig.update((config) => ({
+		...config,
+		highlightWhitespace: !config.highlightWhitespace
+	}));
+};
+
+export const updateHighlightTrailingWhitespace = () => {
+	editorConfig.update((config) => ({
+		...config,
+		highlightTrailingWhitespace: !config.highlightTrailingWhitespace
+	}));
+};
+
 export default editorConfig;

@@ -1,5 +1,5 @@
 <script lang="ts">
-	import editorConfig from '$lib/components/Blocks/Block/store';
+	import editorConfig, { updateHighlightTrailingWhitespace, updateHighlightWhitespace, updateLineNumbers } from '$lib/components/Blocks/Block/store';
 	import CodeBlock from '$lib/components/Blocks/CodeBlock.svelte';
 	import { DatabaseContext } from '$lib/db';
 	import { PostgreSQL } from '$lib/db/psql';
@@ -45,27 +45,6 @@
 			result += (e instanceof Error ? e.message : 'Failed to initialize database') + '\n';
 		}
 	});
-
-	const updateLineNumbers = () => {
-		editorConfig.update((config) => ({
-			...config,
-			lineNumbers: !config.lineNumbers
-		}));
-	};
-
-	const updateHighlightWhitespace = () => {
-		editorConfig.update((config) => ({
-			...config,
-			highlightWhitespace: !config.highlightWhitespace
-		}));
-	};
-
-	const updateHighlightTrailingWhitespace = () => {
-		editorConfig.update((config) => ({
-			...config,
-			highlightTrailingWhitespace: !config.highlightTrailingWhitespace
-		}));
-	};
 </script>
 
 <div class="m-36 min-h-screen">
