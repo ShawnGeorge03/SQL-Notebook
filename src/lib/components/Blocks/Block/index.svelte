@@ -31,7 +31,7 @@
 		lineNumbers,
 		rectangularSelection
 	} from '@codemirror/view';
-	import { getEditorConfig } from './context';
+	import editorConfig from './store';
 
 	export interface BaseBlockProps {
 		content: string;
@@ -47,7 +47,6 @@
 	let view: EditorView;
 	// svelte-ignore non_reactive_update
 	let parent: HTMLDivElement;
-	const editorConfig = getEditorConfig();
 
 	let { class: className, content = $bindable(''), customExtensions = [] }: BlockProps = $props();
 

@@ -1,12 +1,10 @@
 <script lang="ts">
-	import { getEditorConfig, setEditorConfig } from '$lib/components/Blocks/Block/context';
+	import editorConfig from '$lib/components/Blocks/Block/store';
 	import CodeBlock from '$lib/components/Blocks/CodeBlock.svelte';
 	import { DatabaseContext } from '$lib/db';
 	import { PostgreSQL } from '$lib/db/psql';
 	import type { PGlite } from '@electric-sql/pglite';
 	import { onMount } from 'svelte';
-
-	setEditorConfig();
 
 	let db: DatabaseContext<PGlite>;
 
@@ -47,8 +45,6 @@
 			result += (e instanceof Error ? e.message : 'Failed to initialize database') + '\n';
 		}
 	});
-
-	const editorConfig = getEditorConfig();
 
 	const updateLineNumbers = () => {
 		editorConfig.update((config) => ({
