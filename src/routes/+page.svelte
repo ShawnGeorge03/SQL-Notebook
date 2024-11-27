@@ -1,15 +1,20 @@
 <script lang="ts">
-	import editorConfig, { updateHighlightTrailingWhitespace, updateHighlightWhitespace, updateLineNumbers } from '$lib/components/Blocks/Block/store';
+	import editorConfig, {
+		updateHighlightTrailingWhitespace,
+		updateHighlightWhitespace,
+		updateLineNumbers
+	} from '$lib/components/Blocks/Block/store';
 	import CodeBlock from '$lib/components/Blocks/CodeBlock.svelte';
+	import TextBlock from '$lib/components/Blocks/TextBlock.svelte';
 	import { DatabaseContext } from '$lib/db';
 	import { PostgreSQL } from '$lib/db/psql';
-	import type { PGlite } from '@electric-sql/pglite';
 	import { onMount } from 'svelte';
+	import type { PGlite } from '@electric-sql/pglite';
 
 	let db: DatabaseContext<PGlite>;
-
 	let query = $state('');
 	let result = $state('');
+	let markdownContent = $state('');
 
 	const initDB = async () => {
 		await db.init();
@@ -46,6 +51,7 @@
 </script>
 
 <div class="m-36 min-h-screen">
+	<!-- CodeBlock Section for SQL Input -->
 	<div class="flex flex-col">
 		<label for="query">Input:</label>
 		<CodeBlock type="psql" bind:content={query} />
@@ -85,6 +91,12 @@
 		</div>
 	</div>
 
+	<!-- TextBlock Section for Markdown Input -->
+	<div class="mt-10">
+		<p>Markdown Content:</p>
+		<TextBlock class="markdown-editor" type="markdown" bind:content={markdownContent} />
+	</div>
+
 	<div class="mt-10">
 		<p>Code Editor Settings</p>
 		<div class="flex items-center justify-center gap-10">
@@ -111,3 +123,15 @@
 		</div>
 	</div>
 </div>
+
+<style>
+	.m-36 {
+		margin: 9rem;
+	}
+	.min-h-screen {
+		min-height: 100vh;
+	}
+	.bg-gray-300 {
+		background-color: #e2e8f0;
+	}
+</style>
