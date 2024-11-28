@@ -6,8 +6,8 @@ export type QueryResult = {
 	elapsed?: number;
 };
 
-export interface DatabaseStrategy<T> {
-	db: T;
+export interface DatabaseStrategy {
+	db: unknown;
 	dbName: string;
 
 	init(): Promise<void>;

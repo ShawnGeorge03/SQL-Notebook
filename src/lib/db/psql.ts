@@ -3,7 +3,7 @@ import { browser, dev } from '$app/environment';
 import { IdbFs, MemoryFS, PGlite, type PGliteOptions } from '@electric-sql/pglite';
 import type { DatabaseStrategy, DBOptions, QueryResult } from '.';
 
-export class PostgreSQL implements DatabaseStrategy<PGlite> {
+export class PostgreSQL implements DatabaseStrategy {
 	db!: PGlite;
 	dbName: string;
 	dbOptions: PGliteOptions;
