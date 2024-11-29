@@ -8,10 +8,10 @@ export class PostgreSQL implements DatabaseStrategy {
 	dbName: string;
 	dbOptions: PGliteOptions;
 
-	constructor(dbName: string, dbOptions: DBOptions) {
+	constructor(dbName: string, dbOptions: Omit<DBOptions, "engine" | "dbName">) {
 		this.dbName = dbName;
 		this.dbOptions = {
-			fs: dbOptions.presistent ? new IdbFs(this.dbName) : new MemoryFS()
+			fs: dbOptions.persistent ? new IdbFs(this.dbName) : new MemoryFS()
 		};
 	}
 
