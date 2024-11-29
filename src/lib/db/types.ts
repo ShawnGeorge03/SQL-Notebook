@@ -4,7 +4,7 @@ export type QueryResult = {
 	elapsed?: number;
 };
 
-export interface DatabaseStrategy {
+export interface DBStrategy {
 	db: unknown;
 	dbName: string;
 

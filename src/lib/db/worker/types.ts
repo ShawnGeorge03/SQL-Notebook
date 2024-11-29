@@ -1,6 +1,6 @@
 import type { DBOptions } from "../types";
 
-type DBManagerCommands =
+type DBWorkerCommands =
     | 'GET_ACTIVE_DBS'
     | 'GET_AVAILABLE_DBS'
     | 'CREATE_DB'
@@ -8,10 +8,10 @@ type DBManagerCommands =
     | 'EXEC_QUERY'
     | 'CLOSE_DB';
 
-type CommandWithoutArgs<C extends DBManagerCommands> = { command: C };
-type CommandWithArgs<C extends DBManagerCommands, A> = { command: C; args: A };
+type CommandWithoutArgs<C extends DBWorkerCommands> = { command: C };
+type CommandWithArgs<C extends DBWorkerCommands, A> = { command: C; args: A };
 
-export type DBManagerMessage =
+export type DBWorkerMessage =
     | CommandWithoutArgs<'GET_ACTIVE_DBS'>
     | CommandWithoutArgs<'GET_AVAILABLE_DBS'>
     | CommandWithArgs<'CREATE_DB', DBOptions>
@@ -19,7 +19,7 @@ export type DBManagerMessage =
     | CommandWithArgs<'EXEC_QUERY', { dbName: string; query: string }>
     | CommandWithArgs<'CLOSE_DB', { dbName: string }>;
 
-export type DBManagerResponse =
+export type DBWorkerResponse =
     | { status: 'SUCCESS'; command: 'GET_ACTIVE_DBS'; response: { activeDBs: string[] } }
     | { status: 'SUCCESS'; command: 'GET_AVAILABLE_DBS'; response: { availableDBs: string[] } }
     | { status: 'SUCCESS'; command: 'CREATE_DB'; response: { dbName: string } }
