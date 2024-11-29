@@ -1,15 +1,33 @@
 import { PostgreSQL } from '../engines/pgsql';
 import type { DBStrategy } from '../types';
 import type { DBWorkerMessage } from './types';
-import { getAvailableDBs, postError, postSuccess } from './utils';
+import { postError, postSuccess } from './utils';
 
 const activeDBs: Record<string, DBStrategy> = {};
 const availableDBs: Set<string> = new Set();
 
+const updateAvailableDBs = async (port: MessagePort) => {
+    try {
+        availableDBs.clear();
+        const databases = await indexedDB.databases()
+        for (const db of databases) {
+            if (db.name) {
+                const dbName = db.name.startsWith('/pglite/') ? db.name.slice(8) : db.name;
+                availableDBs.add(dbName);
+            }
+        }
+
+        postSuccess(port, 'GET_AVAILABLE_DBS', { availableDBs: Array.from(availableDBs) });
+    } catch (error) {
+        console.error('Failed to fetch Available DBs:', error);
+        postError(port, 'GET_AVAILABLE_DBS', "Failed to fetch Available DBs");
+    }
+}
+
 self.onconnect = async (event: MessageEvent) => {
     const port = event.ports[0];
 
-    await getAvailableDBs();
+    updateAvailableDBs(port);
 
     port.onmessage = async ({ data }: MessageEvent<DBWorkerMessage>) => {
         switch (data.command) {
@@ -18,12 +36,13 @@ self.onconnect = async (event: MessageEvent) => {
                 break;
             }
             case 'GET_AVAILABLE_DBS': {
-                await getAvailableDBs();
-                postSuccess(port, 'GET_AVAILABLE_DBS', { availableDBs: Array.from(availableDBs) });
+                updateAvailableDBs(port);
                 break;
             }
             case 'CREATE_DB': {
                 const { dbName, engine, persistent } = data.args;
+
+                updateAvailableDBs(port);
 
                 if (availableDBs.has(dbName)) {
                     postError(port, 'CREATE_DB', `Database with name "${dbName}" already exists.`);
@@ -40,8 +59,7 @@ self.onconnect = async (event: MessageEvent) => {
                     postSuccess(port, 'CREATE_DB', { dbName: dbName });
                 }
 
-                getAvailableDBs();
-                postSuccess(port, 'GET_AVAILABLE_DBS', { availableDBs: Array.from(availableDBs) });
+                updateAvailableDBs(port);
                 break;
             }
             case 'LOAD_DB': {
