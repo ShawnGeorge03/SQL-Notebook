@@ -1,19 +1,19 @@
 import { readable, type Readable } from "svelte/store";
-import type { DBWorkerMessage, DBWorkerResponse } from "./types";
+import type { DBWorkerMessages, DBWorkerResponses } from "./types";
 
 export class DBWorkerService {
     static #instance: DBWorkerService;
     #worker: SharedWorker;
     #port: MessagePort;
 
-    responses: Readable<DBWorkerResponse>;
+    responses: Readable<DBWorkerResponses>;
 
     private constructor() {
         this.#worker = new SharedWorker(new URL('$lib/db/worker/index.ts', import.meta.url), { type: 'module' });
         this.#port = this.#worker.port;
 
-        this.responses = readable<DBWorkerResponse>({ status: "INITIALIZING" }, (set) => {
-            this.#port.onmessage = (event: MessageEvent<DBWorkerResponse>) => {
+        this.responses = readable<DBWorkerResponses>({ status: "INITIALIZING", command: undefined }, (set) => {
+            this.#port.onmessage = (event: MessageEvent<DBWorkerResponses>) => {
                 set(event.data);
             }
         })
@@ -33,7 +33,7 @@ export class DBWorkerService {
         return DBWorkerService.#instance;
     }
 
-    sendMessage(message: DBWorkerMessage) {
+    sendMessage(message: DBWorkerMessages) {
         this.#port.postMessage(message);
     }
 

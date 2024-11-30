@@ -25,7 +25,7 @@ type Message<C extends DBWorkerCommands, R = undefined> =
     : { command: C; args: R };
 
 // Comprehensive worker message type
-export type DBWorkerMessage =
+export type DBWorkerMessages =
     | Message<'GET_ACTIVE_DBS'>
     | Message<'GET_AVAILABLE_DBS'>
     | Message<'CREATE_DB', DBOptions>
@@ -48,10 +48,10 @@ type SuccessResponse<C extends keyof SuccessResponseData> = {
     data: SuccessResponseData[C];
 };
 
-export type DBWorkerResponse =
-    | { status: 'INITIALIZING' }
-    | { status: 'INITIALIZED' }
-    | { status: 'LOADING'; command?: DBWorkerCommands }
+export type DBWorkerResponses =
+    | { status: 'INITIALIZING', command: undefined }
+    | { status: 'INITIALIZED', command: undefined }
+    | { status: 'LOADING', command?: DBWorkerCommands }
     | SuccessResponse<'GET_ACTIVE_DBS'>
     | SuccessResponse<'GET_AVAILABLE_DBS'>
     | SuccessResponse<'CREATE_DB'>

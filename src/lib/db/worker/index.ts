@@ -1,6 +1,6 @@
 import { PostgreSQL } from '../engines/pgsql';
 import type { DBStrategy } from '../engines/types';
-import type { DBWorkerMessage } from './types';
+import type { DBWorkerMessages } from './types';
 import { postError, postStatus, postSuccess } from './utils';
 
 const activeDBs: Record<string, DBStrategy> = {};
@@ -31,7 +31,7 @@ self.onconnect = async (event: MessageEvent) => {
     await updateAvailableDBs(port);
     postStatus(port, "INITIALIZED");
 
-    port.onmessage = async ({ data }: MessageEvent<DBWorkerMessage>) => {
+    port.onmessage = async ({ data }: MessageEvent<DBWorkerMessages>) => {
         switch (data.command) {
             case 'GET_ACTIVE_DBS': {
                 postSuccess(port, 'GET_ACTIVE_DBS', { activeDBs: Object.keys(activeDBs) });
