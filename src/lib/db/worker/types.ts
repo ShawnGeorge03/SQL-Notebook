@@ -1,7 +1,9 @@
 import type { QueryResult } from "../engines/types";
 
+export type DBEngine = "pgsql" | "sqlite" | "duckdb";
+
 type DBOptions = {
-    engine: 'pgsql' | 'sqlite' | 'duckdb';
+    engine: DBEngine;
     dbName: string;
     persistent: boolean;
 };
