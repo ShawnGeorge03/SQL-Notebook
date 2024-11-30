@@ -1,6 +1,17 @@
-import type { DBOptions } from "../types";
+import type { QueryResult } from "../engines/types";
 
-type DBWorkerCommands =
+type DBOptions = {
+    engine: 'pgsql' | 'sqlite' | 'duckdb';
+    dbName: string;
+    persistent: boolean;
+};
+
+export type DBWorkerStatus =
+    | 'INITIALIZING'
+    | 'INITIALIZED'
+    | 'LOADING';
+
+export type DBWorkerCommands =
     | 'GET_ACTIVE_DBS'
     | 'GET_AVAILABLE_DBS'
     | 'CREATE_DB'
@@ -8,33 +19,50 @@ type DBWorkerCommands =
     | 'EXEC_QUERY'
     | 'CLOSE_DB';
 
-type CommandWithoutArgs<C extends DBWorkerCommands> = { command: C };
-type CommandWithArgs<C extends DBWorkerCommands, A> = { command: C; args: A };
+type Message<C extends DBWorkerCommands, R = undefined> =
+    R extends undefined
+    ? { command: C }
+    : { command: C; args: R };
 
+// Comprehensive worker message type
 export type DBWorkerMessage =
-    | CommandWithoutArgs<'GET_ACTIVE_DBS'>
-    | CommandWithoutArgs<'GET_AVAILABLE_DBS'>
-    | CommandWithArgs<'CREATE_DB', DBOptions>
-    | CommandWithArgs<'LOAD_DB', DBOptions>
-    | CommandWithArgs<'EXEC_QUERY', { dbName: string; query: string }>
-    | CommandWithArgs<'CLOSE_DB', { dbName: string }>;
+    | Message<'GET_ACTIVE_DBS'>
+    | Message<'GET_AVAILABLE_DBS'>
+    | Message<'CREATE_DB', DBOptions>
+    | Message<'LOAD_DB', DBOptions>
+    | Message<'EXEC_QUERY', { dbName: string; query: string }>
+    | Message<'CLOSE_DB', { dbName: string }>;
 
-type SuccessResponse<C extends DBWorkerCommands, R> = {
+export type SuccessResponseData = {
+    'GET_ACTIVE_DBS': { activeDBs: string[] };
+    'GET_AVAILABLE_DBS': { availableDBs: string[] };
+    'CREATE_DB': { dbName: string };
+    'LOAD_DB': { dbName: string };
+    'EXEC_QUERY': QueryResult
+    'CLOSE_DB': { dbName: string };
+};
+
+type SuccessResponse<C extends keyof SuccessResponseData> = {
     status: 'SUCCESS';
     command: C;
-    response: R;
+    data: SuccessResponseData[C];
 };
 
 export type DBWorkerResponse =
-    | { status: 'READY' }
-    | { status: 'LOADING'; command: DBWorkerCommands }
-    | SuccessResponse<'GET_ACTIVE_DBS', { activeDBs: string[] }>
-    | SuccessResponse<'GET_AVAILABLE_DBS', { availableDBs: string[] }>
-    | SuccessResponse<'CREATE_DB', { dbName: string }>
-    | SuccessResponse<'LOAD_DB', { dbName: string }>
-    | SuccessResponse<'CLOSE_DB', { dbName: string }>
+    | { status: 'INITIALIZING' }
+    | { status: 'INITIALIZED' }
+    | { status: 'LOADING'; command?: DBWorkerCommands }
+    | SuccessResponse<'GET_ACTIVE_DBS'>
+    | SuccessResponse<'GET_AVAILABLE_DBS'>
+    | SuccessResponse<'CREATE_DB'>
+    | SuccessResponse<'LOAD_DB'>
+    | SuccessResponse<'EXEC_QUERY'>
+    | SuccessResponse<'CLOSE_DB'>
     | {
         status: 'ERROR';
         command: DBWorkerCommands;
-        response: string;
+        data: {
+            message: string;
+            cause?: unknown;
+        };
     };
