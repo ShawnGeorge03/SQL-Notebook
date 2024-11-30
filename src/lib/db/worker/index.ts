@@ -1,5 +1,5 @@
 import { PostgreSQL } from '../engines/pgsql';
-import type { DBStrategy } from '../types';
+import type { DBStrategy } from '../engines/types';
 import type { DBWorkerMessage } from './types';
 import { postError, postSuccess } from './utils';
 
