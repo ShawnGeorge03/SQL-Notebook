@@ -1,22 +1,28 @@
 <script lang="ts">
-	import { dbWorkerMessagesStore, dbWorkerResponsesStore } from '$lib/db/worker/store';
+	import { DBWorkerService } from "$lib/db/worker/service";
+	import { onMount } from "svelte";
+
+	let dbWorkerService = DBWorkerService.getInstance();
 
 	let availableDBs: string[] = $state([]);
 	let loading: boolean = $state(true);
 
-	const unsubscribe = dbWorkerResponsesStore.subscribe((event) => {
-		if (event.status === 'LOADING' && event.command === 'GET_AVAILABLE_DBS') {
-			loading = true;
-		} else if (event.status === 'READY') {
+	const getAvailableDBs = () => dbWorkerService.sendMessage({ command: 'GET_AVAILABLE_DBS' });
+
+	const unsubscribe = dbWorkerService.responses.subscribe(response => {
+		loading = response.status === 'LOADING' && response.command === 'GET_AVAILABLE_DBS'
+		if (response.status === 'SUCCESS' && response.command === 'GET_AVAILABLE_DBS') {
 			loading = false;
-		} else if (event.status === 'SUCCESS' && event.command === 'GET_AVAILABLE_DBS') {
-			availableDBs = event.response.availableDBs;
-		} else if (event.status === 'ERROR' && event.command === 'GET_AVAILABLE_DBS') {
-			console.error(event.response);
+			availableDBs = response.data.availableDBs;
+		} else if (response.status === 'ERROR' && response.command === 'GET_AVAILABLE_DBS') {
+			console.error(response.data)
 		}
 	});
 
-	const getAvailableDBs = () => dbWorkerMessagesStore.set({ command: 'GET_AVAILABLE_DBS' });
+	onMount(() => {
+		getAvailableDBs()
+	});
+
 
 	() => unsubscribe();
 </script>

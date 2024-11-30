@@ -1,6 +1,6 @@
 <script lang="ts">
+	import AvailableDBs from '$lib/components/AvailableDBs.svelte';
 	import { DBWorkerService } from '$lib/db/worker/service';
-	import type { DBWorkerResponse } from '$lib/db/worker/types';
 
 	import { onMount } from 'svelte';
 
@@ -12,7 +12,7 @@
 		try {
 			dbWorkerService = DBWorkerService.getInstance();
 
-			const unsubscribe = dbWorkerService.responses.subscribe((response: DBWorkerResponse) => {
+			const unsubscribe = dbWorkerService.responses.subscribe(response => {
 				if (response.status === 'INITIALIZING') {
 					loading = true;
 				} else if (response.status === 'INITIALIZED') {
@@ -35,5 +35,9 @@
 		<p>Loading Notebook</p>
 	{:else}
 		<h1 class="mb-6 text-center text-2xl font-bold">Database Manager</h1>
+
+		<div class="grid grid-cols-2 gap-4">
+			<AvailableDBs />
+		</div>
 	{/if}
 </div>
