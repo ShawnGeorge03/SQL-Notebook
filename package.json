@@ -28,7 +28,6 @@
 		"@tailwindcss/typography": "^0.5.15",
 		"@types/eslint": "^9.6.0",
 		"@types/sharedworker": "^0.0.135",
-		"@vercel/speed-insights": "^1.1.0",
 		"autoprefixer": "^10.4.20",
 		"eslint": "^9.7.0",
 		"eslint-config-prettier": "^9.1.0",
