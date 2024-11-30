@@ -28,6 +28,7 @@ self.onconnect = async (event: MessageEvent) => {
     const port = event.ports[0];
 
     updateAvailableDBs(port);
+    port.postMessage({ status: "READY" })
 
     port.onmessage = async ({ data }: MessageEvent<DBWorkerMessage>) => {
         switch (data.command) {
