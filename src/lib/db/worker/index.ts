@@ -27,8 +27,6 @@ const updateAvailableDBs = async (port: MessagePort) => {
 self.onconnect = async (event: MessageEvent) => {
     const port = event.ports[0];
 
-    postStatus(port, "INITIALIZING");
-    await updateAvailableDBs(port);
     postStatus(port, "INITIALIZED");
 
     port.onmessage = async ({ data }: MessageEvent<DBWorkerMessages>) => {
