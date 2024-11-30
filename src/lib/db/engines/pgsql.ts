@@ -1,14 +1,14 @@
 import { browser, dev } from '$app/environment';
 
 import { IdbFs, MemoryFS, PGlite, type PGliteOptions } from '@electric-sql/pglite';
-import type { DatabaseStrategy, DBOptions, QueryResult } from '../types';
+import type { DBEngineOptions, DBStrategy, QueryResult } from './types';
 
-export class PostgreSQL implements DatabaseStrategy {
+export class PostgreSQL implements DBStrategy {
 	db!: PGlite;
 	dbName: string;
 	dbOptions: PGliteOptions;
 
-	constructor(dbName: string, dbOptions: Omit<DBOptions, "engine" | "dbName">) {
+	constructor(dbName: string, dbOptions: DBEngineOptions) {
 		this.dbName = dbName;
 		this.dbOptions = {
 			fs: dbOptions.persistent ? new IdbFs(this.dbName) : new MemoryFS()
