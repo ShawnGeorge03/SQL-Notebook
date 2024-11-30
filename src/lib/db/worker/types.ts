@@ -19,10 +19,22 @@ export type DBWorkerMessage =
     | CommandWithArgs<'EXEC_QUERY', { dbName: string; query: string }>
     | CommandWithArgs<'CLOSE_DB', { dbName: string }>;
 
+type SuccessResponse<C extends DBWorkerCommands, R> = {
+    status: 'SUCCESS';
+    command: C;
+    response: R;
+};
+
 export type DBWorkerResponse =
-    | { status: 'SUCCESS'; command: 'GET_ACTIVE_DBS'; response: { activeDBs: string[] } }
-    | { status: 'SUCCESS'; command: 'GET_AVAILABLE_DBS'; response: { availableDBs: string[] } }
-    | { status: 'SUCCESS'; command: 'CREATE_DB'; response: { dbName: string } }
-    | { status: 'SUCCESS'; command: 'LOAD_DB'; response: { dbName: string } }
-    | { status: 'SUCCESS'; command: 'CLOSE_DB'; response: { dbName: string } }
-    | { status: 'ERROR'; command: string; response: string };
+    | { status: 'READY' }
+    | { status: 'LOADING'; command: DBWorkerCommands }
+    | SuccessResponse<'GET_ACTIVE_DBS', { activeDBs: string[] }>
+    | SuccessResponse<'GET_AVAILABLE_DBS', { availableDBs: string[] }>
+    | SuccessResponse<'CREATE_DB', { dbName: string }>
+    | SuccessResponse<'LOAD_DB', { dbName: string }>
+    | SuccessResponse<'CLOSE_DB', { dbName: string }>
+    | {
+        status: 'ERROR';
+        command: DBWorkerCommands;
+        response: string;
+    };
