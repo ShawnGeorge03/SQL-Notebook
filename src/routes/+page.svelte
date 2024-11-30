@@ -1,4 +1,5 @@
 <script lang="ts">
+	import ActiveDBs from '$lib/components/ActiveDBs.svelte';
 	import AvailableDBs from '$lib/components/AvailableDBs.svelte';
 	import { DBWorkerService } from '$lib/db/worker/service';
 
@@ -38,6 +39,7 @@
 
 		<div class="grid grid-cols-2 gap-4">
 			<AvailableDBs />
+			<ActiveDBs />
 		</div>
 	{/if}
 </div>
