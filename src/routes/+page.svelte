@@ -1,4 +1,5 @@
 <script lang="ts">
+	import AvailableDBs from '$lib/components/AvailableDBs.svelte';
 	import { dbWorkerMessagesStore, dbWorkerResponsesStore } from '$lib/db/worker/store';
 	import type { DBWorkerResponse } from '$lib/db/worker/types';
 
@@ -44,6 +45,9 @@
 	{:else}
 		<h1 class="mb-6 text-center text-2xl font-bold">Database Manager</h1>
 
+		<div class="grid grid-cols-2 gap-4">
+			<AvailableDBs />
+		</div>
 
 	{/if}
 </div>
