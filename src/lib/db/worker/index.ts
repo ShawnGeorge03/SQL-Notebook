@@ -27,7 +27,7 @@ const updateAvailableDBs = async (port: MessagePort) => {
 self.onconnect = async (event: MessageEvent) => {
     const port = event.ports[0];
 
-    updateAvailableDBs(port);
+    await updateAvailableDBs(port);
     port.postMessage({ status: "READY" })
 
     port.onmessage = async ({ data }: MessageEvent<DBWorkerMessage>) => {
@@ -37,13 +37,13 @@ self.onconnect = async (event: MessageEvent) => {
                 break;
             }
             case 'GET_AVAILABLE_DBS': {
-                updateAvailableDBs(port);
+                await updateAvailableDBs(port);
                 break;
             }
             case 'CREATE_DB': {
                 const { dbName, engine, persistent } = data.args;
 
-                updateAvailableDBs(port);
+                await updateAvailableDBs(port);
 
                 if (availableDBs.has(dbName)) {
                     postError(port, 'CREATE_DB', `Database with name "${dbName}" already exists.`);
@@ -60,7 +60,7 @@ self.onconnect = async (event: MessageEvent) => {
                     postSuccess(port, 'CREATE_DB', { dbName: dbName });
                 }
 
-                updateAvailableDBs(port);
+                await updateAvailableDBs(port);
                 break;
             }
             case 'LOAD_DB': {
