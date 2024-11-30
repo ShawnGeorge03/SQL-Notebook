@@ -19,7 +19,7 @@ export class DBWorkerService {
         })
 
         this.#port.onmessageerror = (event: MessageEvent) => {
-            console.log('DBWorkerService: ', event.data);
+            console.error('DBWorkerService: ', event.data);
         };
 
         this.#port.start();
