@@ -101,7 +101,7 @@ self.onconnect = async (event: MessageEvent) => {
 
                 const db = activeDBs[dbName];
                 const results = await db.exec(query);
-                postSuccess(port, 'EXEC_QUERY', { results });
+                postSuccess(port, 'EXEC_QUERY', results);
                 break;
             }
             case 'CLOSE_DB': {
