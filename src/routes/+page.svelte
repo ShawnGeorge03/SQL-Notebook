@@ -1,6 +1,7 @@
 <script lang="ts">
 	import ActiveDBs from '$lib/components/ActiveDBs.svelte';
 	import AvailableDBs from '$lib/components/AvailableDBs.svelte';
+	import CreateDB from '$lib/components/CreateDB.svelte';
 	import { DBWorkerService } from '$lib/db/worker/service';
 
 	import { onMount } from 'svelte';
@@ -40,6 +41,7 @@
 		<div class="grid grid-cols-2 gap-4">
 			<AvailableDBs />
 			<ActiveDBs />
+			<CreateDB />
 		</div>
 	{/if}
 </div>
