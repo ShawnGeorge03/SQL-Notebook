@@ -53,13 +53,17 @@ self.onconnect = async (event: MessageEvent) => {
                     const db = new PostgreSQL(dbName, { persistent });
                     await db.init();
 
-                    if (persistent) await db.close().then(() => availableDBs.add(dbName));
-                    else activeDBs[dbName] = db;
+                    if (persistent) {
+                        await db.close().then(() => availableDBs.add(dbName));
+                        await updateAvailableDBs(port);
+                    } else {
+                        activeDBs[dbName] = db;
+                        postSuccess(port, 'GET_ACTIVE_DBS', { activeDBs: Object.keys(activeDBs) });
+                    }
 
                     postSuccess(port, 'CREATE_DB', { dbName: dbName });
                 }
 
-                await updateAvailableDBs(port);
                 break;
             }
             case 'LOAD_DB': {
