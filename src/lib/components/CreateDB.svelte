@@ -29,17 +29,18 @@
     };
 
 	const unsubscribe = dbWorkerService.responses.subscribe(response => {
+        engine = undefined;
+        dbName = "";
+        persistent = false;
+        disabled = false;
 		loading = response.status === 'LOADING' && response.command === 'CREATE_DB'
-		if (response.status === 'SUCCESS' && response.command === 'CREATE_DB') {
+
+        if (response.status === 'SUCCESS' && response.command === 'CREATE_DB') {
 			loading = false;
-            engine = undefined;
-            dbName = "";
-            persistent = true;
-            disabled = false;
             message = "Created DB: " + response.data.dbName
 		} else if (response.status === 'ERROR' && response.command === 'CREATE_DB') {
 			console.error(response.data)
-            message = response.data.message;
+            message = response.data.message + " " + (response.data.cause && response.data.cause);
 		}
 	});
 
