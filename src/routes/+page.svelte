@@ -1,15 +1,41 @@
 <script lang="ts">
-	import editorConfig, { updateHighlightTrailingWhitespace, updateHighlightWhitespace, updateLineNumbers } from '$lib/components/Blocks/Block/store';
+	import editorConfig, {
+		updateHighlightTrailingWhitespace,
+		updateHighlightWhitespace,
+		updateLineNumbers
+	} from '$lib/components/Blocks/Block/store';
 	import CodeBlock from '$lib/components/Blocks/CodeBlock.svelte';
+	import ChartBlock from '$lib/components/Blocks/ChartBlock.svelte';
 	import { DatabaseContext } from '$lib/db';
 	import { PostgreSQL } from '$lib/db/psql';
 	import type { PGlite } from '@electric-sql/pglite';
+	import { writable } from 'svelte/store';
 	import { onMount } from 'svelte';
 
 	let db: DatabaseContext<PGlite>;
 
 	let query = $state('');
 	let result = $state('');
+
+	let chartOptions = writable({
+		title: {
+			text: 'Example Chart'
+		},
+		tooltip: {},
+		xAxis: {
+			type: 'category' as const,
+			data: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun']
+		},
+		yAxis: {
+			type: 'value' as const
+		},
+		series: [
+			{
+				data: [150, 230, 224, 218, 135, 147, 260],
+				type: 'line' as const
+			}
+		]
+	});
 
 	const initDB = async () => {
 		await db.init();
@@ -82,6 +108,14 @@
 			>
 				Close DB
 			</button>
+		</div>
+	</div>
+
+	<!-- ChartBlock Section for Chart Display -->
+	<div class="mt-10">
+		<p>Chart Content:</p>
+		<div class="flex items-center gap-4">
+			<ChartBlock class="chart-editor" content={''} chartOptions={$chartOptions} />
 		</div>
 	</div>
 
