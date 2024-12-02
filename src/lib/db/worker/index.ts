@@ -1,3 +1,4 @@
+import { iDbName, sqlNoteDB } from '$lib/data/schema';
 import { PostgreSQL } from '../engines/pgsql';
 import type { DBStrategy } from '../engines/types';
 import type { DBWorkerMessages } from './types';
@@ -10,12 +11,23 @@ const updateAvailableDBs = async (port: MessagePort) => {
     try {
         availableDBs.clear();
         const databases = await indexedDB.databases()
+
         for (const db of databases) {
             if (db.name) {
                 const dbName = db.name.startsWith('/pglite/') ? db.name.slice(8) : db.name;
                 availableDBs.add(dbName);
             }
         }
+
+        availableDBs.delete(iDbName);
+        await sqlNoteDB.transaction('readonly', sqlNoteDB.databases, async () => {
+            const inMemoryDBs = await sqlNoteDB.databases.filter(database => !database.persistent).toArray();
+            inMemoryDBs.forEach(database => availableDBs.add(database.name));
+        })
+        await sqlNoteDB.transaction('rw', sqlNoteDB.databases, async () => {
+            const unavailableDBs = await sqlNoteDB.databases.filter((database) => !availableDBs.has(database.name))
+            await unavailableDBs.delete()
+        })
 
         postSuccess(port, 'GET_AVAILABLE_DBS', { availableDBs: Array.from(availableDBs) });
     } catch (error) {
@@ -42,6 +54,11 @@ self.onconnect = async (event: MessageEvent) => {
             case 'CREATE_DB': {
                 const { dbName, engine, persistent } = data.args;
 
+                if (dbName === iDbName) {
+                    postError(port, "CREATE_DB", `Datebase with name "${dbName}" is not allowed.`, "Used by SQL Note.");
+                    break;
+                }
+
                 await updateAvailableDBs(port);
 
                 if (availableDBs.has(dbName)) {
@@ -49,21 +66,35 @@ self.onconnect = async (event: MessageEvent) => {
                     break;
                 }
 
+                let db: DBStrategy;
+
                 if (engine === 'pgsql') {
-                    const db = new PostgreSQL(dbName, { persistent });
-                    await db.init();
-
-                    if (persistent) {
-                        await db.close().then(() => availableDBs.add(dbName));
-                        await updateAvailableDBs(port);
-                    } else {
-                        activeDBs[dbName] = db;
-                        postSuccess(port, 'GET_ACTIVE_DBS', { activeDBs: Object.keys(activeDBs) });
-                    }
-
-                    postSuccess(port, 'CREATE_DB', { dbName: dbName });
+                    db = new PostgreSQL(dbName, { persistent });
+                } else {
+                    postError(port, 'CREATE_DB', `Unknown Database Engine: ${engine}`)
+                    break;
                 }
 
+                await db.init();
+
+                await sqlNoteDB.databases.add({
+                    name: dbName,
+                    persistent,
+                    createdOn: new Date().toLocaleString(),
+                    lastUsedOn: new Date().toLocaleString(),
+                    engine,
+                    system: engine === 'pgsql' ? 'pglite' : engine === 'sqlite' ? 'wa-sqlite' : 'duckdb-wasm',
+                });
+
+                if (persistent) {
+                    await db.close();
+                    await updateAvailableDBs(port);
+                } else {
+                    activeDBs[dbName] = db;
+                    postSuccess(port, 'GET_ACTIVE_DBS', { activeDBs: Object.keys(activeDBs) });
+                }
+
+                postSuccess(port, 'CREATE_DB', { dbName: dbName });
                 break;
             }
             case 'LOAD_DB': {
