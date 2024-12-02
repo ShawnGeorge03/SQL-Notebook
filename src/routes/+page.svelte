@@ -15,11 +15,7 @@
 			dbWorkerService = DBWorkerService.getInstance();
 
 			const unsubscribe = dbWorkerService.responses.subscribe(response => {
-				if (response.status === 'INITIALIZING') {
-					loading = true;
-				} else if (response.status === 'INITIALIZED') {
-					loading = false;
-				}
+				loading = response.status === 'INITIALIZING'
 			});
 
 			return () => {
