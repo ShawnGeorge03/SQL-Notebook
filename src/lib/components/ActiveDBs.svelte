@@ -37,8 +37,6 @@
 				{#each activeDBs as db}
 					<li>{db}</li>
 				{/each}
-			{:else}
-				<li>No active databases</li>
 			{/if}
 		</ul>
 		<button
