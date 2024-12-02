@@ -2,12 +2,6 @@ import type { QueryResult } from "../engines/types";
 
 export type DBEngine = "pgsql" | "sqlite" | "duckdb";
 
-type DBOptions = {
-    engine: DBEngine;
-    dbName: string;
-    persistent: boolean;
-};
-
 export type DBWorkerStatus =
     | 'INITIALIZING'
     | 'INITIALIZED'
@@ -30,8 +24,8 @@ type Message<C extends DBWorkerCommands, R = undefined> =
 export type DBWorkerMessages =
     | Message<'GET_ACTIVE_DBS'>
     | Message<'GET_AVAILABLE_DBS'>
-    | Message<'CREATE_DB', DBOptions>
-    | Message<'LOAD_DB', DBOptions>
+    | Message<'CREATE_DB', { engine: DBEngine; dbName: string; persistent: boolean; }>
+    | Message<'LOAD_DB', { dbName: string }>
     | Message<'EXEC_QUERY', { dbName: string; query: string }>
     | Message<'CLOSE_DB', { dbName: string }>;
 
