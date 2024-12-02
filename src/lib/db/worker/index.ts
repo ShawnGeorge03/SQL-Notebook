@@ -105,30 +105,40 @@ self.onconnect = async (event: MessageEvent) => {
                 break;
             }
             case 'LOAD_DB': {
-                const { dbName, engine, persistent } = data.args;
-
-                if (!persistent) {
-                    postError(
-                        port,
-                        'LOAD_DB',
-                        `Database with name "${dbName}" should be initialized with createDB`
-                    );
-                    break;
-                }
+                const { dbName } = data.args;
 
                 if (dbName in activeDBs) {
-                    postError(port, 'LOAD_DB', `Database with name "${dbName}" is already in use.`);
+                    postError(port, 'LOAD_DB', `Database "${dbName}" is already in use.`);
                     break;
                 }
 
-                if (engine === 'pgsql') {
-                    const db = new PostgreSQL(dbName, { persistent: persistent });
-                    await db.init().then(() => {
-                        activeDBs[dbName] = db;
-                        postSuccess(port, 'LOAD_DB', { dbName });
-                        postSuccess(port, 'GET_ACTIVE_DBS', { activeDBs: Object.keys(activeDBs) });
-                    });
+                await updateAvailableDBs(port);
+                const config = await sqlNoteDB.databases.get(dbName);
+
+                if (!availableDBs.has(dbName) || !config) {
+                    postError(port, 'LOAD_DB', `Database with name "${dbName}" does not exist.`);
+                    break;
                 }
+
+                let db: DBStrategy;
+
+                if (config.engine === 'pgsql') {
+                    db = new PostgreSQL(dbName, { persistent: config.persistent });
+                } else {
+                    postError(port, 'LOAD_DB', `Unknown Database Engine: ${config.engine}`)
+                    break;
+                }
+
+                await db.init().then(() => {
+                    activeDBs[dbName] = db;
+                    postSuccess(port, 'GET_ACTIVE_DBS', { activeDBs: Object.keys(activeDBs) });
+                });
+
+                await updateAvailableDBs(port);
+
+                postSuccess(port, 'LOAD_DB', { dbName });
+
+                await sqlNoteDB.databases.update(dbName, { lastUsedOn: new Date().toLocaleString() });
 
                 break;
             }
