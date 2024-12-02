@@ -2,6 +2,7 @@
 	import ActiveDBs from '$lib/components/ActiveDBs.svelte';
 	import AvailableDBs from '$lib/components/AvailableDBs.svelte';
 	import CreateDB from '$lib/components/CreateDB.svelte';
+	import LoadDB from '$lib/components/LoadDB.svelte';
 	import { DBWorkerService } from '$lib/db/worker/service';
 
 	import { onMount } from 'svelte';
@@ -38,6 +39,7 @@
 			<AvailableDBs />
 			<ActiveDBs />
 			<CreateDB />
+			<LoadDB />
 		</div>
 	{/if}
 </div>
