@@ -10,31 +10,38 @@ const availableDBs: Set<string> = new Set();
 const updateAvailableDBs = async (port: MessagePort) => {
     try {
         availableDBs.clear();
-        const databases = await indexedDB.databases()
 
-        for (const db of databases) {
+        const databases = await indexedDB.databases();
+        databases.forEach(db => {
             if (db.name) {
                 const dbName = db.name.startsWith('/pglite/') ? db.name.slice(8) : db.name;
                 availableDBs.add(dbName);
             }
-        }
+        });
 
-        availableDBs.delete(iDbName);
-        await sqlNoteDB.transaction('readonly', sqlNoteDB.databases, async () => {
-            const inMemoryDBs = await sqlNoteDB.databases.filter(database => !database.persistent).toArray();
+        await sqlNoteDB.transaction('r', sqlNoteDB.databases, async () => {
+            const inMemoryDBs = await sqlNoteDB.databases
+                .filter(database => !database.persistent)
+                .toArray();
             inMemoryDBs.forEach(database => availableDBs.add(database.name));
-        })
-        await sqlNoteDB.transaction('rw', sqlNoteDB.databases, async () => {
-            const unavailableDBs = await sqlNoteDB.databases.filter((database) => !availableDBs.has(database.name))
-            await unavailableDBs.delete()
-        })
+        });
 
+        for (const dbName of Object.keys(activeDBs)) availableDBs.delete(dbName);
+        availableDBs.delete(iDbName);
+
+        await sqlNoteDB.transaction('rw', sqlNoteDB.databases, async () => {
+            const staleDBs = await sqlNoteDB.databases
+                .filter(database => !availableDBs.has(database.name));
+            staleDBs.delete();
+        });
+
+        // Post success response with the list of available databases
         postSuccess(port, 'GET_AVAILABLE_DBS', { availableDBs: Array.from(availableDBs) });
     } catch (error) {
         console.error('Failed to fetch Available DBs:', error);
         postError(port, 'GET_AVAILABLE_DBS', "Failed to fetch Available DBs");
     }
-}
+};
 
 self.onconnect = async (event: MessageEvent) => {
     const port = event.ports[0];
