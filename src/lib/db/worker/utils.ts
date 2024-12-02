@@ -1,7 +1,7 @@
-// utils.ts
 import type {
-	DBWorkerCommands,
+	DBWorkerCommand,
 	DBWorkerStatus,
+	ErrorResponseData,
 	SuccessResponseData
 } from "./types";
 
@@ -9,9 +9,9 @@ import type {
 export const postStatus = (
 	port: MessagePort,
 	status: DBWorkerStatus,
-	command?: DBWorkerCommands,
+	command?: DBWorkerCommand,
 ) => {
-	port.postMessage({ status, command });
+	port.postMessage(command ? { status, command } : { status });
 };
 
 // Post a success message with type-safe response data
@@ -28,18 +28,14 @@ export const postSuccess = <C extends keyof SuccessResponseData>(
 };
 
 // Post an error message with detailed error information
-export const postError = (
+export const postError = <C extends keyof ErrorResponseData>(
 	port: MessagePort,
-	command: DBWorkerCommands,
-	message: string,
-	cause?: unknown
+	command: C,
+	data: ErrorResponseData[C]
 ) => {
 	port.postMessage({
 		status: 'ERROR',
 		command,
-		data: {
-			message,
-			cause
-		}
+		data
 	});
 };

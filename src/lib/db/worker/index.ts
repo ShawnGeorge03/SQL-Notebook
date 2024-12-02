@@ -12,7 +12,7 @@ const updateAvailableDBs = async (port: MessagePort) => {
         availableDBs.clear();
 
         const databases = await indexedDB.databases();
-        databases.forEach(db => {
+        databases.forEach((db) => {
             if (db.name) {
                 const dbName = db.name.startsWith('/pglite/') ? db.name.slice(8) : db.name;
                 availableDBs.add(dbName);
@@ -21,32 +21,37 @@ const updateAvailableDBs = async (port: MessagePort) => {
 
         await sqlNoteDB.transaction('r', sqlNoteDB.databases, async () => {
             const inMemoryDBs = await sqlNoteDB.databases
-                .filter(database => !database.persistent)
+                .filter((database) => !database.persistent)
                 .toArray();
-            inMemoryDBs.forEach(database => availableDBs.add(database.name));
+            inMemoryDBs.forEach((database) => availableDBs.add(database.name));
         });
 
         for (const dbName of Object.keys(activeDBs)) availableDBs.delete(dbName);
         availableDBs.delete(iDbName);
 
         await sqlNoteDB.transaction('rw', sqlNoteDB.databases, async () => {
-            const staleDBs = await sqlNoteDB.databases
-                .filter(database => !availableDBs.has(database.name));
+            const staleDBs = await sqlNoteDB.databases.filter(
+                (database) => !availableDBs.has(database.name)
+            );
             staleDBs.delete();
         });
 
         // Post success response with the list of available databases
-        postSuccess(port, 'GET_AVAILABLE_DBS', { availableDBs: Array.from(availableDBs) });
+        postSuccess(port, 'GET_AVAILABLE_DBS', {
+            availableDBs: Array.from(availableDBs)
+        });
     } catch (error) {
         console.error('Failed to fetch Available DBs:', error);
-        postError(port, 'GET_AVAILABLE_DBS', "Failed to fetch Available DBs");
+        postError(port, 'GET_AVAILABLE_DBS', {
+            message: 'Failed to fetch Available DBs'
+        });
     }
 };
 
 self.onconnect = async (event: MessageEvent) => {
     const port = event.ports[0];
 
-    postStatus(port, "INITIALIZED");
+    postStatus(port, 'INITIALIZED');
 
     port.onmessage = async ({ data }: MessageEvent<DBWorkerMessages>) => {
         switch (data.command) {
@@ -62,14 +67,19 @@ self.onconnect = async (event: MessageEvent) => {
                 const { dbName, engine, persistent } = data.args;
 
                 if (dbName === iDbName) {
-                    postError(port, "CREATE_DB", `Datebase with name "${dbName}" is not allowed.`, "Used by SQL Note.");
+                    postError(port, 'CREATE_DB', {
+                        message: `Datebase with name "${dbName}" is not allowed.`,
+                        cause: 'Used by SQL Note.'
+                    });
                     break;
                 }
 
                 await updateAvailableDBs(port);
 
                 if (availableDBs.has(dbName)) {
-                    postError(port, 'CREATE_DB', `Database with name "${dbName}" already exists.`);
+                    postError(port, 'CREATE_DB', {
+                        message: `Database with name "${dbName}" already exists.`
+                    });
                     break;
                 }
 
@@ -78,7 +88,9 @@ self.onconnect = async (event: MessageEvent) => {
                 if (engine === 'pgsql') {
                     db = new PostgreSQL(dbName, { persistent });
                 } else {
-                    postError(port, 'CREATE_DB', `Unknown Database Engine: ${engine}`)
+                    postError(port, 'CREATE_DB', {
+                        message: `Unknown Database Engine: ${engine}`
+                    });
                     break;
                 }
 
@@ -90,7 +102,7 @@ self.onconnect = async (event: MessageEvent) => {
                     createdOn: new Date().toLocaleString(),
                     lastUsedOn: new Date().toLocaleString(),
                     engine,
-                    system: engine === 'pgsql' ? 'pglite' : engine === 'sqlite' ? 'wa-sqlite' : 'duckdb-wasm',
+                    system: engine === 'pgsql' ? 'pglite' : engine === 'sqlite' ? 'wa-sqlite' : 'duckdb-wasm'
                 });
 
                 if (persistent) {
@@ -108,7 +120,9 @@ self.onconnect = async (event: MessageEvent) => {
                 const { dbName } = data.args;
 
                 if (dbName in activeDBs) {
-                    postError(port, 'LOAD_DB', `Database "${dbName}" is already in use.`);
+                    postError(port, 'LOAD_DB', {
+                        message: `Database "${dbName}" is already in use.`
+                    });
                     break;
                 }
 
@@ -116,7 +130,9 @@ self.onconnect = async (event: MessageEvent) => {
                 const config = await sqlNoteDB.databases.get(dbName);
 
                 if (!availableDBs.has(dbName) || !config) {
-                    postError(port, 'LOAD_DB', `Database with name "${dbName}" does not exist.`);
+                    postError(port, 'LOAD_DB', {
+                        message: `Database with name "${dbName}" does not exist.`
+                    });
                     break;
                 }
 
@@ -125,7 +141,9 @@ self.onconnect = async (event: MessageEvent) => {
                 if (config.engine === 'pgsql') {
                     db = new PostgreSQL(dbName, { persistent: config.persistent });
                 } else {
-                    postError(port, 'LOAD_DB', `Unknown Database Engine: ${config.engine}`)
+                    postError(port, 'LOAD_DB', {
+                        message: `Unknown Database Engine: ${config.engine}`
+                    });
                     break;
                 }
 
@@ -143,15 +161,22 @@ self.onconnect = async (event: MessageEvent) => {
                 break;
             }
             case 'EXEC_QUERY': {
-                const { dbName, query } = data.args;
+                const { id, dbName, query } = data.args;
 
                 if (!(dbName in activeDBs)) {
-                    postError(port, 'EXEC_QUERY', `Database with name "${dbName}" is not initialized.`);
+                    postError(port, 'EXEC_QUERY', {
+                        id,
+                        message: `Database with name "${dbName}" is not initialized.`
+                    });
                     break;
                 }
 
                 const db = activeDBs[dbName];
-                const results = await db.exec(query);
+                const results = {
+                    id,
+                    ...(await db.exec(query))
+                };
+
                 postSuccess(port, 'EXEC_QUERY', results);
                 break;
             }
@@ -159,7 +184,9 @@ self.onconnect = async (event: MessageEvent) => {
                 const { dbName } = data.args;
 
                 if (!(dbName in activeDBs)) {
-                    postError(port, 'CLOSE_DB', `Database with name "${dbName}" is not initialized.`);
+                    postError(port, 'CLOSE_DB', {
+                        message: `Database with name "${dbName}" is not initialized.`
+                    });
                     break;
                 }
 

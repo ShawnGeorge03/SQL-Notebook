@@ -1,13 +1,13 @@
-import type { QueryResult } from "../engines/types";
+import type { QueryResult } from '../engines/types';
 
-export type DBEngine = "pgsql" | "sqlite" | "duckdb";
+/** Supported database engines */
+export type DBEngine = 'pgsql' | 'sqlite' | 'duckdb';
 
-export type DBWorkerStatus =
-    | 'INITIALIZING'
-    | 'INITIALIZED'
-    | 'LOADING';
+/** Worker statuses */
+export type DBWorkerStatus = 'INITIALIZING' | 'INITIALIZED' | 'LOADING';
 
-export type DBWorkerCommands =
+/** Commands handled by the DB worker */
+export type DBWorkerCommand =
     | 'GET_ACTIVE_DBS'
     | 'GET_AVAILABLE_DBS'
     | 'CREATE_DB'
@@ -15,50 +15,58 @@ export type DBWorkerCommands =
     | 'EXEC_QUERY'
     | 'CLOSE_DB';
 
-type Message<C extends DBWorkerCommands, R = undefined> =
-    R extends undefined
+/** Message format */
+type Message<C extends DBWorkerCommand, R = undefined> = R extends undefined
     ? { command: C }
     : { command: C; args: R };
 
-// Comprehensive worker message type
+/** All messages supported by the DB worker */
 export type DBWorkerMessages =
     | Message<'GET_ACTIVE_DBS'>
     | Message<'GET_AVAILABLE_DBS'>
-    | Message<'CREATE_DB', { engine: DBEngine; dbName: string; persistent: boolean; }>
+    | Message<'CREATE_DB', { engine: DBEngine; dbName: string; persistent: boolean }>
     | Message<'LOAD_DB', { dbName: string }>
-    | Message<'EXEC_QUERY', { dbName: string; query: string }>
+    | Message<'EXEC_QUERY', { id: string; dbName: string; query: string }>
     | Message<'CLOSE_DB', { dbName: string }>;
 
-export type SuccessResponseData = {
-    'GET_ACTIVE_DBS': { activeDBs: string[] };
-    'GET_AVAILABLE_DBS': { availableDBs: string[] };
-    'CREATE_DB': { dbName: string };
-    'LOAD_DB': { dbName: string };
-    'EXEC_QUERY': QueryResult
-    'CLOSE_DB': { dbName: string };
-};
+/** Success response data for each command */
+export interface SuccessResponseData {
+    GET_ACTIVE_DBS: { activeDBs: string[] };
+    GET_AVAILABLE_DBS: { availableDBs: string[] };
+    CREATE_DB: { dbName: string };
+    LOAD_DB: { dbName: string };
+    EXEC_QUERY: QueryResult & { id: string };
+    CLOSE_DB: { dbName: string };
+}
 
-type SuccessResponse<C extends keyof SuccessResponseData> = {
-    status: 'SUCCESS';
-    command: C;
-    data: SuccessResponseData[C];
-};
+/** Standardized error structure */
+interface ErrorData {
+    message: string;
+    cause?: unknown;
+}
 
+/** Error response data for each command */
+export interface ErrorResponseData {
+    GET_ACTIVE_DBS: ErrorData;
+    GET_AVAILABLE_DBS: ErrorData;
+    CREATE_DB: ErrorData;
+    LOAD_DB: ErrorData;
+    EXEC_QUERY: ErrorData & { id: string };
+    CLOSE_DB: ErrorData;
+}
+
+/** Response format for each command */
+type Response<C extends DBWorkerCommand> =
+    | { status: 'LOADING'; command: C }
+    | { status: 'SUCCESS'; command: C; data: SuccessResponseData[C] }
+    | { status: 'ERROR'; command: C; data: ErrorResponseData[C] };
+
+/** Consolidated worker responses */
 export type DBWorkerResponses =
-    | { status: 'INITIALIZING', command: undefined }
-    | { status: 'INITIALIZED', command: undefined }
-    | { status: 'LOADING', command?: DBWorkerCommands }
-    | SuccessResponse<'GET_ACTIVE_DBS'>
-    | SuccessResponse<'GET_AVAILABLE_DBS'>
-    | SuccessResponse<'CREATE_DB'>
-    | SuccessResponse<'LOAD_DB'>
-    | SuccessResponse<'EXEC_QUERY'>
-    | SuccessResponse<'CLOSE_DB'>
-    | {
-        status: 'ERROR';
-        command: DBWorkerCommands;
-        data: {
-            message: string;
-            cause?: unknown;
-        };
-    };
+    | { status: 'INITIALIZING' | 'INITIALIZED' }
+    | Response<'GET_ACTIVE_DBS'>
+    | Response<'GET_AVAILABLE_DBS'>
+    | Response<'CREATE_DB'>
+    | Response<'LOAD_DB'>
+    | Response<'EXEC_QUERY'>
+    | Response<'CLOSE_DB'>;

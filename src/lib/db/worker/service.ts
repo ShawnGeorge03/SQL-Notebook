@@ -1,5 +1,5 @@
 import { readable, type Readable } from "svelte/store";
-import type { DBWorkerMessages, DBWorkerResponses } from "./types";
+import { type DBWorkerMessages, type DBWorkerResponses } from "./types";
 
 export class DBWorkerService {
     static #instance: DBWorkerService;
@@ -12,7 +12,7 @@ export class DBWorkerService {
         this.#worker = new SharedWorker(new URL('$lib/db/worker/index.ts', import.meta.url), { type: 'module' });
         this.#port = this.#worker.port;
 
-        this.responses = readable<DBWorkerResponses>({ status: "INITIALIZING", command: undefined }, (set) => {
+        this.responses = readable<DBWorkerResponses>({ status: 'INITIALIZING' }, (set) => {
             this.#port.onmessage = (event: MessageEvent<DBWorkerResponses>) => {
                 set(event.data);
             }
