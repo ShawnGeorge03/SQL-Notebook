@@ -58,7 +58,7 @@
                 type="text"
                 id="dbName"
                 bind:value={dbName}
-                class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
+                class="mt-1 block w-full rounded-md border-gray-300 shadow-sm sm:text-sm"
                 placeholder="Enter database name"
             />
         </div>
@@ -68,7 +68,7 @@
             <select
                 id="engine"
                 bind:value={engine}
-                class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
+                class="mt-1 block w-full rounded-md border-gray-300 shadow-sm sm:text-sm"
             >
                 <option value="" disabled selected>Select a database engine</option>
                 <option value="pgsql">PostgreSQL</option>
@@ -83,7 +83,7 @@
                 type="checkbox"
                 id="persistent"
                 bind:checked={persistent}
-                class="h-4 w-4 rounded border-gray-300 text-indigo-600 focus:ring-indigo-500"
+                class="h-4 w-4 rounded border-gray-300 text-indigo-600"
             />
             <label for="persistent" class="ml-2 block text-sm text-gray-700">Persistent</label>
         </div>
