@@ -100,7 +100,7 @@ self.onconnect = async (event: MessageEvent) => {
                     name: dbName,
                     persistent,
                     createdOn: new Date().toLocaleString(),
-                    lastUsedOn: new Date().toLocaleString(),
+                    modifiedOn: new Date().toLocaleString(),
                     engine,
                     system: engine === 'pgsql' ? 'pglite' : engine === 'sqlite' ? 'wa-sqlite' : 'duckdb-wasm'
                 });
@@ -156,7 +156,7 @@ self.onconnect = async (event: MessageEvent) => {
 
                 postSuccess(port, 'LOAD_DB', { dbName });
 
-                await sqlNoteDB.databases.update(dbName, { lastUsedOn: new Date().toLocaleString() });
+                await sqlNoteDB.databases.update(dbName, { modifiedOn: new Date().toLocaleString() });
 
                 break;
             }
