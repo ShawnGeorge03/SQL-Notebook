@@ -1,10 +1,11 @@
 <script lang="ts">
 	import { DBWorkerService } from "$lib/db/worker/service";
+	import type { DBInfo } from "$lib/db/worker/types";
 	import { onMount } from "svelte";
 
 	let dbWorkerService = DBWorkerService.getInstance();
 
-	let availableDBs: string[] = $state([]);
+	let availableDBs: DBInfo[] = $state([]);
 	let loading: boolean = $state(true);
 
 	const getAvailableDBs = () => dbWorkerService.sendMessage({ command: 'GET_AVAILABLE_DBS' });
@@ -35,7 +36,7 @@
 		<ul class="my-4 ml-4 list-disc">
 			{#if availableDBs.length}
 				{#each availableDBs as db}
-					<li>{db}</li>
+					<li>{db.name}</li>
 				{/each}
 			{/if}
 		</ul>

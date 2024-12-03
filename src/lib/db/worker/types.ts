@@ -3,6 +3,12 @@ import type { QueryResult } from '../engines/types';
 /** Supported database engines */
 export type DBEngine = 'pgsql' | 'sqlite' | 'duckdb';
 
+export type DBInfo = {
+    name: string;
+    engine: DBEngine;
+    persistent: boolean;
+}
+
 /** Worker statuses */
 export type DBWorkerStatus = 'INITIALIZING' | 'INITIALIZED' | 'LOADING';
 
@@ -31,8 +37,8 @@ export type DBWorkerMessages =
 
 /** Success response data for each command */
 export interface SuccessResponseData {
-    GET_ACTIVE_DBS: { activeDBs: string[] };
-    GET_AVAILABLE_DBS: { availableDBs: string[] };
+    GET_ACTIVE_DBS: { activeDBs: DBInfo[] };
+    GET_AVAILABLE_DBS: { availableDBs: DBInfo[] };
     CREATE_DB: { dbName: string };
     LOAD_DB: { dbName: string };
     EXEC_QUERY: QueryResult & { id: string };

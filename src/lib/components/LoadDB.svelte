@@ -1,10 +1,11 @@
 <script lang="ts">
 	import { DBWorkerService } from "$lib/db/worker/service";
+	import type { DBInfo } from "$lib/db/worker/types";
 	import { onMount } from "svelte";
 
 	let dbWorkerService = DBWorkerService.getInstance();
 
-    let availableDBs: string[] = $state([]);
+    let availableDBs: DBInfo[] = $state([]);
 	let dbName: string = $state('');
 
 	let loading: boolean = $state(true);
@@ -64,7 +65,7 @@
                 <option value="" disabled selected>Select a database</option>
                 {#if availableDBs.length}
                     {#each availableDBs as db}
-                        <option value={db}>{db}</option>
+                        <option value={db.name}>{db.name}</option>
                     {/each}
                 {/if}
             </select>

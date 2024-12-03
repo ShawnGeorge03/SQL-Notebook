@@ -1,7 +1,7 @@
 import { iDbName, sqlNoteDB } from '$lib/data/schema';
 import { PostgreSQL } from '../engines/pgsql';
 import type { DBStrategy } from '../engines/types';
-import type { DBWorkerMessages } from './types';
+import type { DBInfo, DBWorkerMessages } from './types';
 import { postError, postStatus, postSuccess } from './utils';
 
 const activeDBs: Record<string, DBStrategy> = {};
@@ -11,6 +11,7 @@ const updateAvailableDBs = async (port: MessagePort) => {
     try {
         availableDBs.clear();
 
+        const databaseInfo: DBInfo[] = [];
         const databases = await indexedDB.databases();
         databases.forEach((db) => {
             if (db.name) {
@@ -36,9 +37,21 @@ const updateAvailableDBs = async (port: MessagePort) => {
             staleDBs.delete();
         });
 
+        await sqlNoteDB.transaction('r', sqlNoteDB.databases, async () => {
+            const databases = await sqlNoteDB.databases.bulkGet(Array.from(availableDBs));
+            databases.forEach((database) => {
+                if (database)
+                    databaseInfo.push({
+                        name: database.name,
+                        engine: database.engine,
+                        persistent: database.persistent
+                    });
+            });
+        });
+
         // Post success response with the list of available databases
         postSuccess(port, 'GET_AVAILABLE_DBS', {
-            availableDBs: Array.from(availableDBs)
+            availableDBs: databaseInfo
         });
     } catch (error) {
         console.error('Failed to fetch Available DBs:', error);
@@ -48,6 +61,23 @@ const updateAvailableDBs = async (port: MessagePort) => {
     }
 };
 
+const getActiveDBs = async (port: MessagePort) => {
+    const databaseInfo: DBInfo[] = [];
+    await sqlNoteDB.transaction('r', sqlNoteDB.databases, async () => {
+        const databases = await sqlNoteDB.databases.bulkGet(Object.keys(activeDBs));
+        databases.forEach((database) => {
+            if (database)
+                databaseInfo.push({
+                    name: database.name,
+                    engine: database.engine,
+                    persistent: database.persistent
+                });
+        });
+    });
+
+    postSuccess(port, 'GET_ACTIVE_DBS', { activeDBs: databaseInfo });
+}
+
 self.onconnect = async (event: MessageEvent) => {
     const port = event.ports[0];
 
@@ -56,7 +86,7 @@ self.onconnect = async (event: MessageEvent) => {
     port.onmessage = async ({ data }: MessageEvent<DBWorkerMessages>) => {
         switch (data.command) {
             case 'GET_ACTIVE_DBS': {
-                postSuccess(port, 'GET_ACTIVE_DBS', { activeDBs: Object.keys(activeDBs) });
+                await getActiveDBs(port);
                 break;
             }
             case 'GET_AVAILABLE_DBS': {
@@ -110,7 +140,7 @@ self.onconnect = async (event: MessageEvent) => {
                     await updateAvailableDBs(port);
                 } else {
                     activeDBs[dbName] = db;
-                    postSuccess(port, 'GET_ACTIVE_DBS', { activeDBs: Object.keys(activeDBs) });
+                    await getActiveDBs(port);
                 }
 
                 postSuccess(port, 'CREATE_DB', { dbName: dbName });
@@ -147,10 +177,9 @@ self.onconnect = async (event: MessageEvent) => {
                     break;
                 }
 
-                await db.init().then(() => {
-                    activeDBs[dbName] = db;
-                    postSuccess(port, 'GET_ACTIVE_DBS', { activeDBs: Object.keys(activeDBs) });
-                });
+                await db.init().then(async () => activeDBs[dbName] = db);
+
+                await getActiveDBs(port);
 
                 await updateAvailableDBs(port);
 
@@ -194,8 +223,9 @@ self.onconnect = async (event: MessageEvent) => {
                 await db.close().then(() => {
                     delete activeDBs[dbName];
                     postSuccess(port, 'CLOSE_DB', { dbName });
-                    postSuccess(port, 'GET_ACTIVE_DBS', { activeDBs: Object.keys(activeDBs) });
                 });
+
+                await getActiveDBs(port);
                 break;
             }
         }
