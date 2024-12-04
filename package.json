@@ -19,7 +19,8 @@
 		"@codemirror/state": "^6.4.1",
 		"@codemirror/view": "^6.34.3",
 		"@electric-sql/pglite": "^0.2.12",
-		"dexie": "^4.0.10"
+		"dexie": "^4.0.10",
+		"nanoid": "^5.0.9"
 	},
 	"devDependencies": {
 		"@sveltejs/adapter-auto": "^3.0.0",
