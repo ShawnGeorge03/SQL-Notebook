@@ -1,5 +1,5 @@
 import { IdbFs, MemoryFS, PGlite, type PGliteOptions } from '@electric-sql/pglite';
-import type { DBStrategy, QueryResult } from './types';
+import type { DBOptions, DBStrategy, QueryResult } from './types';
 
 /** Class representing a PostgreSQL Database.
  *
@@ -15,9 +15,9 @@ export class PostgreSQL implements DBStrategy {
 	 * Creates a PostgreSQL object.
 	 *
 	 * @param {string} dbName - The name of the database.
-	 * @param {Object} dbOptions - The options for the database.
+	 * @param {DBOptions} dbOptions - The options for the database.
 	 */
-	constructor(dbName: string, dbOptions: { persistent: boolean }) {
+	constructor(dbName: string, dbOptions: DBOptions) {
 		this.dbName = dbName;
 		this.dbOptions = {
 			fs: dbOptions.persistent ? new IdbFs(this.dbName) : new MemoryFS()

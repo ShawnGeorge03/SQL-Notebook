@@ -1,3 +1,7 @@
+export type DBOptions = {
+	persistent: boolean
+}
+
 export type QueryResult = {
 	data?: unknown;
 	error?: string;
