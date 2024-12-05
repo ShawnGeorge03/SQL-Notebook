@@ -1,5 +1,3 @@
-import { browser, dev } from '$app/environment';
-
 import { IdbFs, MemoryFS, PGlite, type PGliteOptions } from '@electric-sql/pglite';
 import type { DBStrategy, QueryResult } from './types';
 
@@ -16,8 +14,6 @@ export class PostgreSQL implements DBStrategy {
 	}
 
 	async init(): Promise<void> {
-		if (!browser) return;
-
 		try {
 			this.db = await PGlite.create(this.dbOptions);
 		} catch (error) {
@@ -25,8 +21,6 @@ export class PostgreSQL implements DBStrategy {
 				error instanceof Error
 					? error
 					: new Error(`Database initialization failed: ${String(error)}`);
-
-			if (dev) console.error('Database initialization error:', initError);
 
 			throw initError;
 		}
@@ -42,8 +36,6 @@ export class PostgreSQL implements DBStrategy {
 			await this.db.transaction(async (tx) => {
 				data = await tx.exec(query);
 			});
-
-			if (dev) console.log(data);
 
 			return {
 				data,
@@ -63,7 +55,5 @@ export class PostgreSQL implements DBStrategy {
 
 	async close(): Promise<void> {
 		await this.db.close();
-
-		if (this.db.closed && dev) console.log('Database: ' + this.dbName + ' is closed!');
 	}
 }
