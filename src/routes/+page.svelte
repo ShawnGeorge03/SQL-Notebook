@@ -1,9 +1,9 @@
 <script lang="ts">
-	import ActiveDBs from '$lib/components/ActiveDBs.svelte';
-	import AvailableDBs from '$lib/components/AvailableDBs.svelte';
-	import CloseDB from '$lib/components/CloseDB.svelte';
-	import CreateDB from '$lib/components/CreateDB.svelte';
-	import LoadDB from '$lib/components/LoadDB.svelte';
+	import ActiveDBs from '$lib/components/Manager/ActiveDBs.svelte';
+	import AvailableDBs from '$lib/components/Manager/AvailableDBs.svelte';
+	import CloseDB from '$lib/components/Manager/CloseDB.svelte';
+	import CreateDB from '$lib/components/Manager/CreateDB.svelte';
+	import LoadDB from '$lib/components/Manager/LoadDB.svelte';
 	import Notebook from '$lib/components/Notebook/Notebook.svelte';
 	import { DBWorkerService } from '$lib/db/worker/service';
 
