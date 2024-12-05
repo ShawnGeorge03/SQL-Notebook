@@ -6,7 +6,7 @@
 	} from '$lib/components/Blocks/Block/store';
 	import CodeBlock from '$lib/components/Blocks/CodeBlock.svelte';
 	import TextBlock from '$lib/components/Blocks/TextBlock.svelte';
-	import { PostgreSQL } from '$lib/engines/psql';
+	import { PostgreSQL } from '$lib/db/engines/psql';
 	import { onMount } from 'svelte';
 
 	let db: PostgreSQL;
