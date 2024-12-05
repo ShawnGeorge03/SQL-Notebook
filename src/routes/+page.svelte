@@ -6,12 +6,10 @@
 	} from '$lib/components/Blocks/Block/store';
 	import CodeBlock from '$lib/components/Blocks/CodeBlock.svelte';
 	import TextBlock from '$lib/components/Blocks/TextBlock.svelte';
-	import { DatabaseContext } from '$lib/engines';
 	import { PostgreSQL } from '$lib/engines/psql';
 	import { onMount } from 'svelte';
-	import type { PGlite } from '@electric-sql/pglite';
 
-	let db: DatabaseContext<PGlite>;
+	let db: PostgreSQL;
 	let query = $state('');
 	let result = $state('');
 	let markdownContent = $state('');
@@ -42,8 +40,7 @@
 
 	onMount(async () => {
 		try {
-			db = new DatabaseContext();
-			db.setStrategy(new PostgreSQL('SvelteDB', {}));
+			db = new PostgreSQL('SvelteDB', { persistent: false });
 		} catch (e) {
 			result += (e instanceof Error ? e.message : 'Failed to initialize database') + '\n';
 		}

@@ -1,17 +1,17 @@
 import { browser, dev } from '$app/environment';
 
 import { IdbFs, MemoryFS, PGlite, type PGliteOptions } from '@electric-sql/pglite';
-import type { DatabaseStrategy, DBOptions, QueryResult } from '.';
+import type { DBStrategy, QueryResult } from '.';
 
-export class PostgreSQL implements DatabaseStrategy<PGlite> {
+export class PostgreSQL implements DBStrategy {
 	db!: PGlite;
 	dbName: string;
 	dbOptions: PGliteOptions;
 
-	constructor(dbName: string, dbOptions: DBOptions) {
+	constructor(dbName: string, dbOptions: { persistent: boolean }) {
 		this.dbName = dbName;
 		this.dbOptions = {
-			fs: dbOptions.presistent ? new IdbFs(this.dbName) : new MemoryFS()
+			fs: dbOptions.persistent ? new IdbFs(this.dbName) : new MemoryFS()
 		};
 	}
 
