@@ -4,89 +4,14 @@
 		updateHighlightWhitespace,
 		updateLineNumbers
 	} from '$lib/components/Blocks/Block/store';
-	import CodeBlock from '$lib/components/Blocks/CodeBlock.svelte';
 	import TextBlock from '$lib/components/Blocks/TextBlock.svelte';
-	import { PostgreSQL } from '$lib/db/engines/pgsql';
-	import { onMount } from 'svelte';
+	import PostgreSQL from '$lib/components/Examples/PostgreSQL.svelte';
 
-	let db: PostgreSQL;
-	let query = $state('');
-	let result = $state('');
 	let markdownContent = $state('');
-
-	const initDB = async () => {
-		await db.init();
-		result += '>> Successfully created DB\n';
-	};
-
-	const loadChinook = async () => {
-		query = await fetch('chinook.txt').then((response) => response.text());
-	};
-
-	const runQuery = async () => {
-		const results = await db.exec(query);
-
-		if (results.error) result += `>> Error: ${JSON.stringify(results.error)}\n`;
-		else if (results.data)
-			result += `>> ${JSON.stringify(results.data)} (Took: ${results.elapsed} ms)\n`;
-	};
-
-	const close = async () => {
-		await db.close();
-		result += '>> Successfully closed DB\n';
-		console.log(result);
-		query = '';
-	};
-
-	onMount(async () => {
-		try {
-			db = new PostgreSQL('SvelteDB', { persistent: false });
-		} catch (e) {
-			result += (e instanceof Error ? e.message : 'Failed to initialize database') + '\n';
-		}
-	});
 </script>
 
 <div class="m-36 min-h-screen">
-	<!-- CodeBlock Section for SQL Input -->
-	<div class="flex flex-col">
-		<label for="query">Input:</label>
-		<CodeBlock type="psql" bind:content={query} />
-	</div>
-	<div class="mt-8">
-		<p>Result:</p>
-		<div class="h-36 overflow-y-scroll whitespace-pre-wrap bg-gray-300">{result}</div>
-	</div>
-
-	<div class="mt-10">
-		<p>Database Settings</p>
-		<div class="flex items-center justify-center gap-10">
-			<button
-				class="cursor-pointer rounded border-none bg-cyan-700 px-4 py-2 text-white hover:bg-cyan-900"
-				onclick={() => initDB()}
-			>
-				Connect to DB
-			</button>
-			<button
-				class="cursor-pointer rounded border-none bg-cyan-700 px-4 py-2 text-white hover:bg-cyan-900"
-				onclick={() => loadChinook()}
-			>
-				Load Chinook
-			</button>
-			<button
-				class="cursor-pointer rounded border-none bg-cyan-700 px-4 py-2 text-white hover:bg-cyan-900"
-				onclick={() => runQuery()}
-			>
-				Run Query
-			</button>
-			<button
-				class="cursor-pointer rounded border-none bg-cyan-700 px-4 py-2 text-white hover:bg-cyan-900"
-				onclick={() => close()}
-			>
-				Close DB
-			</button>
-		</div>
-	</div>
+	<PostgreSQL />
 
 	<!-- TextBlock Section for Markdown Input -->
 	<div class="mt-10">
@@ -120,15 +45,3 @@
 		</div>
 	</div>
 </div>
-
-<style>
-	.m-36 {
-		margin: 9rem;
-	}
-	.min-h-screen {
-		min-height: 100vh;
-	}
-	.bg-gray-300 {
-		background-color: #e2e8f0;
-	}
-</style>
