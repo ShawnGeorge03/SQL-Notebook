@@ -6,8 +6,8 @@
 	} from '$lib/components/Blocks/Block/store';
 	import CodeBlock from '$lib/components/Blocks/CodeBlock.svelte';
 	import TextBlock from '$lib/components/Blocks/TextBlock.svelte';
-	import { DatabaseContext } from '$lib/db';
-	import { PostgreSQL } from '$lib/db/psql';
+	import { DatabaseContext } from '$lib/engines';
+	import { PostgreSQL } from '$lib/engines/psql';
 	import { onMount } from 'svelte';
 	import type { PGlite } from '@electric-sql/pglite';
 
