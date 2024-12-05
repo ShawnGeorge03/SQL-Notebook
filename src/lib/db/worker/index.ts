@@ -202,6 +202,57 @@ self.onconnect = async (event: MessageEvent) => {
                 await updateAvailableDBs(port);
                 break;
             }
+            case 'TERMINATE_DB': {
+                const { dbName } = data.args;
+
+                if (dbName in activeDBs) {
+                    postError(port, 'TERMINATE_DB', {
+                        message: `Database with name "${dbName}" is currently running.`
+                    });
+                    break;
+                }
+
+                const config = await sqlNoteDB.databases.get(dbName);
+
+                if (!config) {
+                    postError(port, 'TERMINATE_DB', {
+                        message: `Database with name "${dbName}" does not exist.`
+                    });
+                    break;
+                }
+
+                if (!config.persistent) {
+                    postError(port, 'TERMINATE_DB', {
+                        message: `Database with name "${dbName}" is not persistent.`
+                    });
+                    break;
+                }
+
+                let iDbName = ""
+
+                if (config.system === 'pglite') {
+                    iDbName = '/pglite/' + config.name;
+                } else {
+                    postError(port, 'TERMINATE_DB', {
+                        message: `Unknown Database System: ${config.system}`
+                    });
+                    break;
+                }
+
+                const toDelete = indexedDB.deleteDatabase(iDbName);
+
+                toDelete.onsuccess = async () => {
+
+                    await sqlNoteDB.transaction('readwrite', sqlNoteDB.databases, async () => {
+                        await sqlNoteDB.databases.delete(dbName);
+                    })
+
+                    await updateAvailableDBs(port);
+                    postSuccess(port, 'TERMINATE_DB', { dbName });
+                }
+
+
+            }
         }
     };
 
