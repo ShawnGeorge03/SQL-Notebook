@@ -5,7 +5,7 @@ import type { DBOptions, DBStrategy, QueryResult } from './types';
  *
  * @class
  * @implements {DBStrategy}
-*/
+ */
 export class PostgreSQL implements DBStrategy {
 	db!: PGlite;
 	dbName: string;

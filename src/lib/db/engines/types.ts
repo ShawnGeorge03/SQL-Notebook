@@ -1,6 +1,6 @@
 export type DBOptions = {
-	persistent: boolean
-}
+	persistent: boolean;
+};
 
 export type QueryResult = {
 	data?: unknown;

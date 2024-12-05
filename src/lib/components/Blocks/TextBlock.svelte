@@ -1,9 +1,9 @@
 <script lang="ts">
 	import Editor, { type BaseBlockProps } from '$lib/components/Blocks/Block/index.svelte';
 	import { markdown } from '@codemirror/lang-markdown';
-	import { marked } from 'marked';
-	import 'github-markdown-css';
 	import DOMPurify from 'dompurify';
+	import 'github-markdown-css';
+	import { marked } from 'marked';
 
 	interface TextBlockProps extends BaseBlockProps {
 		content: string;
@@ -34,6 +34,7 @@
 	/>
 	<button class="render-button" onclick={renderMarkdown}>Render Markdown</button>
 	<div class="markdown-preview">
+		<!-- eslint-disable svelte/no-at-html-tags -->
 		{@html htmlContent}
 	</div>
 </div>
