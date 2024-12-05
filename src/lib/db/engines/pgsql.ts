@@ -1,7 +1,7 @@
 import { browser, dev } from '$app/environment';
 
 import { IdbFs, MemoryFS, PGlite, type PGliteOptions } from '@electric-sql/pglite';
-import type { DBStrategy, QueryResult } from '.';
+import type { DBStrategy, QueryResult } from './types';
 
 export class PostgreSQL implements DBStrategy {
 	db!: PGlite;
