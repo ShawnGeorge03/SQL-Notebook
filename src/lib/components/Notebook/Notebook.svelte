@@ -53,29 +53,31 @@
 
 	<CellAdder bind:cellToAdd />
 
-	<div class="mt-32 flex flex-col items-center gap-4">
-		<h3 class="text-lg font-semibold">Block Settings</h3>
-		<div class="flex items-center justify-center gap-10">
-			<button
-				class="cursor-pointer rounded border-none bg-cyan-700 px-4 py-2 text-white hover:bg-cyan-900"
-				onclick={() => updateLineNumbers()}
-			>
-				{$editorConfig.lineNumbers ? 'Remove line numbers' : 'Add line numbers'}
-			</button>
-			<button
-				class="cursor-pointer rounded border-none bg-cyan-700 px-4 py-2 text-white hover:bg-cyan-900"
-				onclick={() => updateHighlightWhitespace()}
-			>
-				{$editorConfig.highlightWhitespace ? 'Unhighlight Whitespace' : 'Highlight Whitespace'}
-			</button>
-			<button
-				class="cursor-pointer rounded border-none bg-cyan-700 px-4 py-2 text-white hover:bg-cyan-900"
-				onclick={() => updateHighlightTrailingWhitespace()}
-			>
-				{$editorConfig.highlightTrailingWhitespace
-					? 'Unhighlight Trailing Whitespace'
-					: 'Highlight Trailing Whitespace'}
-			</button>
+	{#if blocks.length !== 0}
+		<div class="mt-32 flex flex-col items-center gap-4">
+			<h3 class="text-lg font-semibold">Block Settings</h3>
+			<div class="flex items-center justify-center gap-10">
+				<button
+					class="cursor-pointer rounded border-none bg-cyan-700 px-4 py-2 text-white hover:bg-cyan-900"
+					onclick={() => updateLineNumbers()}
+				>
+					{$editorConfig.lineNumbers ? 'Remove line numbers' : 'Add line numbers'}
+				</button>
+				<button
+					class="cursor-pointer rounded border-none bg-cyan-700 px-4 py-2 text-white hover:bg-cyan-900"
+					onclick={() => updateHighlightWhitespace()}
+				>
+					{$editorConfig.highlightWhitespace ? 'Unhighlight Whitespace' : 'Highlight Whitespace'}
+				</button>
+				<button
+					class="cursor-pointer rounded border-none bg-cyan-700 px-4 py-2 text-white hover:bg-cyan-900"
+					onclick={() => updateHighlightTrailingWhitespace()}
+				>
+					{$editorConfig.highlightTrailingWhitespace
+						? 'Unhighlight Trailing Whitespace'
+						: 'Highlight Trailing Whitespace'}
+				</button>
+			</div>
 		</div>
-	</div>
+	{/if}
 </div>
