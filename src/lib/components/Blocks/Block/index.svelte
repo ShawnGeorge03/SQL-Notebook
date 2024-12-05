@@ -40,6 +40,10 @@
 
 	interface BlockProps extends BaseBlockProps {
 		content: string;
+		autocomplete?: string;
+		autocorrect?: string;
+		autocapitalize?: string;
+		spellcheck?: string;
 		class?: string;
 		customExtensions?: Extension[];
 	}
