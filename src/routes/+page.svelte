@@ -1,8 +1,10 @@
 <script lang="ts">
 	import ActiveDBs from '$lib/components/ActiveDBs.svelte';
 	import AvailableDBs from '$lib/components/AvailableDBs.svelte';
+	import CloseDB from '$lib/components/CloseDB.svelte';
 	import CreateDB from '$lib/components/CreateDB.svelte';
 	import LoadDB from '$lib/components/LoadDB.svelte';
+	import Notebook from '$lib/components/Notebook/Notebook.svelte';
 	import { DBWorkerService } from '$lib/db/worker/service';
 
 	import { onMount } from 'svelte';
@@ -15,8 +17,8 @@
 		try {
 			dbWorkerService = DBWorkerService.getInstance();
 
-			const unsubscribe = dbWorkerService.responses.subscribe(response => {
-				loading = response.status === 'INITIALIZING'
+			const unsubscribe = dbWorkerService.responses.subscribe((response) => {
+				loading = response.status === 'INITIALIZING';
 			});
 
 			return () => {
@@ -29,7 +31,7 @@
 	});
 </script>
 
-<div class="container mx-auto">
+<div class="mx-56 flex flex-col">
 	{#if loading}
 		<p>Loading Notebook</p>
 	{:else}
@@ -40,6 +42,9 @@
 			<ActiveDBs />
 			<CreateDB />
 			<LoadDB />
+			<CloseDB />
 		</div>
+
+		<Notebook />
 	{/if}
 </div>

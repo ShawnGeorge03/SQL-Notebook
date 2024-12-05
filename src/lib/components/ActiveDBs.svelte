@@ -1,7 +1,7 @@
 <script lang="ts">
-	import { DBWorkerService } from "$lib/db/worker/service";
-	import type { DBInfo } from "$lib/db/worker/types";
-	import { onMount } from "svelte";
+	import { DBWorkerService } from '$lib/db/worker/service';
+	import type { DBInfo } from '$lib/db/worker/types';
+	import { onMount } from 'svelte';
 
 	let dbWorkerService = DBWorkerService.getInstance();
 
@@ -10,20 +10,19 @@
 
 	const getActiveDBs = () => dbWorkerService.sendMessage({ command: 'GET_ACTIVE_DBS' });
 
-	const unsubscribe = dbWorkerService.responses.subscribe(response => {
-		loading = response.status === 'LOADING' && response.command === 'GET_ACTIVE_DBS'
+	const unsubscribe = dbWorkerService.responses.subscribe((response) => {
+		loading = response.status === 'LOADING' && response.command === 'GET_ACTIVE_DBS';
 		if (response.status === 'SUCCESS' && response.command === 'GET_ACTIVE_DBS') {
 			loading = false;
 			activeDBs = response.data.activeDBs;
 		} else if (response.status === 'ERROR' && response.command === 'GET_ACTIVE_DBS') {
-			console.error(response.data)
+			console.error(response.data);
 		}
 	});
 
 	onMount(() => {
-		getActiveDBs()
+		getActiveDBs();
 	});
-
 
 	() => unsubscribe();
 </script>

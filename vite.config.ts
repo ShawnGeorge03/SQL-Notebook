@@ -1,20 +1,8 @@
 import { sveltekit } from '@sveltejs/kit/vite';
-import { defineConfig, type PluginOption } from 'vite';
-
-const DBWorkerWatcher = (): PluginOption => {
-	return {
-		name: 'db-worker-watcher',
-		enforce: 'post',
-		handleHotUpdate({ file, server }) {
-			if (file.endsWith('worker/index.ts'))
-				server.restart();
-		}
-
-	}
-}
+import { defineConfig } from 'vite';
 
 export default defineConfig({
-	plugins: [sveltekit(), DBWorkerWatcher()],
+	plugins: [sveltekit()],
 	worker: {
 		format: 'es'
 	},

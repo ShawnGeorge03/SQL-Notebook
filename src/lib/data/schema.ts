@@ -1,3 +1,5 @@
+import type { QueryResult } from '$lib/db/engines/types';
+import type { DBEngine } from '$lib/db/worker/types';
 import Dexie, { type EntityTable } from 'dexie';
 
 const iDbName = 'sql-note' as const;
@@ -18,13 +20,21 @@ type Database =
 
 type Project = BaseTable & { notebooks: number[] };
 
-type NotebookData =
+export type NotebookData =
     | {
+        id: string;
+        name?: string;
         cell: 'sql';
         dbName?: string;
-        content: string;
+        engine?: DBEngine;
+        content: {
+            query: string;
+            result: QueryResult;
+        }
     }
     | {
+        id: string;
+        name: string;
         cell: 'text';
         content: string;
     }

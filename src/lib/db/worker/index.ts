@@ -5,54 +5,25 @@ import type { DBInfo, DBWorkerMessages } from './types';
 import { postError, postStatus, postSuccess } from './utils';
 
 const activeDBs: Record<string, DBStrategy> = {};
-const availableDBs: Set<string> = new Set();
 
 const updateAvailableDBs = async (port: MessagePort) => {
     try {
-        availableDBs.clear();
-
         const databaseInfo: DBInfo[] = [];
-        const databases = await indexedDB.databases();
-        databases.forEach((db) => {
-            if (db.name) {
-                const dbName = db.name.startsWith('/pglite/') ? db.name.slice(8) : db.name;
-                availableDBs.add(dbName);
-            }
-        });
 
         await sqlNoteDB.transaction('r', sqlNoteDB.databases, async () => {
-            const inMemoryDBs = await sqlNoteDB.databases
-                .filter((database) => !database.persistent)
-                .toArray();
-            inMemoryDBs.forEach((database) => availableDBs.add(database.name));
-        });
-
-        for (const dbName of Object.keys(activeDBs)) availableDBs.delete(dbName);
-        availableDBs.delete(iDbName);
-
-        await sqlNoteDB.transaction('rw', sqlNoteDB.databases, async () => {
-            const staleDBs = await sqlNoteDB.databases.filter(
-                (database) => !availableDBs.has(database.name)
-            );
-            staleDBs.delete();
-        });
-
-        await sqlNoteDB.transaction('r', sqlNoteDB.databases, async () => {
-            const databases = await sqlNoteDB.databases.bulkGet(Array.from(availableDBs));
-            databases.forEach((database) => {
-                if (database)
+            await sqlNoteDB.databases.each((database) => {
+                if (!Object.keys(activeDBs).includes(database.name)) {
                     databaseInfo.push({
                         name: database.name,
                         engine: database.engine,
                         persistent: database.persistent
                     });
-            });
+                }
+            })
         });
 
         // Post success response with the list of available databases
-        postSuccess(port, 'GET_AVAILABLE_DBS', {
-            availableDBs: databaseInfo
-        });
+        postSuccess(port, 'GET_AVAILABLE_DBS', { availableDBs: databaseInfo });
     } catch (error) {
         console.error('Failed to fetch Available DBs:', error);
         postError(port, 'GET_AVAILABLE_DBS', {
@@ -106,7 +77,9 @@ self.onconnect = async (event: MessageEvent) => {
 
                 await updateAvailableDBs(port);
 
-                if (availableDBs.has(dbName)) {
+                const doesDBExist = await sqlNoteDB.databases.get(dbName);
+
+                if (doesDBExist) {
                     postError(port, 'CREATE_DB', {
                         message: `Database with name "${dbName}" already exists.`
                     });
@@ -159,7 +132,7 @@ self.onconnect = async (event: MessageEvent) => {
                 await updateAvailableDBs(port);
                 const config = await sqlNoteDB.databases.get(dbName);
 
-                if (!availableDBs.has(dbName) || !config) {
+                if (!config) {
                     postError(port, 'LOAD_DB', {
                         message: `Database with name "${dbName}" does not exist.`
                     });
@@ -226,6 +199,7 @@ self.onconnect = async (event: MessageEvent) => {
                 });
 
                 await getActiveDBs(port);
+                await updateAvailableDBs(port);
                 break;
             }
         }
