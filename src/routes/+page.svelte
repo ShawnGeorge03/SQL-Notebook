@@ -9,10 +9,8 @@
 <div class="m-36 min-h-screen">
 	<EditorSettings />
 	<PostgreSQL />
-
-	<!-- TextBlock Section for Markdown Input -->
-	<div class="mt-10">
-		<p>Markdown Content:</p>
+	<div class="mt-10 rounded-xl border-4 border-black p-10 shadow-xl">
+		<h2 class="mb-5 text-center text-2xl">Markdown Content</h2>
 		<TextBlock class="markdown-editor" type="markdown" bind:content={markdownContent} />
 	</div>
 </div>
