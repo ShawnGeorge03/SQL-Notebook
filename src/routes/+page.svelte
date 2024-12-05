@@ -3,6 +3,7 @@
 	import AvailableDBs from '$lib/components/Manager/AvailableDBs.svelte';
 	import CloseDB from '$lib/components/Manager/CloseDB.svelte';
 	import CreateDB from '$lib/components/Manager/CreateDB.svelte';
+	import Demo from '$lib/components/Manager/Demo.svelte';
 	import LoadDB from '$lib/components/Manager/LoadDB.svelte';
 	import TerminateDB from '$lib/components/Manager/TerminateDB.svelte';
 	import Notebook from '$lib/components/Notebook/Notebook.svelte';
@@ -45,6 +46,7 @@
 			<LoadDB />
 			<CloseDB />
 			<TerminateDB />
+			<Demo />
 		</div>
 
 		<Notebook />
