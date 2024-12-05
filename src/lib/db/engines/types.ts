@@ -4,6 +4,11 @@ export type QueryResult = {
 	elapsed?: number;
 };
 
+/**
+ * Interface for classes that represent a Database
+ *
+ * @interface
+ */
 export interface DBStrategy {
 	db: unknown;
 	dbName: string;
