@@ -72,9 +72,41 @@ export class DuckDB implements DBStrategy {
         await this.#conn.query('SET errors_as_json = true;');
     }
 
-    exec(query: string): Promise<QueryResult> {
-        throw new Error('Method not implemented.');
+    /**
+     * Return the results from a query.
+     *
+     * @param {string} query - The query to be run.
+     *
+     * @returns {Promise{QueryResult}} - Promise Object reprsenting the query results.
+     */
+    async exec(query: string): Promise<QueryResult> {
+        try {
+            if (!this.#db) throw new Error('Database not initialized');
+
+            // TODO: Ensure all queries run in Transaction Mode.
+            const startTime = performance.now();
+            const table = await this.#conn.query(query);
+            const elapsed = performance.now() - startTime;
+            const data = await table.toArray().map((row) => row.toJSON());
+
+            return {
+                data,
+                elapsed
+            };
+        } catch (error) {
+            let queryError = '';
+            if (error instanceof Error) {
+                queryError = error.message;
+                if (error.cause) queryError += ' (' + error.cause + ')';
+            } else {
+                queryError = `Database query failed: ${String(error)}`;
+            }
+            return { error: queryError };
+        } finally {
+            await this.#conn.cancelSent();
+        }
     }
+
     close(): Promise<void> {
         throw new Error('Method not implemented.');
     }
