@@ -25,6 +25,6 @@ Source: https://stackoverflow.com/questions/254712/disable-spell-checking-on-htm
 	autocapitalize="off"
 	spellcheck="false"
 	class={className}
-	{content}
+	bind:content
 	{customExtensions}
 />
