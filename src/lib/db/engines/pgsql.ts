@@ -7,9 +7,9 @@ import type { DBOptions, DBStrategy, QueryResult } from './types';
  * @implements {DBStrategy}
  */
 export class PostgreSQL implements DBStrategy {
-	db!: PGlite;
-	dbName: string;
-	dbOptions: PGliteOptions;
+	#db!: PGlite;
+	#dbOptions: PGliteOptions;
+	#dbName: string;
 
 	/**
 	 * Creates a PostgreSQL object.
@@ -18,9 +18,9 @@ export class PostgreSQL implements DBStrategy {
 	 * @param {DBOptions} dbOptions - The options for the database.
 	 */
 	constructor(dbName: string, dbOptions: DBOptions) {
-		this.dbName = dbName;
-		this.dbOptions = {
-			fs: dbOptions.persistent ? new IdbFs(this.dbName) : new MemoryFS()
+		this.#dbName = dbName;
+		this.#dbOptions = {
+			fs: dbOptions.persistent ? new IdbFs(this.#dbName) : new MemoryFS()
 		};
 	}
 
@@ -31,7 +31,7 @@ export class PostgreSQL implements DBStrategy {
 	 */
 	async init(): Promise<void> {
 		try {
-			this.db = await PGlite.create(this.dbOptions);
+			this.#db = await PGlite.create(this.#dbOptions);
 		} catch (error) {
 			const initError =
 				error instanceof Error
@@ -55,12 +55,12 @@ export class PostgreSQL implements DBStrategy {
 	 */
 	async exec(query: string): Promise<QueryResult> {
 		try {
-			if (!this.db) throw new Error('Database not initialized');
+			if (!this.#db) throw new Error('Database not initialized');
 
 			const startTime = performance.now();
 			let data;
 
-			await this.db.transaction(async (tx) => {
+			await this.#db.transaction(async (tx) => {
 				data = await tx.exec(query);
 			});
 
@@ -84,6 +84,6 @@ export class PostgreSQL implements DBStrategy {
 	 * Closes the Database.
 	 */
 	async close(): Promise<void> {
-		await this.db.close();
+		await this.#db.close();
 	}
 }
