@@ -19,17 +19,17 @@
 	} from '@codemirror/language';
 	import { EditorState, StateEffect, type Extension } from '@codemirror/state';
 	import {
-		EditorView,
-		ViewUpdate,
 		crosshairCursor,
 		drawSelection,
 		dropCursor,
+		EditorView,
 		highlightActiveLine,
 		highlightTrailingWhitespace,
 		highlightWhitespace,
 		keymap,
 		lineNumbers,
-		rectangularSelection
+		rectangularSelection,
+		type ViewUpdate
 	} from '@codemirror/view';
 	import editorConfig from './store';
 

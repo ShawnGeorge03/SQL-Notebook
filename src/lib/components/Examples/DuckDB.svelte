@@ -1,17 +1,17 @@
 <script lang="ts">
-	import { PostgreSQL } from '$lib/db/engines/pgsql';
+	import { DuckDB } from '$lib/db/engines/duckdb';
 	import { onMount } from 'svelte';
 	import CodeBlock from '../Blocks/CodeBlock.svelte';
 
-	const DBS = $state<Record<string, PostgreSQL>>({});
+	const DBS = $state<Record<string, DuckDB>>({});
 	let selectedDB = $state('');
 	let query = $state('');
 	let result = $state('');
 
 	onMount(() => {
-		DBS['A'] = new PostgreSQL('A', { persistent: false });
-		DBS['B'] = new PostgreSQL('B', { persistent: false });
-		DBS['C'] = new PostgreSQL('C', { persistent: false });
+		DBS['A'] = new DuckDB();
+		DBS['B'] = new DuckDB();
+		DBS['C'] = new DuckDB();
 		selectedDB = 'A';
 	});
 
@@ -35,9 +35,9 @@
 	};
 
 	const loadSampleQuery = async () => {
-		query = await fetch('chinook.txt')
-			.then((response) => response.text())
-			.catch(() => (result += 'Unable to fetch Chinook Query.'));
+		query =
+			"CREATE TABLE new_tbl AS SELECT * FROM read_json_auto('https://api.datamuse.com/words?ml=sql');\n" +
+			'SELECT * FROM new_tbl;';
 	};
 
 	const close = async () => {
@@ -48,7 +48,7 @@
 </script>
 
 <div class="flex flex-col gap-5 rounded-xl border-4 border-black p-10 shadow-xl">
-	<h2 class="text-center text-2xl">PostgreSQL Database</h2>
+	<h2 class="text-center text-2xl">DuckDB Database</h2>
 
 	<div>
 		<h3 class="pb-2 text-xl">Database</h3>
@@ -64,7 +64,7 @@
 
 	<div class="flex flex-col">
 		<h3 class="pb-2 text-xl">Query</h3>
-		<CodeBlock type="psql" bind:content={query} />
+		<CodeBlock type="standard" bind:content={query} />
 	</div>
 	<div>
 		<h3 class="pb-2 text-xl">Result</h3>

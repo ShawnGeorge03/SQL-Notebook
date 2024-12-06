@@ -4,6 +4,6 @@ import { defineConfig } from 'vite';
 export default defineConfig({
 	plugins: [sveltekit()],
 	optimizeDeps: {
-		exclude: ['@electric-sql/pglite']
+		exclude: ['@electric-sql/pglite', '@duckdb/duckdb-wasm']
 	}
 });
