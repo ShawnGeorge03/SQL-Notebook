@@ -107,7 +107,16 @@ export class DuckDB implements DBStrategy {
         }
     }
 
-    close(): Promise<void> {
-        throw new Error('Method not implemented.');
+    /**
+     * Closes the Database & Connection.
+     */
+    async close(): Promise<void> {
+        await this.#conn.close().catch((e) => {
+            console.error('Failed to close connections in disposal: ', e);
+        });
+
+        await this.#db
+            .terminate()
+            .catch((error) => console.error('Failed to terminate DuckDBInstance: ', error));
     }
 }
