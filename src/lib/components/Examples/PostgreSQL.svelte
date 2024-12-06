@@ -3,25 +3,29 @@
 	import { onMount } from 'svelte';
 	import CodeBlock from '../Blocks/CodeBlock.svelte';
 
-	let db: PostgreSQL;
+	const DBS = $state<Record<string, PostgreSQL>>({});
+	let selectedDB = $state('');
 	let query = $state('');
 	let result = $state('');
 
 	onMount(() => {
-		db = new PostgreSQL('PGSQL', { persistent: false });
+		DBS['A'] = new PostgreSQL('A', { persistent: false });
+		DBS['B'] = new PostgreSQL('B', { persistent: false });
+		DBS['C'] = new PostgreSQL('C', { persistent: false });
+		selectedDB = 'A';
 	});
 
 	const init = async () => {
 		try {
-			await db.init();
-			result += '>> Successfully created DB\n';
+			await DBS[selectedDB].init();
+			result += `>> Successfully created DB: ${selectedDB}\n`;
 		} catch (error) {
 			result += (error instanceof Error ? error.message : 'Failed to initialize database') + '\n';
 		}
 	};
 
 	const execQuery = async () => {
-		const results = await db.exec(query);
+		const results = await DBS[selectedDB].exec(query);
 
 		if (results.error) {
 			result += `>> Error: ${JSON.stringify(results.error)}\n`;
@@ -30,34 +34,51 @@
 		}
 	};
 
-	const loadChinook = async () => {
+	const loadSampleQuery = async () => {
 		query = await fetch('chinook.txt')
 			.then((response) => response.text())
 			.catch(() => (result += 'Unable to fetch Chinook Query.'));
 	};
 
 	const close = async () => {
-		await db.close();
-		result += '>> Successfully closed DB\n';
+		await DBS[selectedDB].close();
+		delete DBS[selectedDB];
+		result += `>> Successfully closed DB: ${selectedDB}\n`;
 	};
 </script>
 
-<div class="rounded-xl border-4 border-black p-10 shadow-xl">
+<div class="flex flex-col gap-5 rounded-xl border-4 border-black p-10 shadow-xl">
 	<h2 class="text-center text-2xl">PostgreSQL Database</h2>
 
+	<div>
+		<h3 class="pb-2 text-xl">Database</h3>
+		<select
+			bind:value={selectedDB}
+			class="mt-1 block rounded-md border-gray-300 shadow-sm sm:text-sm"
+		>
+			{#each Object.keys(DBS) as dbName}
+				<option value={dbName}>{dbName}</option>
+			{/each}
+		</select>
+	</div>
+
 	<div class="flex flex-col">
-		<label for="query">Input:</label>
+		<h3 class="pb-2 text-xl">Query</h3>
 		<CodeBlock type="psql" bind:content={query} />
 	</div>
-	<div class="mt-8">
-		<p>Result:</p>
-		<div class="h-36 {result.length !== 0 ? 'overflow-y-scroll' : ''} whitespace-pre-wrap">
+	<div>
+		<h3 class="pb-2 text-xl">Result</h3>
+		<div
+			class="h-36 {result.length !== 0
+				? 'overflow-y-scroll'
+				: ''} whitespace-pre-wrap rounded-sm border-2 border-black p-2 dark:border-white"
+		>
 			{result}
 		</div>
 	</div>
 
 	<div class="mt-10">
-		<p>Database Settings</p>
+		<h3 class="pb-2 text-xl">Database Settings</h3>
 		<div class="flex items-center justify-center gap-10">
 			<button
 				class="cursor-pointer rounded border-none bg-cyan-700 px-4 py-2 text-white hover:bg-cyan-900"
@@ -67,9 +88,9 @@
 			</button>
 			<button
 				class="cursor-pointer rounded border-none bg-cyan-700 px-4 py-2 text-white hover:bg-cyan-900"
-				onclick={() => loadChinook()}
+				onclick={() => loadSampleQuery()}
 			>
-				Load Chinook
+				Load Sample
 			</button>
 			<button
 				class="cursor-pointer rounded border-none bg-cyan-700 px-4 py-2 text-white hover:bg-cyan-900"
