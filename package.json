@@ -19,6 +19,7 @@
 		"@codemirror/language": "^6.10.3",
 		"@codemirror/state": "^6.4.1",
 		"@codemirror/view": "^6.34.3",
+		"@duckdb/duckdb-wasm": "^1.29.0",
 		"@electric-sql/pglite": "^0.2.12",
 		"dompurify": "^3.2.1",
 		"github-markdown-css": "^5.8.0",
