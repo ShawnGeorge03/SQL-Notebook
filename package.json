@@ -23,7 +23,8 @@
 		"@electric-sql/pglite": "^0.2.12",
 		"dompurify": "^3.2.1",
 		"github-markdown-css": "^5.8.0",
-		"marked": "^15.0.2"
+		"marked": "^15.0.2",
+		"wa-sqlite": "github:rhashimoto/wa-sqlite#v1.0.4"
 	},
 	"devDependencies": {
 		"@sveltejs/adapter-auto": "^3.0.0",

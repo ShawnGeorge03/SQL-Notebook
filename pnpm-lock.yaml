@@ -44,6 +44,9 @@ importers:
       marked:
         specifier: ^15.0.2
         version: 15.0.2
+      wa-sqlite:
+        specifier: github:rhashimoto/wa-sqlite#v1.0.4
+        version: https://codeload.github.com/rhashimoto/wa-sqlite/tar.gz/ca1c304baf70dabe3ebb2b6601c667f5873d65b6
     devDependencies:
       '@sveltejs/adapter-auto':
         specifier: ^3.0.0
@@ -1682,6 +1685,10 @@ packages:
   w3c-keyname@2.2.8:
     resolution: {integrity: sha512-dpojBhNsCNN7T82Tm7k26A6G9ML3NkhDsnw9n/eoxSRlVBB4CEtIQ/KTCLI2Fwf3ataSXRhYFkQi3SlnFwPvPQ==}
 
+  wa-sqlite@https://codeload.github.com/rhashimoto/wa-sqlite/tar.gz/ca1c304baf70dabe3ebb2b6601c667f5873d65b6:
+    resolution: {tarball: https://codeload.github.com/rhashimoto/wa-sqlite/tar.gz/ca1c304baf70dabe3ebb2b6601c667f5873d65b6}
+    version: 1.0.4
+
   which@2.0.2:
     resolution: {integrity: sha512-BLI3Tl1TW3Pvl70l3yq3Y64i+awpwXqsGBYWkkqMtnbXgrMD+yj7rhW0kuEDxzJaYXGjEW5ogapKNMEKNMjibA==}
     engines: {node: '>= 8'}
@@ -3193,6 +3200,8 @@ snapshots:
       vite: 5.4.11(@types/node@20.17.9)
 
   w3c-keyname@2.2.8: {}
+
+  wa-sqlite@https://codeload.github.com/rhashimoto/wa-sqlite/tar.gz/ca1c304baf70dabe3ebb2b6601c667f5873d65b6: {}
 
   which@2.0.2:
     dependencies:
