@@ -35,7 +35,7 @@
 	};
 
 	const loadSampleQuery = async () => {
-		query = await fetch('chinook.txt')
+		query = await fetch('chinook/pgsql.txt')
 			.then((response) => response.text())
 			.catch(() => (result += 'Unable to fetch Chinook Query.'));
 	};
