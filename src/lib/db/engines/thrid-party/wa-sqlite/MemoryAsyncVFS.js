@@ -1,9 +1,12 @@
+// eslint-disable-next-line @typescript-eslint/ban-ts-comment
+// @ts-nocheck
+
 // Copyright 2024 Roy T. Hashimoto. All Rights Reserved.
 import { MemoryVFS } from './MemoryVFS.js';
 
 // Sample asynchronous in-memory filesystem. This filesystem requires an
 // asynchronous WebAssembly build (Asyncify or JSPI).
-export class MemoryAsyncVFS extends MemoryVFS {
+export default class MemoryAsyncVFS extends MemoryVFS {
 	static async create(name, module) {
 		const vfs = new MemoryVFS(name, module);
 		await vfs.isReady();

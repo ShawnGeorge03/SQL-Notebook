@@ -1,5 +1,8 @@
+// eslint-disable-next-line @typescript-eslint/ban-ts-comment
+// @ts-nocheck
+
 // Copyright 2024 Roy T. Hashimoto. All Rights Reserved.
-import * as VFS from 'wa-sqlite/src/sqlite-constants.js';
+import * as CONSTS from 'wa-sqlite/src/sqlite-constants.js';
 
 const DEFAULT_SECTOR_SIZE = 512;
 
@@ -48,7 +51,7 @@ export class Base {
 	 * @returns {number|Promise<number>}
 	 */
 	xOpen(pVfs, zName, pFile, flags, pOutFlags) {
-		return VFS.SQLITE_CANTOPEN;
+		return CONSTS.SQLITE_CANTOPEN;
 	}
 
 	/**
@@ -58,7 +61,7 @@ export class Base {
 	 * @returns {number|Promise<number>}
 	 */
 	xDelete(pVfs, zName, syncDir) {
-		return VFS.SQLITE_OK;
+		return CONSTS.SQLITE_OK;
 	}
 
 	/**
@@ -69,7 +72,7 @@ export class Base {
 	 * @returns {number|Promise<number>}
 	 */
 	xAccess(pVfs, zName, flags, pResOut) {
-		return VFS.SQLITE_OK;
+		return CONSTS.SQLITE_OK;
 	}
 
 	/**
@@ -80,7 +83,7 @@ export class Base {
 	 * @returns {number|Promise<number>}
 	 */
 	xFullPathname(pVfs, zName, nOut, zOut) {
-		return VFS.SQLITE_OK;
+		return CONSTS.SQLITE_OK;
 	}
 
 	/**
@@ -90,7 +93,7 @@ export class Base {
 	 * @returns {number|Promise<number>}
 	 */
 	xGetLastError(pVfs, nBuf, zBuf) {
-		return VFS.SQLITE_OK;
+		return CONSTS.SQLITE_OK;
 	}
 
 	/**
@@ -98,7 +101,7 @@ export class Base {
 	 * @returns {number|Promise<number>}
 	 */
 	xClose(pFile) {
-		return VFS.SQLITE_OK;
+		return CONSTS.SQLITE_OK;
 	}
 
 	/**
@@ -110,7 +113,7 @@ export class Base {
 	 * @returns {number|Promise<number>}
 	 */
 	xRead(pFile, pData, iAmt, iOffsetLo, iOffsetHi) {
-		return VFS.SQLITE_OK;
+		return CONSTS.SQLITE_OK;
 	}
 
 	/**
@@ -122,7 +125,7 @@ export class Base {
 	 * @returns {number|Promise<number>}
 	 */
 	xWrite(pFile, pData, iAmt, iOffsetLo, iOffsetHi) {
-		return VFS.SQLITE_OK;
+		return CONSTS.SQLITE_OK;
 	}
 
 	/**
@@ -132,7 +135,7 @@ export class Base {
 	 * @returns {number|Promise<number>}
 	 */
 	xTruncate(pFile, sizeLo, sizeHi) {
-		return VFS.SQLITE_OK;
+		return CONSTS.SQLITE_OK;
 	}
 
 	/**
@@ -141,7 +144,7 @@ export class Base {
 	 * @returns {number|Promise<number>}
 	 */
 	xSync(pFile, flags) {
-		return VFS.SQLITE_OK;
+		return CONSTS.SQLITE_OK;
 	}
 
 	/**
@@ -151,7 +154,7 @@ export class Base {
 	 * @returns {number|Promise<number>}
 	 */
 	xFileSize(pFile, pSize) {
-		return VFS.SQLITE_OK;
+		return CONSTS.SQLITE_OK;
 	}
 
 	/**
@@ -160,7 +163,7 @@ export class Base {
 	 * @returns {number|Promise<number>}
 	 */
 	xLock(pFile, lockType) {
-		return VFS.SQLITE_OK;
+		return CONSTS.SQLITE_OK;
 	}
 
 	/**
@@ -169,7 +172,7 @@ export class Base {
 	 * @returns {number|Promise<number>}
 	 */
 	xUnlock(pFile, lockType) {
-		return VFS.SQLITE_OK;
+		return CONSTS.SQLITE_OK;
 	}
 
 	/**
@@ -178,7 +181,7 @@ export class Base {
 	 * @returns {number|Promise<number>}
 	 */
 	xCheckReservedLock(pFile, pResOut) {
-		return VFS.SQLITE_OK;
+		return CONSTS.SQLITE_OK;
 	}
 
 	/**
@@ -188,7 +191,7 @@ export class Base {
 	 * @returns {number|Promise<number>}
 	 */
 	xFileControl(pFile, op, pArg) {
-		return VFS.SQLITE_NOTFOUND;
+		return CONSTS.SQLITE_NOTFOUND;
 	}
 
 	/**
@@ -209,12 +212,12 @@ export class Base {
 }
 
 export const FILE_TYPE_MASK = [
-	VFS.SQLITE_OPEN_MAIN_DB,
-	VFS.SQLITE_OPEN_MAIN_JOURNAL,
-	VFS.SQLITE_OPEN_TEMP_DB,
-	VFS.SQLITE_OPEN_TEMP_JOURNAL,
-	VFS.SQLITE_OPEN_TRANSIENT_DB,
-	VFS.SQLITE_OPEN_SUBJOURNAL,
-	VFS.SQLITE_OPEN_SUPER_JOURNAL,
-	VFS.SQLITE_OPEN_WAL
+	CONSTS.SQLITE_OPEN_MAIN_DB,
+	CONSTS.SQLITE_OPEN_MAIN_JOURNAL,
+	CONSTS.SQLITE_OPEN_TEMP_DB,
+	CONSTS.SQLITE_OPEN_TEMP_JOURNAL,
+	CONSTS.SQLITE_OPEN_TRANSIENT_DB,
+	CONSTS.SQLITE_OPEN_SUBJOURNAL,
+	CONSTS.SQLITE_OPEN_SUPER_JOURNAL,
+	CONSTS.SQLITE_OPEN_WAL
 ].reduce((mask, element) => mask | element);

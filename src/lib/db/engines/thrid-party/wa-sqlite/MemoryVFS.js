@@ -1,6 +1,9 @@
+// eslint-disable-next-line @typescript-eslint/ban-ts-comment
+// @ts-nocheck
+
 // Copyright 2024 Roy T. Hashimoto. All Rights Reserved.
+import * as CONSTS from 'wa-sqlite/src/sqlite-constants.js';
 import { FacadeVFS } from './FacadeVFS.js';
-import * as VFS from './VFS.js';
 
 // Sample in-memory filesystem.
 export class MemoryVFS extends FacadeVFS {
@@ -39,7 +42,7 @@ export class MemoryVFS extends FacadeVFS {
 
 		let file = this.mapNameToFile.get(pathname);
 		if (!file) {
-			if (flags & VFS.SQLITE_OPEN_CREATE) {
+			if (flags & CONSTS.SQLITE_OPEN_CREATE) {
 				// Create a new file object.
 				file = {
 					pathname,
@@ -49,14 +52,14 @@ export class MemoryVFS extends FacadeVFS {
 				};
 				this.mapNameToFile.set(pathname, file);
 			} else {
-				return VFS.SQLITE_CANTOPEN;
+				return CONSTS.SQLITE_CANTOPEN;
 			}
 		}
 
 		// Put the file in the opened files map.
 		this.mapIdToFile.set(fileId, file);
 		pOutFlags.setInt32(0, flags, true);
-		return VFS.SQLITE_OK;
+		return CONSTS.SQLITE_OK;
 	}
 
 	/**
@@ -67,10 +70,10 @@ export class MemoryVFS extends FacadeVFS {
 		const file = this.mapIdToFile.get(fileId);
 		this.mapIdToFile.delete(fileId);
 
-		if (file.flags & VFS.SQLITE_OPEN_DELETEONCLOSE) {
+		if (file.flags & CONSTS.SQLITE_OPEN_DELETEONCLOSE) {
 			this.mapNameToFile.delete(file.pathname);
 		}
-		return VFS.SQLITE_OK;
+		return CONSTS.SQLITE_OK;
 	}
 
 	/**
@@ -94,9 +97,9 @@ export class MemoryVFS extends FacadeVFS {
 		if (nBytes < pData.byteLength) {
 			// Zero unused area of read buffer.
 			pData.fill(0, nBytes);
-			return VFS.SQLITE_IOERR_SHORT_READ;
+			return CONSTS.SQLITE_IOERR_SHORT_READ;
 		}
-		return VFS.SQLITE_OK;
+		return CONSTS.SQLITE_OK;
 	}
 
 	/**
@@ -118,7 +121,7 @@ export class MemoryVFS extends FacadeVFS {
 		// Copy data.
 		new Uint8Array(file.data, iOffset, pData.byteLength).set(pData);
 		file.size = Math.max(file.size, iOffset + pData.byteLength);
-		return VFS.SQLITE_OK;
+		return CONSTS.SQLITE_OK;
 	}
 
 	/**
@@ -131,7 +134,7 @@ export class MemoryVFS extends FacadeVFS {
 
 		// For simplicity we don't make the ArrayBuffer smaller.
 		file.size = Math.min(file.size, iSize);
-		return VFS.SQLITE_OK;
+		return CONSTS.SQLITE_OK;
 	}
 
 	/**
@@ -143,7 +146,7 @@ export class MemoryVFS extends FacadeVFS {
 		const file = this.mapIdToFile.get(fileId);
 
 		pSize64.setBigInt64(0, BigInt(file.size), true);
-		return VFS.SQLITE_OK;
+		return CONSTS.SQLITE_OK;
 	}
 
 	/**
@@ -156,7 +159,7 @@ export class MemoryVFS extends FacadeVFS {
 		const pathname = url.pathname;
 
 		this.mapNameToFile.delete(pathname);
-		return VFS.SQLITE_OK;
+		return CONSTS.SQLITE_OK;
 	}
 
 	/**
@@ -171,6 +174,6 @@ export class MemoryVFS extends FacadeVFS {
 
 		const file = this.mapNameToFile.get(pathname);
 		pResOut.setInt32(0, file ? 1 : 0, true);
-		return VFS.SQLITE_OK;
+		return CONSTS.SQLITE_OK;
 	}
 }

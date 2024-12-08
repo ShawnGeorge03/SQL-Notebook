@@ -1,4 +1,8 @@
-import * as VFS from './VFS.js';
+// eslint-disable-next-line @typescript-eslint/ban-ts-comment
+// @ts-nocheck
+
+// Copyright 2024 Roy T. Hashimoto. All Rights Reserved.
+import * as CONSTS from 'wa-sqlite/src/sqlite-constants.js';
 
 // Options for navigator.locks.request().
 /** @type {LockOptions} */ const SHARED = { mode: 'shared' };
@@ -54,14 +58,14 @@ export const WebLocksMixin = (superclass) =>
 					const name = this.getFilename(fileId);
 					const state = {
 						baseName: name,
-						type: VFS.SQLITE_LOCK_NONE,
+						type: CONSTS.SQLITE_LOCK_NONE,
 						writeHint: false
 					};
 					this.#mapIdToState.set(fileId, state);
 				}
 
 				const lockState = this.#mapIdToState.get(fileId);
-				if (lockType <= lockState.type) return VFS.SQLITE_OK;
+				if (lockType <= lockState.type) return CONSTS.SQLITE_OK;
 
 				switch (this.#options.lockPolicy) {
 					case 'exclusive':
@@ -72,7 +76,7 @@ export const WebLocksMixin = (superclass) =>
 				}
 			} catch (e) {
 				console.error('WebLocksMixin: lock error', e);
-				return VFS.SQLITE_IOERR_LOCK;
+				return CONSTS.SQLITE_IOERR_LOCK;
 			}
 		}
 
@@ -84,7 +88,7 @@ export const WebLocksMixin = (superclass) =>
 		async jUnlock(fileId, lockType) {
 			try {
 				const lockState = this.#mapIdToState.get(fileId);
-				if (lockType >= lockState.type) return VFS.SQLITE_OK;
+				if (lockType >= lockState.type) return CONSTS.SQLITE_OK;
 
 				switch (this.#options.lockPolicy) {
 					case 'exclusive':
@@ -95,7 +99,7 @@ export const WebLocksMixin = (superclass) =>
 				}
 			} catch (e) {
 				console.error('WebLocksMixin: unlock error', e);
-				return VFS.SQLITE_IOERR_UNLOCK;
+				return CONSTS.SQLITE_IOERR_UNLOCK;
 			}
 		}
 
@@ -116,10 +120,10 @@ export const WebLocksMixin = (superclass) =>
 				}
 			} catch (e) {
 				console.error('WebLocksMixin: check reserved lock error', e);
-				return VFS.SQLITE_IOERR_CHECKRESERVEDLOCK;
+				return CONSTS.SQLITE_IOERR_CHECKRESERVEDLOCK;
 			}
 			pResOut.setInt32(0, 0, true);
-			return VFS.SQLITE_OK;
+			return CONSTS.SQLITE_OK;
 		}
 
 		/**
@@ -133,13 +137,13 @@ export const WebLocksMixin = (superclass) =>
 				this.#mapIdToState.get(pFile) ??
 				(() => {
 					// Call jLock() to create the lock state.
-					this.jLock(pFile, VFS.SQLITE_LOCK_NONE);
+					this.jLock(pFile, CONSTS.SQLITE_LOCK_NONE);
 					return this.#mapIdToState.get(pFile);
 				})();
 			if (op === WebLocksMixin.WRITE_HINT_OP_CODE && this.#options.lockPolicy === 'shared+hint') {
 				lockState.writeHint = true;
 			}
-			return VFS.SQLITE_NOTFOUND;
+			return CONSTS.SQLITE_NOTFOUND;
 		}
 
 		/**
@@ -150,12 +154,12 @@ export const WebLocksMixin = (superclass) =>
 		async #lockExclusive(lockState, lockType) {
 			if (!lockState.access) {
 				if (!(await this.#acquire(lockState, 'access'))) {
-					return VFS.SQLITE_BUSY;
+					return CONSTS.SQLITE_BUSY;
 				}
 				console.assert(!!lockState.access);
 			}
 			lockState.type = lockType;
-			return VFS.SQLITE_OK;
+			return CONSTS.SQLITE_OK;
 		}
 
 		/**
@@ -164,12 +168,12 @@ export const WebLocksMixin = (superclass) =>
 		 * @returns {number}
 		 */
 		#unlockExclusive(lockState, lockType) {
-			if (lockType === VFS.SQLITE_LOCK_NONE) {
+			if (lockType === CONSTS.SQLITE_LOCK_NONE) {
 				lockState.access?.();
 				console.assert(!lockState.access);
 			}
 			lockState.type = lockType;
-			return VFS.SQLITE_OK;
+			return CONSTS.SQLITE_OK;
 		}
 
 		/**
@@ -179,7 +183,7 @@ export const WebLocksMixin = (superclass) =>
 		 */
 		#checkReservedExclusive(lockState, pResOut) {
 			pResOut.setInt32(0, 0, true);
-			return VFS.SQLITE_OK;
+			return CONSTS.SQLITE_OK;
 		}
 
 		/**
@@ -189,16 +193,16 @@ export const WebLocksMixin = (superclass) =>
 		 */
 		async #lockShared(lockState, lockType) {
 			switch (lockState.type) {
-				case VFS.SQLITE_LOCK_NONE:
+				case CONSTS.SQLITE_LOCK_NONE:
 					switch (lockType) {
-						case VFS.SQLITE_LOCK_SHARED:
+						case CONSTS.SQLITE_LOCK_SHARED:
 							if (lockState.writeHint) {
 								// xFileControl() has hinted that this transaction will
 								// write. Acquire the hint lock, which is required to reach
 								// the RESERVED state.
 								if (!(await this.#acquire(lockState, 'hint'))) {
 									// Timeout before lock acquired.
-									return VFS.SQLITE_BUSY;
+									return CONSTS.SQLITE_BUSY;
 								}
 							}
 
@@ -206,7 +210,7 @@ export const WebLocksMixin = (superclass) =>
 							if (!(await this.#acquire(lockState, 'gate', SHARED))) {
 								// Timeout before lock acquired.
 								lockState.hint?.();
-								return VFS.SQLITE_BUSY;
+								return CONSTS.SQLITE_BUSY;
 							}
 							await this.#acquire(lockState, 'access', SHARED);
 							lockState.gate();
@@ -219,16 +223,16 @@ export const WebLocksMixin = (superclass) =>
 							throw new Error('unsupported lock transition');
 					}
 					break;
-				case VFS.SQLITE_LOCK_SHARED:
+				case CONSTS.SQLITE_LOCK_SHARED:
 					switch (lockType) {
-						case VFS.SQLITE_LOCK_RESERVED:
+						case CONSTS.SQLITE_LOCK_RESERVED:
 							if (this.#options.lockPolicy === 'shared+hint') {
 								// Ideally we should already have the hint lock, but if not
 								// poll for it here.
 								if (!lockState.hint && !(await this.#acquire(lockState, 'hint', POLL_EXCLUSIVE))) {
 									// Another connection has the hint lock so this is a
 									// deadlock. This connection must retry.
-									return VFS.SQLITE_BUSY;
+									return CONSTS.SQLITE_BUSY;
 								}
 							}
 
@@ -240,7 +244,7 @@ export const WebLocksMixin = (superclass) =>
 								// lock because we hold a shared access lock. This connection
 								// must retry.
 								lockState.hint?.();
-								return VFS.SQLITE_BUSY;
+								return CONSTS.SQLITE_BUSY;
 							}
 							lockState.access();
 							console.assert(!lockState.gate);
@@ -248,18 +252,18 @@ export const WebLocksMixin = (superclass) =>
 							console.assert(!!lockState.reserved);
 							break;
 
-						case VFS.SQLITE_LOCK_EXCLUSIVE:
+						case CONSTS.SQLITE_LOCK_EXCLUSIVE:
 							// Jumping directly from SHARED to EXCLUSIVE without passing
 							// through RESERVED is only done with a hot journal.
 							if (!(await this.#acquire(lockState, 'gate'))) {
 								// Timeout before lock acquired.
-								return VFS.SQLITE_BUSY;
+								return CONSTS.SQLITE_BUSY;
 							}
 							lockState.access();
 							if (!(await this.#acquire(lockState, 'access'))) {
 								// Timeout before lock acquired.
 								lockState.gate();
-								return VFS.SQLITE_BUSY;
+								return CONSTS.SQLITE_BUSY;
 							}
 							console.assert(!!lockState.gate);
 							console.assert(!!lockState.access);
@@ -270,20 +274,20 @@ export const WebLocksMixin = (superclass) =>
 							throw new Error('unsupported lock transition');
 					}
 					break;
-				case VFS.SQLITE_LOCK_RESERVED:
+				case CONSTS.SQLITE_LOCK_RESERVED:
 					switch (lockType) {
-						case VFS.SQLITE_LOCK_EXCLUSIVE:
+						case CONSTS.SQLITE_LOCK_EXCLUSIVE:
 							// Prevent other connections from entering the SHARED state.
 							if (!(await this.#acquire(lockState, 'gate'))) {
 								// Timeout before lock acquired.
-								return VFS.SQLITE_BUSY;
+								return CONSTS.SQLITE_BUSY;
 							}
 
 							// Block until all other connections exit the SHARED state.
 							if (!(await this.#acquire(lockState, 'access'))) {
 								// Timeout before lock acquired.
 								lockState.gate();
-								return VFS.SQLITE_BUSY;
+								return CONSTS.SQLITE_BUSY;
 							}
 							console.assert(!!lockState.gate);
 							console.assert(!!lockState.access);
@@ -296,7 +300,7 @@ export const WebLocksMixin = (superclass) =>
 					break;
 			}
 			lockState.type = lockType;
-			return VFS.SQLITE_OK;
+			return CONSTS.SQLITE_OK;
 		}
 
 		/**
@@ -306,7 +310,7 @@ export const WebLocksMixin = (superclass) =>
 		 */
 		async #unlockShared(lockState, lockType) {
 			// lockType can only be SQLITE_LOCK_SHARED or SQLITE_LOCK_NONE.
-			if (lockType === VFS.SQLITE_LOCK_NONE) {
+			if (lockType === CONSTS.SQLITE_LOCK_NONE) {
 				lockState.access?.();
 				lockState.gate?.();
 				lockState.reserved?.();
@@ -317,9 +321,9 @@ export const WebLocksMixin = (superclass) =>
 				console.assert(!lockState.reserved);
 				console.assert(!lockState.hint);
 			} else {
-				// lockType === VFS.SQLITE_LOCK_SHARED
+				// lockType === CONSTS.SQLITE_LOCK_SHARED
 				switch (lockState.type) {
-					case VFS.SQLITE_LOCK_EXCLUSIVE:
+					case CONSTS.SQLITE_LOCK_EXCLUSIVE:
 						// Release our exclusive access lock and reacquire it with a
 						// shared lock. This should always succeed because we hold
 						// the gate lock.
@@ -336,7 +340,7 @@ export const WebLocksMixin = (superclass) =>
 						console.assert(!lockState.reserved);
 						break;
 
-					case VFS.SQLITE_LOCK_RESERVED:
+					case CONSTS.SQLITE_LOCK_RESERVED:
 						// This transition is rare, probably only on an I/O error
 						// while writing to a journal file.
 						await this.#acquire(lockState, 'access', SHARED);
@@ -349,7 +353,7 @@ export const WebLocksMixin = (superclass) =>
 				}
 			}
 			lockState.type = lockType;
-			return VFS.SQLITE_OK;
+			return CONSTS.SQLITE_OK;
 		}
 
 		/**
@@ -365,7 +369,7 @@ export const WebLocksMixin = (superclass) =>
 			} else {
 				pResOut.setInt32(0, 1, true);
 			}
-			return VFS.SQLITE_OK;
+			return CONSTS.SQLITE_OK;
 		}
 
 		/**

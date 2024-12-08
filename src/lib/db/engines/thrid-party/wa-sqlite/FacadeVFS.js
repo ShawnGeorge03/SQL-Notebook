@@ -1,4 +1,8 @@
+// eslint-disable-next-line @typescript-eslint/ban-ts-comment
+// @ts-nocheck
+
 // Copyright 2024 Roy T. Hashimoto. All Rights Reserved.
+import * as CONSTS from 'wa-sqlite/src/sqlite-constants.js';
 import * as VFS from './VFS.js';
 
 const AsyncFunction = Object.getPrototypeOf(async function () {}).constructor;
@@ -46,7 +50,7 @@ export class FacadeVFS extends VFS.Base {
 	 * @returns {number|Promise<number>}
 	 */
 	jOpen(filename, pFile, flags, pOutFlags) {
-		return VFS.SQLITE_CANTOPEN;
+		return CONSTS.SQLITE_CANTOPEN;
 	}
 
 	/**
@@ -55,7 +59,7 @@ export class FacadeVFS extends VFS.Base {
 	 * @returns {number|Promise<number>}
 	 */
 	jDelete(filename, syncDir) {
-		return VFS.SQLITE_OK;
+		return CONSTS.SQLITE_OK;
 	}
 
 	/**
@@ -65,7 +69,7 @@ export class FacadeVFS extends VFS.Base {
 	 * @returns {number|Promise<number>}
 	 */
 	jAccess(filename, flags, pResOut) {
-		return VFS.SQLITE_OK;
+		return CONSTS.SQLITE_OK;
 	}
 
 	/**
@@ -76,10 +80,10 @@ export class FacadeVFS extends VFS.Base {
 	jFullPathname(filename, zOut) {
 		// Copy the filename to the output buffer.
 		const { read, written } = new TextEncoder().encodeInto(filename, zOut);
-		if (read < filename.length) return VFS.SQLITE_IOERR;
-		if (written >= zOut.length) return VFS.SQLITE_IOERR;
+		if (read < filename.length) return CONSTS.SQLITE_IOERR;
+		if (written >= zOut.length) return CONSTS.SQLITE_IOERR;
 		zOut[written] = 0;
-		return VFS.SQLITE_OK;
+		return CONSTS.SQLITE_OK;
 	}
 
 	/**
@@ -87,7 +91,7 @@ export class FacadeVFS extends VFS.Base {
 	 * @returns {number|Promise<number>}
 	 */
 	jGetLastError(zBuf) {
-		return VFS.SQLITE_OK;
+		return CONSTS.SQLITE_OK;
 	}
 
 	/**
@@ -95,7 +99,7 @@ export class FacadeVFS extends VFS.Base {
 	 * @returns {number|Promise<number>}
 	 */
 	jClose(pFile) {
-		return VFS.SQLITE_OK;
+		return CONSTS.SQLITE_OK;
 	}
 
 	/**
@@ -106,7 +110,7 @@ export class FacadeVFS extends VFS.Base {
 	 */
 	jRead(pFile, pData, iOffset) {
 		pData.fill(0);
-		return VFS.SQLITE_IOERR_SHORT_READ;
+		return CONSTS.SQLITE_IOERR_SHORT_READ;
 	}
 
 	/**
@@ -116,7 +120,7 @@ export class FacadeVFS extends VFS.Base {
 	 * @returns {number|Promise<number>}
 	 */
 	jWrite(pFile, pData, iOffset) {
-		return VFS.SQLITE_IOERR_WRITE;
+		return CONSTS.SQLITE_IOERR_WRITE;
 	}
 
 	/**
@@ -125,7 +129,7 @@ export class FacadeVFS extends VFS.Base {
 	 * @returns {number|Promise<number>}
 	 */
 	jTruncate(pFile, size) {
-		return VFS.SQLITE_OK;
+		return CONSTS.SQLITE_OK;
 	}
 
 	/**
@@ -134,7 +138,7 @@ export class FacadeVFS extends VFS.Base {
 	 * @returns {number|Promise<number>}
 	 */
 	jSync(pFile, flags) {
-		return VFS.SQLITE_OK;
+		return CONSTS.SQLITE_OK;
 	}
 
 	/**
@@ -143,7 +147,7 @@ export class FacadeVFS extends VFS.Base {
 	 * @returns {number|Promise<number>}
 	 */
 	jFileSize(pFile, pSize) {
-		return VFS.SQLITE_OK;
+		return CONSTS.SQLITE_OK;
 	}
 
 	/**
@@ -152,7 +156,7 @@ export class FacadeVFS extends VFS.Base {
 	 * @returns {number|Promise<number>}
 	 */
 	jLock(pFile, lockType) {
-		return VFS.SQLITE_OK;
+		return CONSTS.SQLITE_OK;
 	}
 
 	/**
@@ -161,7 +165,7 @@ export class FacadeVFS extends VFS.Base {
 	 * @returns {number|Promise<number>}
 	 */
 	jUnlock(pFile, lockType) {
-		return VFS.SQLITE_OK;
+		return CONSTS.SQLITE_OK;
 	}
 
 	/**
@@ -171,7 +175,7 @@ export class FacadeVFS extends VFS.Base {
 	 */
 	jCheckReservedLock(pFile, pResOut) {
 		pResOut.setInt32(0, 0, true);
-		return VFS.SQLITE_OK;
+		return CONSTS.SQLITE_OK;
 	}
 
 	/**
@@ -181,7 +185,7 @@ export class FacadeVFS extends VFS.Base {
 	 * @returns {number|Promise<number>}
 	 */
 	jFileControl(pFile, op, pArg) {
-		return VFS.SQLITE_NOTFOUND;
+		return CONSTS.SQLITE_NOTFOUND;
 	}
 
 	/**
@@ -469,7 +473,7 @@ export class FacadeVFS extends VFS.Base {
 	}
 
 	#decodeFilename(zName, flags) {
-		if (flags & VFS.SQLITE_OPEN_URI) {
+		if (flags & CONSTS.SQLITE_OPEN_URI) {
 			// The first null-terminated string is the URI path. Subsequent
 			// strings are query parameter keys and values.
 			// https://www.sqlite.org/c3ref/open.html#urifilenamesinsqlite3open
