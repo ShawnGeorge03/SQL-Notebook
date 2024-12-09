@@ -19,12 +19,14 @@
 		"@codemirror/language": "^6.10.3",
 		"@codemirror/state": "^6.4.1",
 		"@codemirror/view": "^6.34.3",
+		"@duckdb/duckdb-wasm": "^1.29.0",
 		"@electric-sql/pglite": "^0.2.12",
 		"dexie": "^4.0.10",
-		"nanoid": "^5.0.9",
 		"dompurify": "^3.2.1",
 		"github-markdown-css": "^5.8.0",
-		"marked": "^15.0.2"
+		"marked": "^15.0.2",
+		"nanoid": "^5.0.9",
+		"wa-sqlite": "github:rhashimoto/wa-sqlite#v1.0.4"
 	},
 	"devDependencies": {
 		"@sveltejs/adapter-auto": "^3.0.0",
@@ -34,6 +36,7 @@
 		"@tailwindcss/typography": "^0.5.15",
 		"@types/eslint": "^9.6.0",
 		"@types/sharedworker": "^0.0.135",
+		"@vercel/speed-insights": "^1.1.0",
 		"autoprefixer": "^10.4.20",
 		"eslint": "^9.7.0",
 		"eslint-config-prettier": "^9.1.0",

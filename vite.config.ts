@@ -7,6 +7,6 @@ export default defineConfig({
 		format: 'es'
 	},
 	optimizeDeps: {
-		exclude: ['@electric-sql/pglite']
+		exclude: ['@electric-sql/pglite', '@duckdb/duckdb-wasm', 'wa-sqlite']
 	}
 });

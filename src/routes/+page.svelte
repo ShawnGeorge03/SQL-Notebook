@@ -1,4 +1,6 @@
 <script lang="ts">
+	import EditorSettings from '$lib/components/Blocks/EditorSettings.svelte';
+	import TextBlock from '$lib/components/Blocks/TextBlock.svelte';
 	import ActiveDBs from '$lib/components/Manager/ActiveDBs.svelte';
 	import AvailableDBs from '$lib/components/Manager/AvailableDBs.svelte';
 	import CloseDB from '$lib/components/Manager/CloseDB.svelte';
@@ -12,6 +14,7 @@
 	import { onMount } from 'svelte';
 
 	let loading: boolean = $state(true);
+	let markdownContent: string = $state('');
 
 	let dbWorkerService: DBWorkerService;
 
@@ -47,6 +50,14 @@
 			<CloseDB />
 			<TerminateDB />
 			<Demo />
+		</div>
+
+		<div class="mx-36 mt-10 min-h-screen">
+			<EditorSettings />
+			<div class="mt-10 rounded-xl border-4 border-black p-10 shadow-xl">
+				<h2 class="mb-5 text-center text-2xl">Markdown Content</h2>
+				<TextBlock class="markdown-editor" type="markdown" bind:content={markdownContent} />
+			</div>
 		</div>
 
 		<Notebook />

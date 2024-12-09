@@ -1,4 +1,4 @@
-import { iDbName, sqlNoteDB } from '$lib/data/schema';
+import iDB, { iDBname } from '$lib/indexeddb/schema';
 import { PostgreSQL } from '../engines/pgsql';
 import type { DBStrategy } from '../engines/types';
 import type { DBInfo, DBWorkerMessages } from './types';
@@ -10,8 +10,8 @@ const updateAvailableDBs = async (port: MessagePort) => {
     try {
         const databaseInfo: DBInfo[] = [];
 
-        await sqlNoteDB.transaction('r', sqlNoteDB.databases, async () => {
-            await sqlNoteDB.databases.each((database) => {
+        await iDB.transaction('r', iDB.databases, async () => {
+            await iDB.databases.each((database) => {
                 if (!Object.keys(activeDBs).includes(database.name)) {
                     databaseInfo.push({
                         name: database.name,
@@ -34,8 +34,8 @@ const updateAvailableDBs = async (port: MessagePort) => {
 
 const getActiveDBs = async (port: MessagePort) => {
     const databaseInfo: DBInfo[] = [];
-    await sqlNoteDB.transaction('r', sqlNoteDB.databases, async () => {
-        const databases = await sqlNoteDB.databases.bulkGet(Object.keys(activeDBs));
+    await iDB.transaction('r', iDB.databases, async () => {
+        const databases = await iDB.databases.bulkGet(Object.keys(activeDBs));
         databases.forEach((database) => {
             if (database)
                 databaseInfo.push({
@@ -67,7 +67,7 @@ self.onconnect = async (event: MessageEvent) => {
             case 'CREATE_DB': {
                 const { dbName, engine, persistent } = data.args;
 
-                if (dbName === iDbName) {
+                if (dbName === iDBname) {
                     postError(port, 'CREATE_DB', {
                         message: `Datebase with name "${dbName}" is not allowed.`,
                         cause: 'Used by SQL Note.'
@@ -77,7 +77,7 @@ self.onconnect = async (event: MessageEvent) => {
 
                 await updateAvailableDBs(port);
 
-                const doesDBExist = await sqlNoteDB.databases.get(dbName);
+                const doesDBExist = await iDB.databases.get(dbName);
 
                 if (doesDBExist) {
                     postError(port, 'CREATE_DB', {
@@ -99,9 +99,10 @@ self.onconnect = async (event: MessageEvent) => {
 
                 await db.init();
 
-                await sqlNoteDB.databases.add({
+                await iDB.databases.add({
                     name: dbName,
                     persistent,
+                    createdBy: 'user',
                     createdOn: new Date().toLocaleString(),
                     modifiedOn: new Date().toLocaleString(),
                     engine,
@@ -130,7 +131,7 @@ self.onconnect = async (event: MessageEvent) => {
                 }
 
                 await updateAvailableDBs(port);
-                const config = await sqlNoteDB.databases.get(dbName);
+                const config = await iDB.databases.get(dbName);
 
                 if (!config) {
                     postError(port, 'LOAD_DB', {
@@ -158,7 +159,7 @@ self.onconnect = async (event: MessageEvent) => {
 
                 postSuccess(port, 'LOAD_DB', { dbName });
 
-                await sqlNoteDB.databases.update(dbName, { modifiedOn: new Date().toLocaleString() });
+                await iDB.databases.update(dbName, { modifiedOn: new Date().toLocaleString() });
 
                 break;
             }
@@ -212,7 +213,7 @@ self.onconnect = async (event: MessageEvent) => {
                     break;
                 }
 
-                const config = await sqlNoteDB.databases.get(dbName);
+                const config = await iDB.databases.get(dbName);
 
                 if (!config) {
                     postError(port, 'TERMINATE_DB', {
@@ -243,8 +244,8 @@ self.onconnect = async (event: MessageEvent) => {
 
                 toDelete.onsuccess = async () => {
 
-                    await sqlNoteDB.transaction('readwrite', sqlNoteDB.databases, async () => {
-                        await sqlNoteDB.databases.delete(dbName);
+                    await iDB.transaction('readwrite', iDB.databases, async () => {
+                        await iDB.databases.delete(dbName);
                     })
 
                     await updateAvailableDBs(port);
