@@ -9,9 +9,10 @@
 	let result = $state('');
 
 	onMount(() => {
-		DBS['sqlite-persistent'] = new SQLite('sqlite-persistent', { persistent: true });
-		DBS['sqlite-memory'] = new SQLite('sqlite-memory', { persistent: false });
-		selectedDB = 'sqlite-memory';
+		const dbNames = ['sqlite-memory', 'sqlite-persistent'];
+		for (const dbName of dbNames)
+			DBS[dbName] = new SQLite(dbName, { persistent: dbName === 'sqlite-persistent' });
+		selectedDB = dbNames[0];
 	});
 
 	const init = async () => {

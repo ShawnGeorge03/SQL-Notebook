@@ -9,10 +9,10 @@
 	let result = $state('');
 
 	onMount(() => {
-		DBS['A'] = new PostgreSQL('A', { persistent: false });
-		DBS['B'] = new PostgreSQL('B', { persistent: false });
-		DBS['C'] = new PostgreSQL('C', { persistent: false });
-		selectedDB = 'A';
+		const dbNames = ['pgsql-memory', 'pgsql-persistent'];
+		for (const dbName of dbNames)
+			DBS[dbName] = new PostgreSQL(dbName, { persistent: dbName === 'pgsql-persistent' });
+		selectedDB = dbNames[0];
 	});
 
 	const init = async () => {
