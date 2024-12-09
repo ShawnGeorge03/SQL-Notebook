@@ -3,6 +3,7 @@
 	import TextBlock from '$lib/components/Blocks/TextBlock.svelte';
 	import DuckDB from '$lib/components/Examples/DuckDB.svelte';
 	import PostgreSQL from '$lib/components/Examples/PostgreSQL.svelte';
+	import SQLite from '$lib/components/Examples/SQLite.svelte';
 
 	let markdownContent = $state('');
 </script>
@@ -12,6 +13,7 @@
 	<div class="flex flex-col gap-10">
 		<PostgreSQL />
 		<DuckDB />
+		<SQLite />
 	</div>
 	<div class="mt-10 rounded-xl border-4 border-black p-10 shadow-xl">
 		<h2 class="mb-5 text-center text-2xl">Markdown Content</h2>
