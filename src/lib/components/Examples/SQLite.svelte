@@ -1,18 +1,17 @@
 <script lang="ts">
-	import { PostgreSQL } from '$lib/db/engines/pgsql';
+	import { SQLite } from '$lib/db/engines/sqlite';
 	import { onMount } from 'svelte';
 	import CodeBlock from '../Blocks/CodeBlock.svelte';
 
-	const DBS = $state<Record<string, PostgreSQL>>({});
+	const DBS = $state<Record<string, SQLite>>({});
 	let selectedDB = $state('');
 	let query = $state('');
 	let result = $state('');
 
 	onMount(() => {
-		DBS['A'] = new PostgreSQL('A', { persistent: false });
-		DBS['B'] = new PostgreSQL('B', { persistent: false });
-		DBS['C'] = new PostgreSQL('C', { persistent: false });
-		selectedDB = 'A';
+		DBS['sqlite-persistent'] = new SQLite('sqlite-persistent', { persistent: true });
+		DBS['sqlite-memory'] = new SQLite('sqlite-memory', { persistent: false });
+		selectedDB = 'sqlite-memory';
 	});
 
 	const init = async () => {
@@ -35,7 +34,7 @@
 	};
 
 	const loadSampleQuery = async () => {
-		query = await fetch('chinook/pgsql.txt')
+		query = await fetch('chinook/sqlite.txt')
 			.then((response) => response.text())
 			.catch(() => (result += 'Unable to fetch Chinook Query.'));
 	};
@@ -48,7 +47,7 @@
 </script>
 
 <div class="flex flex-col gap-5 rounded-xl border-4 border-black p-10 shadow-xl">
-	<h2 class="text-center text-2xl">PostgreSQL Database</h2>
+	<h2 class="text-center text-2xl">SQLite Database</h2>
 
 	<div>
 		<h3 class="pb-2 text-xl">Database</h3>
