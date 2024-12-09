@@ -9,10 +9,9 @@
 	let result = $state('');
 
 	onMount(() => {
-		DBS['A'] = new DuckDB();
-		DBS['B'] = new DuckDB();
-		DBS['C'] = new DuckDB();
-		selectedDB = 'A';
+		const dbNames = ['duckdb-A', 'duckdb-B'];
+		for (const dbName of dbNames) DBS[dbName] = new DuckDB(dbName);
+		selectedDB = dbNames[0];
 	});
 
 	const init = async () => {

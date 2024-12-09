@@ -1,3 +1,4 @@
+import { iDB } from '$lib/indexeddb/schema';
 import { IdbFs, MemoryFS, PGlite, type PGliteOptions } from '@electric-sql/pglite';
 import type { DBOptions, DBStrategy, QueryResult } from './types';
 
@@ -32,6 +33,17 @@ export class PostgreSQL implements DBStrategy {
 	async init(): Promise<void> {
 		try {
 			this.#db = await PGlite.create(this.#dbOptions);
+			await iDB.transaction('readwrite', iDB.databases, async () => {
+				await iDB.databases.add({
+					'name': this.#dbName,
+					'createdBy': 'sql-notebook',
+					'createdOn': new Date().toISOString(),
+					'modifiedOn': new Date().toISOString(),
+					'persistent': this.#dbOptions.fs instanceof IdbFs,
+					'engine': 'pgsql',
+					'system': 'pglite'
+				});
+			});
 		} catch (error) {
 			const initError =
 				error instanceof Error

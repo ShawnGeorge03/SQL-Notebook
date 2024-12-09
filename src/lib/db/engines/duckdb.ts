@@ -7,6 +7,7 @@ import {
     selectBundle
 } from '@duckdb/duckdb-wasm';
 
+import { iDB } from '$lib/indexeddb/schema';
 import type { DBStrategy, QueryResult } from './types';
 
 /** Class representing a DuckDB Database.
@@ -16,7 +17,18 @@ import type { DBStrategy, QueryResult } from './types';
  */
 export class DuckDB implements DBStrategy {
     #db!: AsyncDuckDB;
+    #dbName: string;
     #conn!: AsyncDuckDBConnection;
+
+    /**
+     * Creates a SQLite object.
+     *
+     * @param {string} dbName - The name of the database.
+     */
+    constructor(dbName: string) {
+        this.#dbName = dbName;
+    }
+
 
     /**
      * Initializes a DuckDB Database.
@@ -48,6 +60,18 @@ export class DuckDB implements DBStrategy {
             });
 
             this.#connect();
+
+            await iDB.transaction('readwrite', iDB.databases, async () => {
+                await iDB.databases.add({
+                    'name': this.#dbName,
+                    'createdBy': 'sql-notebook',
+                    'createdOn': new Date().toISOString(),
+                    'modifiedOn': new Date().toISOString(),
+                    'persistent': false,
+                    'engine': 'duckdb',
+                    'system': 'duckdb-wasm'
+                });
+            });
         } catch (error) {
             console.log(error);
             const initError =

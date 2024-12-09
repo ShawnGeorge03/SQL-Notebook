@@ -21,6 +21,7 @@
 		"@codemirror/view": "^6.34.3",
 		"@duckdb/duckdb-wasm": "^1.29.0",
 		"@electric-sql/pglite": "^0.2.12",
+		"dexie": "^4.0.10",
 		"dompurify": "^3.2.1",
 		"github-markdown-css": "^5.8.0",
 		"marked": "^15.0.2",
