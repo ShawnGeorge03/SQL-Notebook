@@ -1,5 +1,7 @@
 import iDB, { iDBname } from '$lib/indexeddb/schema';
+import { DuckDB } from '../engines/duckdb';
 import { PostgreSQL } from '../engines/pgsql';
+import { SQLite } from '../engines/sqlite';
 import type { DBStrategy } from '../engines/types';
 import type { DBInfo, DBWorkerMessages } from './types';
 import { postError, postStatus, postSuccess } from './utils';
@@ -90,6 +92,10 @@ self.onconnect = async (event: MessageEvent) => {
 
                 if (engine === 'pgsql') {
                     db = new PostgreSQL(dbName, { persistent });
+                } else if (engine === 'sqlite') {
+                    db = new SQLite(dbName, { persistent });
+                } else if (engine === 'duckdb') {
+                    db = new DuckDB();
                 } else {
                     postError(port, 'CREATE_DB', {
                         message: `Unknown Database Engine: ${engine}`
@@ -99,23 +105,27 @@ self.onconnect = async (event: MessageEvent) => {
 
                 await db.init();
 
-                await iDB.databases.add({
-                    name: dbName,
-                    persistent,
-                    createdBy: 'user',
-                    createdOn: new Date().toLocaleString(),
-                    modifiedOn: new Date().toLocaleString(),
-                    engine,
-                    system: engine === 'pgsql' ? 'pglite' : engine === 'sqlite' ? 'wa-sqlite' : 'duckdb-wasm'
-                });
+                await iDB.transaction('readwrite', iDB.databases, async () => {
+                    await iDB.databases.add({
+                        name: dbName,
+                        persistent,
+                        createdBy: 'user',
+                        createdOn: new Date().toLocaleString(),
+                        modifiedOn: new Date().toLocaleString(),
+                        engine,
+                        system: engine === 'pgsql' ? 'pglite' : engine === 'sqlite' ? 'wa-sqlite' : 'duckdb-wasm'
+                    });
+                }).then(async () => {
 
-                if (persistent) {
-                    await db.close();
-                    await updateAvailableDBs(port);
-                } else {
-                    DBS[dbName] = db;
-                    await getActiveDBs(port);
-                }
+                    if (persistent) {
+                        await db.close();
+                        await updateAvailableDBs(port);
+                    } else {
+                        DBS[dbName] = db;
+                        await getActiveDBs(port);
+                    }
+                })
+
 
                 postSuccess(port, 'CREATE_DB', { dbName: dbName });
                 break;
@@ -144,22 +154,29 @@ self.onconnect = async (event: MessageEvent) => {
 
                 if (config.engine === 'pgsql') {
                     db = new PostgreSQL(dbName, { persistent: config.persistent });
+                } else if (config.engine === 'sqlite') {
+                    db = new SQLite(dbName, { persistent: config.persistent });
+                } else if (config.engine === 'duckdb') {
+                    db = new DuckDB();
                 } else {
                     postError(port, 'LOAD_DB', {
-                        message: `Unknown Database Engine: ${config.engine}`
+                        message: 'Unknown Database Engine',
+                        cause: config
                     });
                     break;
                 }
 
-                await db.init().then(async () => DBS[dbName] = db);
+                await db.init().then(async () => {
+                    DBS[dbName] = db
+                    await updateAvailableDBs(port);
+                    await getActiveDBs(port);
 
-                await getActiveDBs(port);
+                    await iDB.transaction('readwrite', iDB.databases, async () => {
+                        await iDB.databases.update(dbName, { modifiedOn: new Date().toLocaleString() });
+                    })
 
-                await updateAvailableDBs(port);
-
-                postSuccess(port, 'LOAD_DB', { dbName });
-
-                await iDB.databases.update(dbName, { modifiedOn: new Date().toLocaleString() });
+                    postSuccess(port, 'LOAD_DB', { dbName });
+                });
 
                 break;
             }
