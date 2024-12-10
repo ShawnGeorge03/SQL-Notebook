@@ -239,36 +239,31 @@ self.onconnect = async (event: MessageEvent) => {
                     break;
                 }
 
-                if (!config.persistent) {
-                    postError(port, 'TERMINATE_DB', {
-                        message: `Database with name "${dbName}" is not persistent.`
-                    });
-                    break;
-                }
-
-                let iDbName = ""
-
-                if (config.system === 'pglite') {
-                    iDbName = '/pglite/' + config.name;
-                } else {
-                    postError(port, 'TERMINATE_DB', {
-                        message: `Unknown Database System: ${config.system}`
-                    });
-                    break;
-                }
-
-                const toDelete = indexedDB.deleteDatabase(iDbName);
-
-                toDelete.onsuccess = async () => {
-
+                if (config.engine === 'duckdb') {
                     await iDB.transaction('readwrite', iDB.databases, async () => {
                         await iDB.databases.delete(dbName);
+                    }).then(async () => {
+                        await updateAvailableDBs(port);
+                        postSuccess(port, 'TERMINATE_DB', { dbName });
                     })
-
-                    await updateAvailableDBs(port);
-                    postSuccess(port, 'TERMINATE_DB', { dbName });
+                } else if (config.engine === 'pgsql' || config.engine === 'sqlite') {
+                    const iDBtoDelete = config.engine === 'pgsql' ? '/pglite/' + config.name : config.name;
+                    const toDelete = indexedDB.deleteDatabase(iDBtoDelete);
+                    toDelete.onsuccess = async () => {
+                        await iDB.transaction('readwrite', iDB.databases, async () => {
+                            await iDB.databases.delete(dbName);
+                        }).then(async () => {
+                            await updateAvailableDBs(port);
+                            postSuccess(port, 'TERMINATE_DB', { dbName });
+                        })
+                    }
+                } else {
+                    postError(port, 'TERMINATE_DB', {
+                        message: 'Unknown Database Engine',
+                        cause: config
+                    });
+                    break;
                 }
-
 
             }
         }
