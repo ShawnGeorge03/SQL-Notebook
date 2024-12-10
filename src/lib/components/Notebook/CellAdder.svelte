@@ -7,14 +7,14 @@
 	import type { DBInfo } from '$lib/db/worker/types';
 	import type { AddCell } from './type';
 
-	import ChartIcon from '$lib/icons/add-chart.svg?raw';
-	import AIIcon from '$lib/icons/ai.svg?raw';
-	import DatabaseIcon from '$lib/icons/database.svg?raw';
-	import DuckDBIcon from '$lib/icons/duckdb.svg?raw';
-	import MarkdownIcon from '$lib/icons/markdown.svg?raw';
-	import PostgreSQLIcon from '$lib/icons/postgresql.svg?raw';
-	import SpinnerIcon from '$lib/icons/spinner.svg?raw';
-	import SQLiteIcon from '$lib/icons/sqlite.svg?raw';
+	import ChartIcon from '$lib/assets/add-chart.svg?raw';
+	import AIIcon from '$lib/assets/ai.svg?raw';
+	import DatabaseIcon from '$lib/assets/database.svg?raw';
+	import DuckDBIcon from '$lib/assets/duckdb.svg?raw';
+	import MarkdownIcon from '$lib/assets/markdown.svg?raw';
+	import PostgreSQLIcon from '$lib/assets/postgresql.svg?raw';
+	import SpinnerIcon from '$lib/assets/spinner.svg?raw';
+	import SQLiteIcon from '$lib/assets/sqlite.svg?raw';
 
 	let isOpen = $state(false);
 

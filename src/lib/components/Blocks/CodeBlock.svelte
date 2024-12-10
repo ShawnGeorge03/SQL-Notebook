@@ -7,11 +7,12 @@
 	import type { QueryResult } from '$lib/db/engines/types';
 	import { DBWorkerService } from '$lib/db/worker/service';
 	import type { DBEngine, DBInfo } from '$lib/db/worker/types';
-	import DuckDBIcon from '$lib/icons/duckdb.svg?raw';
-	import PostgreSQLIcon from '$lib/icons/postgresql.svg?raw';
-	import SpinnerIcon from '$lib/icons/spinner.svg?raw';
-	import SQLiteIcon from '$lib/icons/sqlite.svg?raw';
 	import { PostgreSQL, sql, SQLite, StandardSQL } from '@codemirror/lang-sql';
+
+	import DuckDBIcon from '$lib/assets/duckdb.svg?raw';
+	import PostgreSQLIcon from '$lib/assets/postgresql.svg?raw';
+	import SpinnerIcon from '$lib/assets/spinner.svg?raw';
+	import SQLiteIcon from '$lib/assets/sqlite.svg?raw';
 
 	interface CodeBlockProps {
 		id: string;
