@@ -4,7 +4,7 @@ import type { DBStrategy } from '../engines/types';
 import type { DBInfo, DBWorkerMessages } from './types';
 import { postError, postStatus, postSuccess } from './utils';
 
-const activeDBs: Record<string, DBStrategy> = {};
+const DBS: Record<string, DBStrategy> = {};
 
 const updateAvailableDBs = async (port: MessagePort) => {
     try {
@@ -12,7 +12,7 @@ const updateAvailableDBs = async (port: MessagePort) => {
 
         await iDB.transaction('r', iDB.databases, async () => {
             await iDB.databases.each((database) => {
-                if (!Object.keys(activeDBs).includes(database.name)) {
+                if (!Object.keys(DBS).includes(database.name)) {
                     databaseInfo.push({
                         name: database.name,
                         engine: database.engine,
@@ -35,7 +35,7 @@ const updateAvailableDBs = async (port: MessagePort) => {
 const getActiveDBs = async (port: MessagePort) => {
     const databaseInfo: DBInfo[] = [];
     await iDB.transaction('r', iDB.databases, async () => {
-        const databases = await iDB.databases.bulkGet(Object.keys(activeDBs));
+        const databases = await iDB.databases.bulkGet(Object.keys(DBS));
         databases.forEach((database) => {
             if (database)
                 databaseInfo.push({
@@ -113,7 +113,7 @@ self.onconnect = async (event: MessageEvent) => {
                     await db.close();
                     await updateAvailableDBs(port);
                 } else {
-                    activeDBs[dbName] = db;
+                    DBS[dbName] = db;
                     await getActiveDBs(port);
                 }
 
@@ -123,7 +123,7 @@ self.onconnect = async (event: MessageEvent) => {
             case 'LOAD_DB': {
                 const { dbName } = data.args;
 
-                if (dbName in activeDBs) {
+                if (dbName in DBS) {
                     postError(port, 'LOAD_DB', {
                         message: `Database "${dbName}" is already in use.`
                     });
@@ -151,7 +151,7 @@ self.onconnect = async (event: MessageEvent) => {
                     break;
                 }
 
-                await db.init().then(async () => activeDBs[dbName] = db);
+                await db.init().then(async () => DBS[dbName] = db);
 
                 await getActiveDBs(port);
 
@@ -166,7 +166,7 @@ self.onconnect = async (event: MessageEvent) => {
             case 'EXEC_QUERY': {
                 const { id, dbName, query } = data.args;
 
-                if (!(dbName in activeDBs)) {
+                if (!(dbName in DBS)) {
                     postError(port, 'EXEC_QUERY', {
                         id,
                         message: `Database with name "${dbName}" is not initialized.`
@@ -174,7 +174,7 @@ self.onconnect = async (event: MessageEvent) => {
                     break;
                 }
 
-                const db = activeDBs[dbName];
+                const db = DBS[dbName];
                 const results = {
                     id,
                     ...(await db.exec(query))
@@ -186,16 +186,16 @@ self.onconnect = async (event: MessageEvent) => {
             case 'CLOSE_DB': {
                 const { dbName } = data.args;
 
-                if (!(dbName in activeDBs)) {
+                if (!(dbName in DBS)) {
                     postError(port, 'CLOSE_DB', {
                         message: `Database with name "${dbName}" is not initialized.`
                     });
                     break;
                 }
 
-                const db = activeDBs[dbName];
+                const db = DBS[dbName];
                 await db.close().then(() => {
-                    delete activeDBs[dbName];
+                    delete DBS[dbName];
                     postSuccess(port, 'CLOSE_DB', { dbName });
                 });
 
@@ -206,7 +206,7 @@ self.onconnect = async (event: MessageEvent) => {
             case 'TERMINATE_DB': {
                 const { dbName } = data.args;
 
-                if (dbName in activeDBs) {
+                if (dbName in DBS) {
                     postError(port, 'TERMINATE_DB', {
                         message: `Database with name "${dbName}" is currently running.`
                     });
