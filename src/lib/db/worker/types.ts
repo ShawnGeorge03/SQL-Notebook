@@ -51,21 +51,15 @@ export interface SuccessResponseData {
     TERMINATE_DB: { dbName: string };
 }
 
-/** Standardized error structure */
-interface ErrorData {
-    message: string;
-    cause?: unknown;
-}
-
 /** Error response data for each command */
 export interface ErrorResponseData {
-    GET_ACTIVE_DBS: ErrorData;
-    GET_AVAILABLE_DBS: ErrorData;
-    CREATE_DB: ErrorData;
-    LOAD_DB: ErrorData;
-    EXEC_QUERY: ErrorData & { id: string };
-    CLOSE_DB: ErrorData;
-    TERMINATE_DB: ErrorData;
+    GET_ACTIVE_DBS: Error;
+    GET_AVAILABLE_DBS: Error;
+    CREATE_DB: Error;
+    LOAD_DB: Error;
+    EXEC_QUERY: Error & { id: string };
+    CLOSE_DB: Error;
+    TERMINATE_DB: Error;
 }
 
 /** Response format for each command */
