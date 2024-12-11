@@ -1,4 +1,5 @@
 import type { QueryResult } from "$lib/db/engines/types";
+import type { DBEngine } from "$lib/db/worker/types";
 
 interface BaseTable {
     id: number;
@@ -11,9 +12,9 @@ interface BaseTable {
 type BaseDatabase = Omit<BaseTable, 'id'> & { persistent: boolean };
 
 export type Database =
-    | (BaseDatabase & { engine: 'pgsql'; system: 'pglite' })
-    | (BaseDatabase & { engine: 'sqlite'; system: 'wa-sqlite' })
-    | (BaseDatabase & { engine: 'duckdb'; system: 'duckdb-wasm' });
+    | (BaseDatabase & { engine: DBEngine.PGSQL; system: 'pglite' })
+    | (BaseDatabase & { engine: DBEngine.SQLITE; system: 'wa-sqlite' })
+    | (BaseDatabase & { engine: DBEngine.DUCKDB; system: 'duckdb-wasm' });
 
 export type Project = BaseTable & { notebookIDs: number[] };
 

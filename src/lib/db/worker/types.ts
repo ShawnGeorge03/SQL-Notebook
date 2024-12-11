@@ -1,8 +1,11 @@
 import type { QueryResult } from '../engines/types';
 
 /** Supported database engines */
-export type DBEngine = 'pgsql' | 'sqlite' | 'duckdb';
-
+export enum DBEngine {
+    PGSQL = 'pgsql',
+    SQLITE = 'sqlite',
+    DUCKDB = 'duckdb',
+}
 export type DBInfo = {
     name: string;
     engine: DBEngine;

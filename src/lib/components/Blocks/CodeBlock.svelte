@@ -30,7 +30,7 @@
 		query = $bindable(''),
 		result = $bindable({}),
 		dbName = $bindable(''),
-		engine = $bindable('duckdb'),
+		engine = $bindable(),
 		ondelete = $bindable<VoidFunction>()
 	}: CodeBlockProps = $props();
 
