@@ -33,7 +33,7 @@
 			availableDBs = response.data.availableDBs;
 		} else if (response.status === 'SUCCESS' && response.command === 'TERMINATE_DB') {
 			loading = false;
-			message = 'Closed DB: ' + response.data.dbName;
+			message = 'Terminated DB: ' + response.data.dbName;
 		} else if (response.status === 'ERROR' && response.command === 'TERMINATE_DB') {
 			console.error(response.data);
 			message = response.data.message + ' ' + (response.data.cause && response.data.cause);
