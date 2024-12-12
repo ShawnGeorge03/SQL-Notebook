@@ -36,7 +36,7 @@
 	});
 </script>
 
-<div class="mx-56 flex flex-col">
+<div class="mx-36 min-h-screen">
 	{#if loading}
 		<p>Loading Notebook</p>
 	{:else}
@@ -49,11 +49,11 @@
 			<LoadDB />
 			<CloseDB />
 			<TerminateDB />
-			<Demo />
 		</div>
 
-		<div class="mx-36 mt-10 min-h-screen">
-			<EditorSettings />
+		<div class="mt-10">
+			<Demo />
+			<div class="mt-10"><EditorSettings /></div>
 			<div class="mt-10 rounded-xl border-4 border-black p-10 shadow-xl">
 				<h2 class="mb-5 text-center text-2xl">Markdown Content</h2>
 				<TextBlock class="markdown-editor" type="markdown" bind:content={markdownContent} />

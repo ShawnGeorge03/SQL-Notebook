@@ -23,7 +23,8 @@ export type DBWorkerCommand =
     | 'LOAD_DB'
     | 'EXEC_QUERY'
     | 'CLOSE_DB'
-    | 'TERMINATE_DB';
+    | 'TERMINATE_DB'
+    | 'CREATE_DEMO';
 
 /** Message format */
 type Message<C extends DBWorkerCommand, R = undefined> = R extends undefined
@@ -38,7 +39,8 @@ export type DBWorkerMessages =
     | Message<'LOAD_DB', { dbName: string }>
     | Message<'EXEC_QUERY', { id: string; dbName: string; query: string }>
     | Message<'CLOSE_DB', { dbName: string }>
-    | Message<'TERMINATE_DB', { dbName: string }>;
+    | Message<'TERMINATE_DB', { dbName: string }>
+    | Message<'CREATE_DEMO', { engine: DBEngine }>;
 
 /** Success response data for each command */
 export interface SuccessResponseData {
@@ -49,6 +51,7 @@ export interface SuccessResponseData {
     EXEC_QUERY: QueryResult & { id: string };
     CLOSE_DB: { dbName: string };
     TERMINATE_DB: { dbName: string };
+    CREATE_DEMO: { dbName: string };
 }
 
 /** Error response data for each command */
@@ -60,6 +63,7 @@ export interface ErrorResponseData {
     EXEC_QUERY: Error & { id: string };
     CLOSE_DB: Error;
     TERMINATE_DB: Error;
+    CREATE_DEMO: Error;
 }
 
 /** Response format for each command */
@@ -77,4 +81,5 @@ export type DBWorkerResponses =
     | Response<'LOAD_DB'>
     | Response<'EXEC_QUERY'>
     | Response<'CLOSE_DB'>
-    | Response<'TERMINATE_DB'>;
+    | Response<'TERMINATE_DB'>
+    | Response<'CREATE_DEMO'>;

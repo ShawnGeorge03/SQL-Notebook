@@ -1,5 +1,6 @@
 import iDB, { iDBname } from '$lib/indexeddb/schema';
 import { type DexieError } from 'dexie';
+import { nanoid } from 'nanoid/non-secure';
 import { DuckDB } from '../engines/duckdb';
 import { PostgreSQL } from '../engines/pgsql';
 import { SQLite } from '../engines/sqlite';
@@ -75,7 +76,7 @@ const createDB = async (port: MessagePort, dbName: string, engine: DBEngine, per
             cause: 'First character of Database Name must be an alphabet.'
         }
 
-    const alphanumericPattern = /^[a-zA-Z0-9]+$/;
+    const alphanumericPattern = /^[a-zA-Z0-9-]+$/;
     if (!alphanumericPattern.test(dbName))
         return {
             name: 'INVALID_ARGS',
@@ -355,9 +356,46 @@ self.onconnect = async (event: MessageEvent) => {
                         message: 'Unknown Database Engine',
                         cause: `Supported Engines: ${DBEngine.PGSQL}, ${DBEngine.SQLITE}, ${DBEngine.DUCKDB}`
                     });
-                    break;
+                }
+                break;
+            }
+            case 'CREATE_DEMO': {
+                const { engine } = data.args;
+                const dbName = `Sample-Chinook-${nanoid()}`;
+
+                try {
+                    const response = await fetch(`/samples/chinook-${engine}.txt`);
+                    if (!response.ok) {
+                        throw new Error(`HTTP error! status: ${response.status}`);
+                    }
+
+                    const query = await response.text();
+
+                    const dbResult = await createDB(port, dbName, engine, false);
+                    if ('name' in dbResult) {
+                        postError(port, 'CREATE_DEMO', dbResult);
+                        return;
+                    }
+
+                    const queryResult = await execQuery(port, nanoid(), dbName, query);
+                    if ('name' in queryResult) {
+                        await closeDB(port, dbName);
+                        postError(port, 'CREATE_DEMO', queryResult);
+                        return;
+                    }
+
+                    postSuccess(port, 'CREATE_DEMO', { dbName });
+                } catch {
+                    postError(port, 'CREATE_DEMO', {
+                        name: 'INVALID_ARG',
+                        message: 'Sample Database creation failed',
+                        cause: `Supported Sample Database for ${DBEngine.PGSQL}, ${DBEngine.SQLITE}`
+                    });
+
+                    if (DBS[dbName]) await closeDB(port, dbName);
                 }
 
+                break;
             }
         }
     };
