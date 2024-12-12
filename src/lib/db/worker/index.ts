@@ -4,11 +4,10 @@ import { DuckDB } from '../engines/duckdb';
 import { PostgreSQL } from '../engines/pgsql';
 import { SQLite } from '../engines/sqlite';
 import type { DBStrategy } from '../engines/types';
-import { DBEngine, type DBInfo, type DBWorkerMessages } from './types';
-import { postError, postStatus, postSuccess } from './utils';
+import { DBEngine, type DBInfo, type DBWorkerMessages, type ErrorResponseData, type SuccessResponseData } from './types';
+import postResponse, { postError, postStatus, postSuccess } from './utils';
 
 const DBS: Record<string, { db: DBStrategy, modifiedOn: string }> = {};
-
 
 const getAvailableDBs = async (port: MessagePort) => {
     const databaseInfo: DBInfo[] = [];
@@ -61,54 +60,45 @@ const getActiveDBs = async (port: MessagePort) => {
         })
 }
 
-const createDB = async (port: MessagePort, dbName: string, engine: DBEngine, persistent: boolean) => {
-    if (!dbName || dbName.trim() === '') {
-        postError(port, 'CREATE_DB', {
+const createDB = async (port: MessagePort, dbName: string, engine: DBEngine, persistent: boolean): Promise<SuccessResponseData['CREATE_DB'] | ErrorResponseData['CREATE_DB']> => {
+    if (!dbName || dbName.trim() === '')
+        return {
             name: 'INVALID_ARGS',
             message: 'Invalid Database Name',
             cause: 'Database Name cannot be blank.'
-        });
-        return;
-    }
+        }
 
-    if (/\d/.test(dbName[0])) {
-        postError(port, 'CREATE_DB', {
+    if (/\d/.test(dbName[0]))
+        return {
             name: 'INVALID_ARGS',
             message: 'Invalid Database Name',
             cause: 'First character of Database Name must be an alphabet.'
-        });
-        return;
-    }
+        }
 
     const alphanumericPattern = /^[a-zA-Z0-9]+$/;
-    if (!alphanumericPattern.test(dbName)) {
-        postError(port, 'CREATE_DB', {
+    if (!alphanumericPattern.test(dbName))
+        return {
             name: 'INVALID_ARGS',
             message: 'Invalid Database Name',
             cause: 'Database Name must be Alphanumeric.'
-        });
-        return;
-    }
+        };
 
     if (dbName === iDBname) {
-        postError(port, 'CREATE_DB', {
+        return {
             name: 'INVALID_ARGS',
             message: 'Invalid Database Name',
             cause: 'Used by SQL Notebook.'
-        });
-        return;
+        };
     }
 
     const doesDBExist = await iDB.databases.get(dbName);
 
-    if (doesDBExist) {
-        postError(port, 'CREATE_DB', {
+    if (doesDBExist)
+        return {
             name: 'DB_EXISTS',
             message: 'Duplicate Database',
             cause: `Database with name "${dbName}" already exists.`
-        });
-        return;
-    }
+        };
 
     let db: DBStrategy;
 
@@ -119,34 +109,32 @@ const createDB = async (port: MessagePort, dbName: string, engine: DBEngine, per
     } else if (engine === DBEngine.DUCKDB) {
         db = new DuckDB();
     } else {
-        postError(port, 'CREATE_DB', {
+        return {
             name: 'INVALID_ARGS',
             message: 'Unknown Database Engine',
             cause: `Supported Engines: ${DBEngine.PGSQL}, ${DBEngine.SQLITE}, ${DBEngine.DUCKDB}`
-        });
-        return;
+        };
     }
 
     try {
         await db.init();
     } catch (error) {
-        postError(port, 'CREATE_DB', {
+        return {
             name: 'DB_INIT',
             message: 'Unable to initialize database',
             cause: error
-        })
-        return;
+        };
     }
 
-    const datetime = new Date().toLocaleString();
+    const curr = new Date().toLocaleString();
 
-    await iDB.transaction('readwrite', iDB.databases, async () => {
+    return await iDB.transaction('readwrite', iDB.databases, async () => {
         await iDB.databases.add({
             name: dbName,
             persistent,
             createdBy: 'user',
-            createdOn: datetime,
-            modifiedOn: datetime,
+            createdOn: curr,
+            modifiedOn: curr,
             engine,
             system: engine === 'pgsql' ? 'pglite' : engine === 'sqlite' ? 'wa-sqlite' : 'duckdb-wasm'
         });
@@ -157,49 +145,44 @@ const createDB = async (port: MessagePort, dbName: string, engine: DBEngine, per
         } else {
             DBS[dbName] = {
                 db,
-                modifiedOn: datetime
+                modifiedOn: curr
             }
         }
 
-        postSuccess(port, 'CREATE_DB', { dbName: dbName });
+        return { dbName };
     }).catch(async (error: DexieError) => {
         const message = error.name === 'InvalidTableError' ? error.message : 'Failed to create DB'
         console.error('message', error);
-        postError(port, 'CREATE_DB', {
+        await db.close();
+
+        return {
             name: 'IDB_ERROR',
             message,
             cause: error.cause
-        });
-
-        await db.close();
-
+        };
     }).finally(async () => {
         await getAvailableDBs(port);
         await getActiveDBs(port);
     })
 }
 
-const loadDB = async (port: MessagePort, dbName: string) => {
+const loadDB = async (port: MessagePort, dbName: string): Promise<SuccessResponseData['LOAD_DB'] | ErrorResponseData['LOAD_DB']> => {
 
-    if (dbName in DBS) {
-        postError(port, 'LOAD_DB', {
+    if (dbName in DBS)
+        return {
             name: 'DB_IN_USE',
             message: 'Database In Use',
             cause: `Database with name ${dbName} is alredy in use`
-        });
-        return;
-    }
+        };
 
     const config = await iDB.databases.get(dbName);
 
-    if (!config) {
-        postError(port, 'LOAD_DB', {
+    if (!config)
+        return {
             name: 'DB_DNE',
             message: 'Database does not exist',
             cause: `Database with name "${dbName}" does not exist.`
-        });
-        return;
-    }
+        };
 
     let db: DBStrategy;
 
@@ -210,23 +193,21 @@ const loadDB = async (port: MessagePort, dbName: string) => {
     } else if (config.engine === DBEngine.DUCKDB) {
         db = new DuckDB();
     } else {
-        postError(port, 'LOAD_DB', {
+        return {
             name: 'INVALID_DB',
             message: 'Unknown Database Engine',
             cause: `Supported Engines: ${DBEngine.PGSQL}, ${DBEngine.SQLITE}, ${DBEngine.DUCKDB}`
-        });
-        return;
+        };
     }
 
     try {
         await db.init();
     } catch (error) {
-        postError(port, 'LOAD_DB', {
+        return {
             name: 'DB_INIT',
             message: 'Unable to initialize database',
             cause: error
-        })
-        return;
+        };
     }
 
     DBS[dbName] = {
@@ -236,19 +217,17 @@ const loadDB = async (port: MessagePort, dbName: string) => {
 
     await getAvailableDBs(port);
     await getActiveDBs(port);
-    postSuccess(port, 'LOAD_DB', { dbName });
+    return { dbName };
 }
 
-const execQuery = async (port: MessagePort, id: string, dbName: string, query: string) => {
-    if (!(dbName in DBS)) {
-        postError(port, 'EXEC_QUERY', {
+const execQuery = async (port: MessagePort, id: string, dbName: string, query: string): Promise<SuccessResponseData['EXEC_QUERY'] | ErrorResponseData['EXEC_QUERY']> => {
+    if (!(dbName in DBS))
+        return {
             id,
             name: 'DB_NOT_IN_USE',
             message: 'Database not In Use',
             cause: `Database with name "${dbName}" is not initialized.`
-        });
-        return;
-    }
+        };
 
     const { db } = DBS[dbName];
     const results = {
@@ -258,37 +237,36 @@ const execQuery = async (port: MessagePort, id: string, dbName: string, query: s
 
     DBS[dbName].modifiedOn = new Date().toLocaleString();
 
-    postSuccess(port, 'EXEC_QUERY', results);
+    return results;
 }
 
-const closeDB = async (port: MessagePort, dbName: string) => {
-    if (!(dbName in DBS)) {
-        postError(port, 'CLOSE_DB', {
+const closeDB = async (port: MessagePort, dbName: string): Promise<SuccessResponseData['CLOSE_DB'] | ErrorResponseData['CLOSE_DB']> => {
+    if (!(dbName in DBS))
+        return {
             name: 'DB_NOT_IN_USE',
             message: 'Database not In Use',
             cause: `Database with name "${dbName}" is not initialized.`
-        });
-        return;
-    }
+        };
 
     const { db, modifiedOn } = DBS[dbName];
-    await iDB.transaction('readwrite', iDB.databases, async () => {
+    return await iDB.transaction('readwrite', iDB.databases, async () => {
         await iDB.databases.update(dbName, { modifiedOn });
-    }).catch(async (error: DexieError) => {
-        const message = error.name === 'InvalidTableError' ? error.message : 'Failed to create DB'
-        console.error('message', error);
-        postError(port, 'CLOSE_DB', {
-            name: 'IDB_ERROR',
-            message,
-            cause: error.cause
-        });
-    }).finally(async () => {
-        await db.close()
-        delete DBS[dbName];
-        await getAvailableDBs(port);
-        await getActiveDBs(port);
-        postSuccess(port, 'CLOSE_DB', { dbName });
     })
+        .then(() => { return { dbName }; })
+        .catch(async (error: DexieError) => {
+            const message = error.name === 'InvalidTableError' ? error.message : 'Failed to create DB'
+            console.error('message', error);
+            return {
+                name: 'IDB_ERROR',
+                message,
+                cause: error.cause
+            };
+        }).finally(async () => {
+            await db.close()
+            delete DBS[dbName];
+            await getAvailableDBs(port);
+            await getActiveDBs(port);
+        })
 }
 
 self.onconnect = async (event: MessageEvent) => {
@@ -308,22 +286,26 @@ self.onconnect = async (event: MessageEvent) => {
             }
             case 'CREATE_DB': {
                 const { dbName, engine, persistent } = data.args;
-                await createDB(port, dbName, engine, persistent);
+                const response = await createDB(port, dbName, engine, persistent);
+                postResponse(port, 'CREATE_DB', response);
                 break;
             }
             case 'LOAD_DB': {
                 const { dbName } = data.args;
-                await loadDB(port, dbName);
+                const response = await loadDB(port, dbName);
+                postResponse(port, 'LOAD_DB', response);
                 break;
             }
             case 'EXEC_QUERY': {
                 const { id, dbName, query } = data.args;
-                await execQuery(port, id, dbName, query);
+                const response = await execQuery(port, id, dbName, query);
+                postResponse(port, 'EXEC_QUERY', response);
                 break;
             }
             case 'CLOSE_DB': {
                 const { dbName } = data.args;
-                await closeDB(port, dbName);
+                const response = await closeDB(port, dbName);
+                postResponse(port, 'CLOSE_DB', response);
                 break;
             }
             case 'TERMINATE_DB': {

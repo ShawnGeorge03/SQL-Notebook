@@ -39,3 +39,13 @@ export const postError = <C extends keyof ErrorResponseData>(
 		data
 	});
 };
+
+const postResponse = <C extends DBWorkerCommand>(port: MessagePort, command: C, response: SuccessResponseData[C] | ErrorResponseData[C]) => {
+	if ('name' in response && 'message' in response) {
+		postError(port, command, response);
+	} else {
+		postSuccess(port, command, response);
+	}
+}
+
+export default postResponse;
