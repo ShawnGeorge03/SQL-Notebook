@@ -1,4 +1,3 @@
-import { iDB } from '$lib/indexeddb/schema';
 import * as WaSQLite from 'wa-sqlite';
 import SQLiteESMFactory from 'wa-sqlite/dist/wa-sqlite-async.mjs';
 import IDBBatchAtomicVFS from './thrid-party/wa-sqlite/IDBBatchAtomicVFS.js';
@@ -41,18 +40,6 @@ export class SQLite implements DBStrategy {
             this.#sqlite3.vfs_register(vfs as SQLiteVFS, true);
 
             this.#db = await this.#sqlite3.open_v2(this.#dbName);
-
-            await iDB.transaction('readwrite', iDB.databases, async () => {
-                await iDB.databases.add({
-                    'name': this.#dbName,
-                    'createdBy': 'sql-notebook',
-                    'createdOn': new Date().toISOString(),
-                    'modifiedOn': new Date().toISOString(),
-                    'persistent': this.#dbOptions.persistent,
-                    'engine': 'sqlite',
-                    'system': 'wa-sqlite'
-                });
-            });
         } catch (error) {
             const initError =
                 error instanceof Error

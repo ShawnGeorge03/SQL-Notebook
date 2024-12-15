@@ -1,11 +1,11 @@
 export type DBOptions = {
-	persistent: boolean;
+    persistent: boolean;
 };
 
 export type QueryResult = {
-	data?: unknown;
-	error?: string;
-	elapsed?: number;
+    data?: unknown;
+    error?: string;
+    elapsed?: number;
 };
 
 /**
@@ -14,7 +14,7 @@ export type QueryResult = {
  * @interface
  */
 export interface DBStrategy {
-	init(): Promise<void>;
-	exec(query: string): Promise<QueryResult>;
-	close(): Promise<void>;
+    init(): Promise<void>;
+    exec(query: string): Promise<QueryResult>;
+    close(): Promise<void>;
 }
