@@ -47,6 +47,9 @@ importers:
       marked:
         specifier: ^15.0.2
         version: 15.0.2
+      nanoid:
+        specifier: ^5.0.9
+        version: 5.0.9
       wa-sqlite:
         specifier: github:rhashimoto/wa-sqlite#v1.0.4
         version: https://codeload.github.com/rhashimoto/wa-sqlite/tar.gz/ca1c304baf70dabe3ebb2b6601c667f5873d65b6
@@ -69,6 +72,9 @@ importers:
       '@types/eslint':
         specifier: ^9.6.0
         version: 9.6.1
+      '@types/sharedworker':
+        specifier: ^0.0.135
+        version: 0.0.135
       '@vercel/speed-insights':
         specifier: ^1.1.0
         version: 1.1.0(@sveltejs/kit@2.8.0(@sveltejs/vite-plugin-svelte@4.0.0(svelte@5.1.15)(vite@5.4.11(@types/node@20.17.9)))(svelte@5.1.15)(vite@5.4.11(@types/node@20.17.9)))(svelte@5.1.15)
@@ -578,6 +584,9 @@ packages:
 
   '@types/node@20.17.9':
     resolution: {integrity: sha512-0JOXkRyLanfGPE2QRCwgxhzlBAvaRdCNMcvbd7jFfpmD4eEXll7LRwy5ymJmyeZqk7Nh7eD2LeUyQ68BbndmXw==}
+
+  '@types/sharedworker@0.0.135':
+    resolution: {integrity: sha512-Kx4N6gymfqGRnWmjzmoJLoXkXe8GNzKWmkgvNXvRMAlvooAgOqMxenuQLZScrJ1/fLSxYyTey5D9pOoS+XPYOA==}
 
   '@types/trusted-types@2.0.7':
     resolution: {integrity: sha512-ScaPdn1dQczgbl0QFTeTOmVHFULt394XJgOQNoyVhZ6r2vLnMLJfBPd53SB52T/3G36VI1/g2MZaX0cwDuXsfw==}
@@ -1227,6 +1236,11 @@ packages:
   nanoid@3.3.7:
     resolution: {integrity: sha512-eSRppjcPIatRIMC1U6UngP8XFcz8MQWGQdt1MTBQ7NaAmvXDfvNxbvWV3x2y6CdEUciCSsDHDQZbhYaB8QEo2g==}
     engines: {node: ^10 || ^12 || ^13.7 || ^14 || >=15.0.1}
+    hasBin: true
+
+  nanoid@5.0.9:
+    resolution: {integrity: sha512-Aooyr6MXU6HpvvWXKoVoXwKMs/KyVakWwg7xQfv5/S/RIgJMy0Ifa45H9qqYy7pTCszrHzP21Uk4PZq2HpEM8Q==}
+    engines: {node: ^18 || >=20}
     hasBin: true
 
   natural-compare@1.4.0:
@@ -2175,6 +2189,8 @@ snapshots:
     dependencies:
       undici-types: 6.19.8
 
+  '@types/sharedworker@0.0.135': {}
+
   '@types/trusted-types@2.0.7':
     optional: true
 
@@ -2817,6 +2833,8 @@ snapshots:
       thenify-all: 1.6.0
 
   nanoid@3.3.7: {}
+
+  nanoid@5.0.9: {}
 
   natural-compare@1.4.0: {}
 
