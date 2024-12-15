@@ -6,17 +6,18 @@ import { PostgreSQL } from '../engines/pgsql';
 import { SQLite } from '../engines/sqlite';
 import type { DBStrategy } from '../engines/types';
 import { DBEngine, type DBInfo, type DBWorkerMessages, type ErrorResponseData, type SuccessResponseData } from './types';
-import postResponse, { postError, postStatus, postSuccess } from './utils';
+import { broadcastResponse, postError, postResponse, postStatus, postSuccess } from './utils';
 
 const DBS: Record<string, { db: DBStrategy, modifiedOn: string }> = {};
+const ports: MessagePort[] = [];
 
-const getAvailableDBs = async (port: MessagePort) => {
-    const databaseInfo: DBInfo[] = [];
+const getAvailableDBs = async () => {
+    const availableDBs: DBInfo[] = [];
 
-    await iDB.transaction('r', iDB.databases, async () => {
+    return await iDB.transaction('r', iDB.databases, async () => {
         await iDB.databases.each((database) => {
             if (!Object.keys(DBS).includes(database.name)) {
-                databaseInfo.push({
+                availableDBs.push({
                     name: database.name,
                     engine: database.engine,
                     persistent: database.persistent
@@ -24,11 +25,11 @@ const getAvailableDBs = async (port: MessagePort) => {
             }
         })
     })
-        .then(() => postSuccess(port, 'GET_AVAILABLE_DBS', { availableDBs: databaseInfo }))
+        .then(() => broadcastResponse(ports, 'GET_AVAILABLE_DBS', { availableDBs }))
         .catch((error: DexieError) => {
             const message = error.name === 'InvalidTableError' ? error.message : 'Failed to fetch Available DBs'
             console.error('message', error);
-            postError(port, 'GET_AVAILABLE_DBS', {
+            broadcastResponse(ports, 'GET_AVAILABLE_DBS', {
                 name: 'IDB_ERROR',
                 message,
                 cause: error.cause
@@ -36,24 +37,24 @@ const getAvailableDBs = async (port: MessagePort) => {
         })
 };
 
-const getActiveDBs = async (port: MessagePort) => {
-    const databaseInfo: DBInfo[] = [];
+const getActiveDBs = async () => {
+    const activeDBs: DBInfo[] = [];
     await iDB.transaction('r', iDB.databases, async () => {
         const databases = await iDB.databases.bulkGet(Object.keys(DBS));
         databases.forEach((database) => {
             if (database)
-                databaseInfo.push({
+                activeDBs.push({
                     name: database.name,
                     engine: database.engine,
                     persistent: database.persistent
                 });
         });
     })
-        .then(() => postSuccess(port, 'GET_ACTIVE_DBS', { activeDBs: databaseInfo }))
+        .then(() => broadcastResponse(ports, 'GET_ACTIVE_DBS', { activeDBs }))
         .catch((error: DexieError) => {
             const message = error.name === 'InvalidTableError' ? error.message : 'Failed to fetch Active DBs'
             console.error('message', error);
-            postError(port, 'GET_ACTIVE_DBS', {
+            broadcastResponse(ports, 'GET_ACTIVE_DBS', {
                 name: 'IDB_ERROR',
                 message,
                 cause: error.cause
@@ -162,8 +163,8 @@ const createDB = async (port: MessagePort, dbName: string, engine: DBEngine, per
             cause: error.cause
         };
     }).finally(async () => {
-        await getAvailableDBs(port);
-        await getActiveDBs(port);
+        await getAvailableDBs();
+        await getActiveDBs();
     })
 }
 
@@ -216,8 +217,8 @@ const loadDB = async (port: MessagePort, dbName: string): Promise<SuccessRespons
         modifiedOn: new Date().toLocaleString()
     }
 
-    await getAvailableDBs(port);
-    await getActiveDBs(port);
+    await getAvailableDBs();
+    await getActiveDBs();
     return { dbName };
 }
 
@@ -265,24 +266,26 @@ const closeDB = async (port: MessagePort, dbName: string): Promise<SuccessRespon
         }).finally(async () => {
             await db.close()
             delete DBS[dbName];
-            await getAvailableDBs(port);
-            await getActiveDBs(port);
+            await getAvailableDBs();
+            await getActiveDBs();
         })
 }
 
 self.onconnect = async (event: MessageEvent) => {
     const port = event.ports[0];
 
+    ports.push(port);
+
     postStatus(port, 'INITIALIZED');
 
     port.onmessage = async ({ data }: MessageEvent<DBWorkerMessages>) => {
         switch (data.command) {
             case 'GET_ACTIVE_DBS': {
-                await getActiveDBs(port);
+                await getActiveDBs();
                 break;
             }
             case 'GET_AVAILABLE_DBS': {
-                await getAvailableDBs(port);
+                await getAvailableDBs();
                 break;
             }
             case 'CREATE_DB': {
@@ -336,7 +339,7 @@ self.onconnect = async (event: MessageEvent) => {
                     await iDB.transaction('readwrite', iDB.databases, async () => {
                         await iDB.databases.delete(dbName);
                     }).then(async () => {
-                        await getAvailableDBs(port);
+                        await getAvailableDBs();
                         postSuccess(port, 'TERMINATE_DB', { dbName });
                     })
                 } else if (config.engine === DBEngine.PGSQL || config.engine === DBEngine.SQLITE) {
@@ -346,7 +349,7 @@ self.onconnect = async (event: MessageEvent) => {
                         await iDB.transaction('readwrite', iDB.databases, async () => {
                             await iDB.databases.delete(dbName);
                         }).then(async () => {
-                            await getAvailableDBs(port);
+                            await getAvailableDBs();
                             postSuccess(port, 'TERMINATE_DB', { dbName });
                         })
                     }

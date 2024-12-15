@@ -40,7 +40,7 @@ export const postError = <C extends keyof ErrorResponseData>(
 	});
 };
 
-const postResponse = <C extends DBWorkerCommand>(port: MessagePort, command: C, response: SuccessResponseData[C] | ErrorResponseData[C]) => {
+export const postResponse = <C extends DBWorkerCommand>(port: MessagePort, command: C, response: SuccessResponseData[C] | ErrorResponseData[C]) => {
 	if ('name' in response && 'message' in response) {
 		postError(port, command, response);
 	} else {
@@ -48,4 +48,6 @@ const postResponse = <C extends DBWorkerCommand>(port: MessagePort, command: C, 
 	}
 }
 
-export default postResponse;
+export const broadcastResponse = <C extends DBWorkerCommand>(ports: MessagePort[], command: C, response: SuccessResponseData[C] | ErrorResponseData[C]) => {
+	ports.map(port => postResponse(port, command, response));
+};
