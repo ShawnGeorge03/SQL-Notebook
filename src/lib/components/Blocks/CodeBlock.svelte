@@ -58,9 +58,15 @@
 					error: response.data.error,
 					elapsed: response.data.elapsed
 				};
+			} else if (response.command === 'FORMAT_QUERY' && response.data.id === id) {
+				query = response.data.query;
 			}
-		} else if (response.status === 'ERROR' && response.command === 'GET_ACTIVE_DBS') {
-			console.error(response.data);
+		} else if (response.status === 'ERROR') {
+			if (response.command === 'GET_ACTIVE_DBS') {
+				console.error(response.data);
+			} else if (response.command === 'FORMAT_QUERY') {
+				console.error(response.data);
+			}
 		}
 	});
 
@@ -105,11 +111,21 @@
 			{/if}
 
 			<button
-				class="ml-auto cursor-pointer rounded border-none bg-cyan-700 px-4 py-2 text-white hover:bg-cyan-900"
+				disabled={activeDBs.length === 0}
+				class="ml-auto cursor-pointer rounded border-none bg-cyan-700 px-4 py-2 text-white hover:bg-cyan-900 disabled:cursor-not-allowed"
 				onclick={() => {
 					dbWorkerService.sendMessage({ command: 'EXEC_QUERY', args: { id, dbName, query } });
 					result = {};
 				}}>Run</button
+			>
+			<button
+				class="cursor-pointer rounded border-none bg-cyan-700 px-4 py-2 text-white hover:bg-cyan-900 disabled:cursor-not-allowed"
+				onclick={() => {
+					dbWorkerService.sendMessage({
+						command: 'FORMAT_QUERY',
+						args: { id, engine: engine as DBEngine, query }
+					});
+				}}>Format</button
 			>
 			<button
 				class="cursor-pointer rounded border-none bg-cyan-700 px-4 py-2 text-white hover:bg-cyan-900"
