@@ -1,6 +1,7 @@
 import iDB, { iDBname } from '$lib/indexeddb/schema';
 import { type DexieError } from 'dexie';
 import { nanoid } from 'nanoid/non-secure';
+import { format, type FormatOptionsWithLanguage } from 'sql-formatter';
 import { DuckDB } from '../engines/duckdb';
 import { PostgreSQL } from '../engines/pgsql';
 import { SQLite } from '../engines/sqlite';
@@ -10,6 +11,14 @@ import { broadcastResponse, postError, postResponse, postStatus, postSuccess } f
 
 const DBS: Record<string, { db: DBStrategy, modifiedOn: string }> = {};
 const ports: MessagePort[] = [];
+
+const getSQLFormatConfig = (engine: DBEngine): FormatOptionsWithLanguage => {
+    return {
+        language: engine === 'pgsql' ? 'postgresql' : engine === 'sqlite' ? 'sqlite' : 'sql',
+        keywordCase: 'upper',
+        newlineBeforeSemicolon: true
+    }
+}
 
 const getAvailableDBs = async () => {
     const availableDBs: DBInfo[] = [];
@@ -399,6 +408,19 @@ self.onconnect = async (event: MessageEvent) => {
                 }
 
                 break;
+            }
+            case 'FORMAT_QUERY': {
+                const { id, engine, query } = data.args
+
+                try {
+                    postSuccess(port, 'FORMAT_QUERY', {
+                        id,
+                        query: format(query, getSQLFormatConfig(engine))
+                    });
+                } catch (error) {
+                    postError(port, 'FORMAT_QUERY', { id, ...error as Error })
+                }
+
             }
         }
     };
