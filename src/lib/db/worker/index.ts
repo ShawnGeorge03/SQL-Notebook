@@ -77,7 +77,7 @@ const createDB = async (port: MessagePort, dbName: string, engine: DBEngine, per
             cause: 'First character of Database Name must be an alphabet.'
         }
 
-    const alphanumericPattern = /^[a-zA-Z0-9-]+$/;
+    const alphanumericPattern = /^[a-zA-Z0-9-_]+$/;
     if (!alphanumericPattern.test(dbName))
         return {
             name: 'INVALID_ARGS',
