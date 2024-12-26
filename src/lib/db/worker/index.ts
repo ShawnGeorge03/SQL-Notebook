@@ -2,7 +2,6 @@ import iDB, { iDBname } from '$lib/indexeddb/schema';
 import { type DexieError } from 'dexie';
 import { nanoid } from 'nanoid/non-secure';
 import { format, type FormatOptionsWithLanguage } from 'sql-formatter';
-import { DuckDB } from '../engines/duckdb';
 import { PostgreSQL } from '../engines/pgsql';
 import { SQLite } from '../engines/sqlite';
 import type { DBStrategy } from '../engines/types';
@@ -117,13 +116,11 @@ const createDB = async (port: MessagePort, dbName: string, engine: DBEngine, per
         db = new PostgreSQL(dbName, { persistent });
     } else if (engine === DBEngine.SQLITE) {
         db = new SQLite(dbName, { persistent });
-    } else if (engine === DBEngine.DUCKDB) {
-        db = new DuckDB();
     } else {
         return {
             name: 'INVALID_ARGS',
             message: 'Unknown Database Engine',
-            cause: `Supported Engines: ${DBEngine.PGSQL}, ${DBEngine.SQLITE}, ${DBEngine.DUCKDB}`
+            cause: `Supported Engines: ${DBEngine.PGSQL}, ${DBEngine.SQLITE}`
         };
     }
 
@@ -147,7 +144,7 @@ const createDB = async (port: MessagePort, dbName: string, engine: DBEngine, per
             createdOn: curr,
             modifiedOn: curr,
             engine,
-            system: engine === 'pgsql' ? 'pglite' : engine === 'sqlite' ? 'wa-sqlite' : 'duckdb-wasm'
+            system: engine === 'pgsql' ? 'pglite' : 'wa-sqlite'
         });
     }).then(async () => {
 
@@ -201,13 +198,11 @@ const loadDB = async (port: MessagePort, dbName: string): Promise<SuccessRespons
         db = new PostgreSQL(dbName, { persistent: config.persistent });
     } else if (config.engine === DBEngine.SQLITE) {
         db = new SQLite(dbName, { persistent: config.persistent });
-    } else if (config.engine === DBEngine.DUCKDB) {
-        db = new DuckDB();
     } else {
         return {
             name: 'INVALID_DB',
             message: 'Unknown Database Engine',
-            cause: `Supported Engines: ${DBEngine.PGSQL}, ${DBEngine.SQLITE}, ${DBEngine.DUCKDB}`
+            cause: `Supported Engines: ${DBEngine.PGSQL}, ${DBEngine.SQLITE}`
         };
     }
 
@@ -344,31 +339,25 @@ self.onconnect = async (event: MessageEvent) => {
                     break;
                 }
 
-                if (config.engine === DBEngine.DUCKDB) {
+                if (config.engine !== DBEngine.PGSQL && config.engine === DBEngine.SQLITE) {
+                    postError(port, 'TERMINATE_DB', {
+                        name: 'INVALID_DB',
+                        message: 'Unknown Database Engine',
+                        cause: `Supported Engines: ${DBEngine.PGSQL}, ${DBEngine.SQLITE}`
+                    });
+                }
+
+                const iDBtoDelete = config.engine === DBEngine.PGSQL ? '/pglite/' + config.name : config.name;
+                const toDelete = indexedDB.deleteDatabase(iDBtoDelete);
+                toDelete.onsuccess = async () => {
                     await iDB.transaction('readwrite', iDB.databases, async () => {
                         await iDB.databases.delete(dbName);
                     }).then(async () => {
                         await getAvailableDBs();
                         postSuccess(port, 'TERMINATE_DB', { dbName });
                     })
-                } else if (config.engine === DBEngine.PGSQL || config.engine === DBEngine.SQLITE) {
-                    const iDBtoDelete = config.engine === DBEngine.PGSQL ? '/pglite/' + config.name : config.name;
-                    const toDelete = indexedDB.deleteDatabase(iDBtoDelete);
-                    toDelete.onsuccess = async () => {
-                        await iDB.transaction('readwrite', iDB.databases, async () => {
-                            await iDB.databases.delete(dbName);
-                        }).then(async () => {
-                            await getAvailableDBs();
-                            postSuccess(port, 'TERMINATE_DB', { dbName });
-                        })
-                    }
-                } else {
-                    postError(port, 'TERMINATE_DB', {
-                        name: 'INVALID_DB',
-                        message: 'Unknown Database Engine',
-                        cause: `Supported Engines: ${DBEngine.PGSQL}, ${DBEngine.SQLITE}, ${DBEngine.DUCKDB}`
-                    });
                 }
+
                 break;
             }
             case 'CREATE_DEMO': {
