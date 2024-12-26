@@ -1,4 +1,3 @@
-import type { QueryResult } from '../engines/types';
 
 /** Supported database engines */
 export enum DBEngine {
@@ -49,7 +48,7 @@ export interface SuccessResponseData {
     GET_AVAILABLE_DBS: { availableDBs: DBInfo[] };
     CREATE_DB: { dbName: string };
     LOAD_DB: { dbName: string };
-    EXEC_QUERY: QueryResult & { id: string };
+    EXEC_QUERY: { id: string; data: unknown[]; elapsed: number; };
     CLOSE_DB: { dbName: string };
     TERMINATE_DB: { dbName: string };
     CREATE_DEMO: { dbName: string };
@@ -62,7 +61,7 @@ export interface ErrorResponseData {
     GET_AVAILABLE_DBS: Error;
     CREATE_DB: Error;
     LOAD_DB: Error;
-    EXEC_QUERY: Error & { id: string };
+    EXEC_QUERY: Error & { id: string; };
     CLOSE_DB: Error;
     TERMINATE_DB: Error;
     CREATE_DEMO: Error;

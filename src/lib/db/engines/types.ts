@@ -3,9 +3,8 @@ export type DBOptions = {
 };
 
 export type QueryResult = {
-    data?: unknown;
-    error?: string;
-    elapsed?: number;
+    rows: unknown[];
+    cols: { name: string, type: string }[]
 };
 
 /**
@@ -15,6 +14,6 @@ export type QueryResult = {
  */
 export interface DBStrategy {
     init(): Promise<void>;
-    exec(query: string): Promise<QueryResult>;
+    exec(query: string): Promise<unknown[]>;
     close(): Promise<void>;
 }
