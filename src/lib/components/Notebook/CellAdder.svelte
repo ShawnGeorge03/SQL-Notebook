@@ -10,6 +10,7 @@
 	import ChartIcon from '$lib/assets/add-chart.svg?raw';
 	import AIIcon from '$lib/assets/ai.svg?raw';
 	import DatabaseIcon from '$lib/assets/database.svg?raw';
+	import DuckDBIcon from '$lib/assets/duckdb.svg?raw';
 	import MarkdownIcon from '$lib/assets/markdown.svg?raw';
 	import PostgreSQLIcon from '$lib/assets/postgresql.svg?raw';
 	import SpinnerIcon from '$lib/assets/spinner.svg?raw';
@@ -108,6 +109,8 @@
 								<span class="h-8 w-10" aria-hidden="true">{@html PostgreSQLIcon}</span>
 							{:else if database.engine === 'sqlite'}
 								<span class="h-8 w-10" aria-hidden="true">{@html SQLiteIcon}</span>
+							{:else if database.engine === 'duckdb'}
+								<span class="h-8 w-10" aria-hidden="true">{@html DuckDBIcon}</span>
 							{/if}
 							<span class="flex-1 text-sm font-medium text-gray-900">{database.name}</span>
 						</button>

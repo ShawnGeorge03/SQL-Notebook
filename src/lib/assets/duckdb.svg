@@ -1,0 +1,19 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="30" height="30" viewBox="0 0 100 100">
+    <g transform="matrix(1.16 0 0 1.16 49.9 50.06)">
+        <circle
+            style="stroke: rgb(0,0,0); stroke-width: 0; stroke-dasharray: ; stroke-linecap: butt; stroke-dashoffset: 0; stroke-linejoin: round; stroke-miterlimit: 4; fill: rgb(0,0,0); fill-rule: nonzero; opacity: 1;"
+            cx="0" cy="0" r="40" />
+    </g>
+    <g transform="matrix(0.49 0 0 0.49 38.74 49.05)">
+        <circle
+            style="stroke: rgb(0,0,0); stroke-width: 0; stroke-dasharray: none; stroke-linecap: butt; stroke-dashoffset: 0; stroke-linejoin: miter; stroke-miterlimit: 4; fill: rgb(255,255,0); fill-rule: nonzero; opacity: 1;"
+            cx="0" cy="0" r="40" />
+    </g>
+    <g transform="matrix(0.17 0 0 0.17 72.85 48.89)">
+        <path
+            style="stroke: rgb(0,0,0); stroke-width: 0; stroke-dasharray: none; stroke-linecap: butt; stroke-dashoffset: 0; stroke-linejoin: miter; stroke-miterlimit: 4; fill: rgb(255,255,0); fill-rule: nonzero; opacity: 1;"
+            transform=" translate(-57.95, -51.83)"
+            d="m 0 0 l 57.952755 0 l 0 0 c 32.006428 -1.4055393e-14 57.952755 23.203636 57.952755 51.82677 c 0 28.623135 -25.946327 51.82677 -57.952755 51.82677 l -57.952755 0 z"
+            stroke-linecap="round" />
+    </g>
+</svg>

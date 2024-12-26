@@ -3,7 +3,8 @@ import type { QueryResult } from '../engines/types';
 /** Supported database engines */
 export enum DBEngine {
     PGSQL = 'pgsql',
-    SQLITE = 'sqlite'
+    SQLITE = 'sqlite',
+    DUCKDB = 'duckdb',
 }
 export type DBInfo = {
     name: string;

@@ -2,6 +2,7 @@ import iDB, { iDBname } from '$lib/indexeddb/schema';
 import { type DexieError } from 'dexie';
 import { nanoid } from 'nanoid/non-secure';
 import { format, type FormatOptionsWithLanguage } from 'sql-formatter';
+import { DuckDB } from '../engines/duckdb';
 import { PostgreSQL } from '../engines/pgsql';
 import { SQLite } from '../engines/sqlite';
 import type { DBStrategy } from '../engines/types';
@@ -116,6 +117,8 @@ const createDB = async (port: MessagePort, dbName: string, engine: DBEngine, per
         db = new PostgreSQL(dbName, { persistent });
     } else if (engine === DBEngine.SQLITE) {
         db = new SQLite(dbName, { persistent });
+    } else if (engine === DBEngine.DUCKDB) {
+        db = new DuckDB();
     } else {
         return {
             name: 'INVALID_ARGS',
@@ -144,7 +147,7 @@ const createDB = async (port: MessagePort, dbName: string, engine: DBEngine, per
             createdOn: curr,
             modifiedOn: curr,
             engine,
-            system: engine === 'pgsql' ? 'pglite' : 'wa-sqlite'
+            system: engine === 'pgsql' ? 'pglite' : engine === 'sqlite' ? 'wa-sqlite' : 'duckdb-wasm'
         });
     }).then(async () => {
 
