@@ -15,7 +15,6 @@
 	};
 
 	const unsubscribe = dbWorkerService.responses.subscribe((response) => {
-		console.log(response);
 		loading = response.status === 'LOADING' && response.command === 'CREATE_DEMO';
 
 		if (response.status === 'SUCCESS' && response.command === 'CREATE_DEMO') {

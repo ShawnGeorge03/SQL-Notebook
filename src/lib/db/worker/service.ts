@@ -1,3 +1,4 @@
+import { dev } from "$app/environment";
 import { readable, type Readable } from "svelte/store";
 import { type DBWorkerMessages, type DBWorkerResponses } from "./types";
 
@@ -14,6 +15,7 @@ export class DBWorkerService {
 
         this.responses = readable<DBWorkerResponses>({ status: 'INITIALIZING' }, (set) => {
             this.#port.onmessage = (event: MessageEvent<DBWorkerResponses>) => {
+                if (dev) console.log(event.data);
                 set(event.data);
             }
         })
