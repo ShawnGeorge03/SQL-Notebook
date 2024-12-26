@@ -9,7 +9,6 @@
 	import type { DBEngine, DBInfo } from '$lib/db/worker/types';
 	import { PostgreSQL, sql, SQLite, StandardSQL } from '@codemirror/lang-sql';
 
-	import DuckDBIcon from '$lib/assets/duckdb.svg?raw';
 	import PostgreSQLIcon from '$lib/assets/postgresql.svg?raw';
 	import SpinnerIcon from '$lib/assets/spinner.svg?raw';
 	import SQLiteIcon from '$lib/assets/sqlite.svg?raw';
@@ -100,8 +99,6 @@
 						<span class="h-8 w-10" aria-hidden="true">{@html PostgreSQLIcon}</span>
 					{:else if engine === 'sqlite'}
 						<span class="h-8 w-10" aria-hidden="true">{@html SQLiteIcon}</span>
-					{:else if engine === 'duckdb'}
-						<span class="h-8 w-10" aria-hidden="true">{@html DuckDBIcon}</span>
 					{/if}
 					{dbName}
 					<span class="ml-2 transition-transform duration-200 {isOpen ? 'rotate-180' : ''}">
@@ -150,8 +147,6 @@
 							<span class="h-8 w-10" aria-hidden="true">{@html PostgreSQLIcon}</span>
 						{:else if database.engine === 'sqlite'}
 							<span class="h-8 w-10" aria-hidden="true">{@html SQLiteIcon}</span>
-						{:else if database.engine === 'duckdb'}
-							<span class="h-8 w-10" aria-hidden="true">{@html DuckDBIcon}</span>
 						{/if}
 						<span class="flex-1 text-sm font-medium text-gray-900">{database.name}</span>
 					</button>
