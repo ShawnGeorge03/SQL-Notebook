@@ -13,8 +13,7 @@ type BaseDatabase = Omit<BaseTable, 'id'> & { persistent: boolean };
 
 export type Database =
     | (BaseDatabase & { engine: DBEngine.PGSQL; system: 'pglite' })
-    | (BaseDatabase & { engine: DBEngine.SQLITE; system: 'wa-sqlite' })
-    | (BaseDatabase & { engine: DBEngine.DUCKDB; system: 'duckdb-wasm' });
+    | (BaseDatabase & { engine: DBEngine.SQLITE; system: 'wa-sqlite' });
 
 export type Project = BaseTable & { notebookIDs: number[] };
 
