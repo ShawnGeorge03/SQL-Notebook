@@ -1,23 +1,16 @@
 import iDB, { iDBname } from '$lib/indexeddb/schema';
 import { type DexieError } from 'dexie';
 import { nanoid } from 'nanoid/non-secure';
-import { format, type FormatOptionsWithLanguage } from 'sql-formatter';
+import { format } from 'sql-formatter';
 import { PostgreSQL } from '../engines/pgsql';
 import { SQLite } from '../engines/sqlite';
 import type { DBStrategy } from '../engines/types';
+import getSQLFormatConfig from '../engines/utils';
 import { DBEngine, type DBInfo, type DBWorkerMessages, type ErrorResponseData, type SuccessResponseData } from './types';
 import { broadcastResponse, postError, postResponse, postStatus, postSuccess } from './utils';
 
 const DBS: Record<string, { db: DBStrategy, modifiedOn: string }> = {};
 const ports: MessagePort[] = [];
-
-const getSQLFormatConfig = (engine: DBEngine): FormatOptionsWithLanguage => {
-    return {
-        language: engine === 'pgsql' ? 'postgresql' : engine === 'sqlite' ? 'sqlite' : 'sql',
-        keywordCase: 'upper',
-        newlineBeforeSemicolon: true
-    }
-}
 
 const getAvailableDBs = async () => {
     const availableDBs: DBInfo[] = [];
