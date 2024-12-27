@@ -1,7 +1,7 @@
-import { IdbFs, MemoryFS, PGlite, type PGliteOptions, type Transaction } from '@electric-sql/pglite';
+import { IdbFs, MemoryFS, PGlite, types, type PGliteOptions, type Results, type Transaction } from '@electric-sql/pglite';
 import { format, type FormatOptionsWithLanguage } from 'sql-formatter';
 import { DBEngine } from '../worker/types';
-import type { DBOptions, DBStrategy } from './types';
+import { NotebookType, type DBOptions, type DBStrategy, type QueryResult } from './types';
 import getSQLFormatConfig from './utils';
 
 /** Class representing a PostgreSQL Database.
@@ -13,6 +13,7 @@ export class PostgreSQL implements DBStrategy {
 	#db!: PGlite;
 	#dbName: string;
 	#dbOptions: PGliteOptions;
+
 	#sqlFormatConfig: FormatOptionsWithLanguage;
 
 	/**
@@ -59,15 +60,15 @@ export class PostgreSQL implements DBStrategy {
 	 *
 	 * @param {string} query - The query to be run.
 	 *
-	 * @returns {Promise{unknown[]}} - Promise Object reprsenting the query results.
+	 * @returns {Promise{QueryResult[]}} - Promise Object reprsenting the query results.
 	 */
-	async exec(query: string): Promise<unknown[]> {
+	async exec(query: string): Promise<QueryResult[]> {
 		if (!this.#db)
 			throw new Error('Database not initialized');
 
 		const statements = format(query, this.#sqlFormatConfig).split(';')
 
-		const data: unknown[] = [];
+		const data: QueryResult[] = [];
 
 		await this.#db.transaction(async (tx: Transaction) => {
 			for (const statement of statements) {
@@ -75,9 +76,10 @@ export class PostgreSQL implements DBStrategy {
 
 				await tx.query(statement)
 					.then((result) => {
+						if (result.fields.length === 0) return;
 						data.push({
 							rows: result.rows,
-							cols: result.fields,
+							cols: this.#columnToTypes(result.fields),
 						})
 					})
 					.catch(async (error) => {
@@ -98,6 +100,60 @@ export class PostgreSQL implements DBStrategy {
 		})
 
 		return data;
+	}
+
+	/**
+	 * Maps the data type IDs returned from the database to the corresponding NotebookType.
+	 * This function is used to determine the data type of each column in the query results.
+	 *
+	 * @param fields - The fields returned from the database query.
+	 * @returns The column definitions with the appropriate data types.
+	 */
+	#columnToTypes(fields: Results['fields']): QueryResult['cols'] {
+		const cols = [];
+
+		for (const { name, dataTypeID } of fields) {
+			switch (dataTypeID) {
+				case types.BOOL:
+					cols.push({ name, type: NotebookType.BOOLEAN })
+					break;
+				case types.INT2:
+				case types.INT4:
+				case types.INT8:
+				case types.FLOAT4:
+				case types.FLOAT8:
+				case types.MONEY:
+				case types.NUMERIC:
+					cols.push({ name, type: NotebookType.NUMBER })
+					break;
+				case types.DATE:
+					cols.push({ name, type: NotebookType.DATE })
+					break;
+				case types.TIME:
+				case types.TIMETZ:
+					cols.push({ name, type: NotebookType.TIME })
+					break;
+				case types.ABSTIME:
+				case types.TIMESTAMP:
+				case types.TIMESTAMPTZ:
+					cols.push({ name, type: NotebookType.DATETIME })
+					break;
+				case types.TEXT:
+				case types.CHAR:
+				case types.VARCHAR:
+				case types.BPCHAR:
+				case types.RELTIME:
+				case types.INTERVAL:
+				case types.UUID:
+					cols.push({ name, type: NotebookType.STRING })
+					break;
+				default:
+					cols.push({ name, type: NotebookType.STRING })
+					break;
+			}
+		}
+
+		return cols;
 	}
 
 	/**
