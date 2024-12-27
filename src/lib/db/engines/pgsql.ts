@@ -10,11 +10,10 @@ import getSQLFormatConfig from './utils';
  * @implements {DBStrategy}
  */
 export class PostgreSQL implements DBStrategy {
-	db!: PGlite;
-	dbName: string;
-	dbOptions: PGliteOptions;
-
-	sqlFormatConfig: FormatOptionsWithLanguage;
+	#db!: PGlite;
+	#dbName: string;
+	#dbOptions: PGliteOptions;
+	#sqlFormatConfig: FormatOptionsWithLanguage;
 
 	/**
 	 * Creates a PostgreSQL object.
@@ -23,12 +22,12 @@ export class PostgreSQL implements DBStrategy {
 	 * @param {DBOptions} dbOptions - The options for the database.
 	 */
 	constructor(dbName: string, dbOptions: DBOptions) {
-		this.dbName = dbName;
-		this.dbOptions = {
-			fs: dbOptions.persistent ? new IdbFs(this.dbName) : new MemoryFS()
+		this.#dbName = dbName;
+		this.#dbOptions = {
+			fs: dbOptions.persistent ? new IdbFs(this.#dbName) : new MemoryFS()
 		};
 
-		this.sqlFormatConfig = getSQLFormatConfig(DBEngine.PGSQL);
+		this.#sqlFormatConfig = getSQLFormatConfig(DBEngine.PGSQL);
 	}
 
 	/**
@@ -38,7 +37,7 @@ export class PostgreSQL implements DBStrategy {
 	 */
 	async init(): Promise<void> {
 		try {
-			this.db = await PGlite.create(this.dbOptions);
+			this.#db = await PGlite.create(this.#dbOptions);
 		} catch (error) {
 			const initError =
 				error instanceof Error
@@ -63,14 +62,14 @@ export class PostgreSQL implements DBStrategy {
 	 * @returns {Promise{unknown[]}} - Promise Object reprsenting the query results.
 	 */
 	async exec(query: string): Promise<unknown[]> {
-		if (!this.db)
+		if (!this.#db)
 			throw new Error('Database not initialized');
 
-		const statements = format(query, this.sqlFormatConfig).split(';')
+		const statements = format(query, this.#sqlFormatConfig).split(';')
 
 		const data: unknown[] = [];
 
-		await this.db.transaction(async (tx: Transaction) => {
+		await this.#db.transaction(async (tx: Transaction) => {
 			for (const statement of statements) {
 				if (statement.length === 0) continue;
 
@@ -105,6 +104,6 @@ export class PostgreSQL implements DBStrategy {
 	 * Closes the Database.
 	 */
 	async close(): Promise<void> {
-		await this.db.close();
+		await this.#db.close();
 	}
 }
