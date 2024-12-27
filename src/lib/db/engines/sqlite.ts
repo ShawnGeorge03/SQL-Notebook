@@ -2,7 +2,7 @@ import * as WaSQLite from 'wa-sqlite';
 import SQLiteESMFactory from 'wa-sqlite/dist/wa-sqlite-async.mjs';
 import IDBBatchAtomicVFS from './thrid-party/wa-sqlite/IDBBatchAtomicVFS.js';
 import MemoryAsyncVFS from './thrid-party/wa-sqlite/MemoryAsyncVFS.js';
-import type { DBOptions, DBStrategy, QueryResult } from './types';
+import type { DBOptions, DBStrategy } from './types';
 
 /** Class representing a SQLite Database.
  *
@@ -59,14 +59,18 @@ export class SQLite implements DBStrategy {
      *
      * @param {string} query - The query to be run.
      *
-     * @returns {Promise{QueryResult}} - Promise Object reprsenting the query results.
+     * @returns {Promise{unknown[]}} - Promise Object reprsenting the query results.
      */
-    async exec(query: string): Promise<QueryResult> {
+    async exec(query: string): Promise<unknown[]> {
         try {
-            if (!this.#db) throw new Error('Database not initialized');
+            if (!this.#db)
+                throw new Error('Database not initialized');
 
-            const startTime = performance.now();
-            const results = [];
+
+            const data: unknown[] = [];
+
+            await this.#sqlite3.exec(this.#db, 'BEGIN TRANSACTION;')
+
             for await (const stmt of this.#sqlite3.statements(this.#db, query)) {
                 const rows = [];
                 while (await this.#sqlite3.step(stmt) === WaSQLite.SQLITE_ROW) {
@@ -75,24 +79,24 @@ export class SQLite implements DBStrategy {
                 }
 
                 const columns = this.#sqlite3.column_names(stmt)
-                if (columns.length) {
-                    results.push({ columns, rows });
-                }
+                if (columns.length) data.push({ columns, rows });
             }
 
-            return {
-                data: { results },
-                elapsed: performance.now() - startTime
-            };
+            await this.#sqlite3.exec(this.#db, 'COMMIT;')
+
+            return data;
         } catch (error) {
-            let queryError = '';
+            await this.#sqlite3.exec(this.#db, 'ROLLBACK;')
+
             if (error instanceof Error) {
-                queryError = error.message;
-                if (error.cause) queryError += ' (' + error.cause + ')';
+                if (error.cause) {
+                    throw new Error(error.message + ' (' + error.cause + ')');
+                } else {
+                    throw new Error(error.message);
+                }
             } else {
-                queryError = `Database query failed: ${String(error)}`;
+                throw new Error(`Database query failed: ${String(error)}`);
             }
-            return { error: queryError };
         }
     }
 
