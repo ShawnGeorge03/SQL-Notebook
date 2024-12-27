@@ -1,5 +1,8 @@
-import { IdbFs, MemoryFS, PGlite, type PGliteOptions } from '@electric-sql/pglite';
-import type { DBOptions, DBStrategy, QueryResult } from './types';
+import { IdbFs, MemoryFS, PGlite, type PGliteOptions, type Transaction } from '@electric-sql/pglite';
+import { format, type FormatOptionsWithLanguage } from 'sql-formatter';
+import { DBEngine } from '../worker/types';
+import type { DBOptions, DBStrategy } from './types';
+import getSQLFormatConfig from './utils';
 
 /** Class representing a PostgreSQL Database.
  *
@@ -10,6 +13,8 @@ export class PostgreSQL implements DBStrategy {
 	db!: PGlite;
 	dbName: string;
 	dbOptions: PGliteOptions;
+
+	sqlFormatConfig: FormatOptionsWithLanguage;
 
 	/**
 	 * Creates a PostgreSQL object.
@@ -22,6 +27,8 @@ export class PostgreSQL implements DBStrategy {
 		this.dbOptions = {
 			fs: dbOptions.persistent ? new IdbFs(this.dbName) : new MemoryFS()
 		};
+
+		this.sqlFormatConfig = getSQLFormatConfig(DBEngine.PGSQL);
 	}
 
 	/**
@@ -53,33 +60,45 @@ export class PostgreSQL implements DBStrategy {
 	 *
 	 * @param {string} query - The query to be run.
 	 *
-	 * @returns {Promise{QueryResult}} - Promise Object reprsenting the query results.
+	 * @returns {Promise{unknown[]}} - Promise Object reprsenting the query results.
 	 */
-	async exec(query: string): Promise<QueryResult> {
-		try {
-			if (!this.db) throw new Error('Database not initialized');
+	async exec(query: string): Promise<unknown[]> {
+		if (!this.db)
+			throw new Error('Database not initialized');
 
-			const startTime = performance.now();
-			let data;
+		const statements = format(query, this.sqlFormatConfig).split(';')
 
-			await this.db.transaction(async (tx) => {
-				data = await tx.exec(query);
-			});
+		const data: unknown[] = [];
 
-			return {
-				data,
-				elapsed: performance.now() - startTime
-			};
-		} catch (error) {
-			let queryError = '';
-			if (error instanceof Error) {
-				queryError = error.message;
-				if (error.cause) queryError += ' (' + error.cause + ')';
-			} else {
-				queryError = `Database query failed: ${String(error)}`;
+		await this.db.transaction(async (tx: Transaction) => {
+			for (const statement of statements) {
+				if (statement.length === 0) continue;
+
+				await tx.query(statement)
+					.then((result) => {
+						data.push({
+							rows: result.rows,
+							cols: result.fields,
+						})
+					})
+					.catch(async (error) => {
+						const cause = statement.trim();
+						await tx.rollback();
+
+						if (error instanceof Error) {
+							if (error.cause) {
+								throw new Error(error.message + ' (' + error.cause + ')', { cause });
+							} else {
+								throw new Error(error.message, { cause });
+							}
+						} else {
+							throw new Error(`Database query failed: ${String(error)}`, { cause });
+						}
+					})
 			}
-			return { error: queryError };
-		}
+		})
+
+		return data;
 	}
 
 	/**
