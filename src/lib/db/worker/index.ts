@@ -228,15 +228,28 @@ const execQuery = async (port: MessagePort, id: string, dbName: string, query: s
             cause: `Database with name "${dbName}" is not initialized.`
         };
 
-    const { db } = DBS[dbName];
-    const results = {
-        id,
-        ...(await db.exec(query))
-    };
+    const startTime = performance.now();
 
-    DBS[dbName].modifiedOn = new Date().toLocaleString();
+    try {
+        const { db } = DBS[dbName];
+        const results = {
+            id,
+            data: await db.exec(query),
+            elapsed: performance.now() - startTime
+        };
 
-    return results;
+        DBS[dbName].modifiedOn = new Date().toLocaleString();
+
+        return results;
+    } catch (error) {
+        const { message, cause } = error as Error;
+        return {
+            id,
+            name: 'INVALID_QUERY',
+            message,
+            cause
+        };
+    }
 }
 
 const closeDB = async (port: MessagePort, dbName: string): Promise<SuccessResponseData['CLOSE_DB'] | ErrorResponseData['CLOSE_DB']> => {

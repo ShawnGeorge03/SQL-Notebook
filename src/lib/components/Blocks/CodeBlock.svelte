@@ -4,9 +4,8 @@
 	import { slide } from 'svelte/transition';
 
 	import Editor from '$lib/components/Blocks/Block/index.svelte';
-	import type { QueryResult } from '$lib/db/engines/types';
 	import { DBWorkerService } from '$lib/db/worker/service';
-	import type { DBEngine, DBInfo } from '$lib/db/worker/types';
+	import type { DBEngine, DBInfo, SuccessResponseData } from '$lib/db/worker/types';
 	import { PostgreSQL, sql, SQLite, StandardSQL } from '@codemirror/lang-sql';
 
 	import PostgreSQLIcon from '$lib/assets/postgresql.svg?raw';
@@ -19,7 +18,7 @@
 		dbName?: string;
 		engine?: DBEngine;
 		query: string;
-		result: QueryResult;
+		result: Omit<SuccessResponseData['EXEC_QUERY'], 'id'>;
 		ondelete: VoidFunction;
 	}
 
@@ -27,7 +26,7 @@
 		id,
 		class: className,
 		query = $bindable(''),
-		result = $bindable({}),
+		result = $bindable({ data: [], elapsed: 0 }),
 		dbName = $bindable(''),
 		engine = $bindable(),
 		ondelete = $bindable<VoidFunction>()
@@ -54,7 +53,6 @@
 			} else if (response.command === 'EXEC_QUERY' && response.data.id === id) {
 				result = {
 					data: response.data.data,
-					error: response.data.error,
 					elapsed: response.data.elapsed
 				};
 			} else if (response.command === 'FORMAT_QUERY' && response.data.id === id) {
@@ -62,6 +60,8 @@
 			}
 		} else if (response.status === 'ERROR') {
 			if (response.command === 'GET_ACTIVE_DBS') {
+				console.error(response.data);
+			} else if (response.command === 'EXEC_QUERY') {
 				console.error(response.data);
 			} else if (response.command === 'FORMAT_QUERY') {
 				console.error(response.data);
@@ -112,7 +112,7 @@
 				class="ml-auto cursor-pointer rounded border-none bg-cyan-700 px-4 py-2 text-white hover:bg-cyan-900 disabled:cursor-not-allowed"
 				onclick={() => {
 					dbWorkerService.sendMessage({ command: 'EXEC_QUERY', args: { id, dbName, query } });
-					result = {};
+					result = { data: [], elapsed: 0 };
 				}}>Run</button
 			>
 			<button
