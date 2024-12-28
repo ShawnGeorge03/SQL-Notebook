@@ -2,7 +2,7 @@ import * as WaSQLite from 'wa-sqlite';
 import SQLiteESMFactory from 'wa-sqlite/dist/wa-sqlite-async.mjs';
 import IDBBatchAtomicVFS from './thrid-party/wa-sqlite/IDBBatchAtomicVFS.js';
 import MemoryAsyncVFS from './thrid-party/wa-sqlite/MemoryAsyncVFS.js';
-import type { DBOptions, DBStrategy } from './types';
+import { NotebookType, type DBOptions, type DBStrategy, type QueryResult } from './types';
 
 /** Class representing a SQLite Database.
  *
@@ -59,27 +59,66 @@ export class SQLite implements DBStrategy {
      *
      * @param {string} query - The query to be run.
      *
-     * @returns {Promise{unknown[]}} - Promise Object reprsenting the query results.
+     * @returns {Promise{QueryResult[]}} - Promise Object reprsenting the query results.
      */
-    async exec(query: string): Promise<unknown[]> {
+    async exec(query: string): Promise<QueryResult[]> {
         try {
             if (!this.#db)
                 throw new Error('Database not initialized');
 
-
-            const data: unknown[] = [];
+            const data: QueryResult[] = [];
 
             await this.#sqlite3.exec(this.#db, 'BEGIN TRANSACTION;')
 
             for await (const stmt of this.#sqlite3.statements(this.#db, query)) {
                 const rows = [];
+                const colNames = this.#sqlite3.column_names(stmt);
+                const colTypes: Record<string, Record<string, number>> =
+                    colNames.reduce((acc, cur) => ({ ...acc, [cur]: {} }), {});
+
                 while (await this.#sqlite3.step(stmt) === WaSQLite.SQLITE_ROW) {
                     const row = this.#sqlite3.row(stmt);
                     rows.push(row);
+                    let col_num = 0;
+
+                    while (col_num !== Object.keys(colTypes).length) {
+                        const colName = colNames[col_num];
+                        const colType = this.#columnToTypes(await this.#sqlite3.column_type(stmt, col_num))
+
+                        if (!Object.keys(colTypes).includes(colName))
+                            colTypes[colName] = {};
+
+                        if (!Object.keys(colTypes[colName]).includes(colType))
+                            colTypes[colName] = {
+                                ...colTypes[colName],
+                                [colType]: 0,
+                            }
+
+                        colTypes[colName][colType] += 1;
+                        col_num += 1;
+                    }
                 }
 
-                const columns = this.#sqlite3.column_names(stmt)
-                if (columns.length) data.push({ columns, rows });
+                const cols = []
+
+                for (const colName of colNames) {
+                    const colType = colTypes[colName];
+                    let maxKey, maxValue = -Infinity;
+
+                    for (const type in colType) {
+                        if (colType[type] > maxValue) {
+                            maxKey = type;
+                            maxValue = colType[type];
+                        }
+                    }
+
+                    cols.push({
+                        name: colName,
+                        type: maxKey
+                    })
+                }
+
+                data.push({ rows, cols: cols as QueryResult['cols'] });
             }
 
             await this.#sqlite3.exec(this.#db, 'COMMIT;')
@@ -97,6 +136,20 @@ export class SQLite implements DBStrategy {
             } else {
                 throw new Error(`Database query failed: ${String(error)}`);
             }
+        }
+    }
+
+    #columnToTypes(field: number) {
+        switch (field) {
+            case WaSQLite.SQLITE_NULL:
+                return NotebookType.BOOLEAN
+            case WaSQLite.SQLITE_INTEGER:
+            case WaSQLite.SQLITE_FLOAT:
+                return NotebookType.NUMBER
+            case WaSQLite.SQLITE_TEXT:
+                return NotebookType.STRING;
+            default:
+                return NotebookType.STRING;
         }
     }
 
