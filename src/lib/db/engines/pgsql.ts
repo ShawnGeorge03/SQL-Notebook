@@ -52,64 +52,83 @@ export class PostgreSQL implements DBStrategy {
 	}
 
 	/**
-	 * Return the results from a query.
+	 * Executes a SQL query within a transaction, ensuring
+	 * failed queries do not cause issues to the database.
 	 *
-	 * All queries will be run within a transaction to
-	 * ensure failed queries do not cause issues to the
-	 * database.
+	 * @param {string} query - The SQL query to be executed.
 	 *
-	 * @param {string} query - The query to be run.
+	 * @returns {Promise<QueryResult[]>} - A Promise that resolves to an array of
+	 * 	`QueryResult` objects representing the results of the executed query.
 	 *
-	 * @returns {Promise{QueryResult[]}} - Promise Object reprsenting the query results.
+	 * @throws {Error} Will throw an Error if the database is not initialized.
+	 * @throws {Error} Will throw an Error if the query execution fails.
+	 *
 	 */
 	async exec(query: string): Promise<QueryResult[]> {
-		if (!this.#db)
-			throw new Error('Database not initialized');
+		if (!this.#db) throw new Error('Database not initialized');
 
-		const statements = format(query, this.#sqlFormatConfig).split(';')
-
+		const statements = this.parseStatements(query);
 		const data: QueryResult[] = [];
 
 		await this.#db.transaction(async (tx: Transaction) => {
 			for (const statement of statements) {
-				if (statement.length === 0) continue;
-
-				await tx.query(statement)
-					.then((result) => {
-						if (result.fields.length === 0) return;
-						data.push({
-							rows: result.rows,
-							cols: this.#columnToTypes(result.fields),
-						})
-					})
-					.catch(async (error) => {
-						const cause = statement.trim();
-						await tx.rollback();
-
-						if (error instanceof Error) {
-							if (error.cause) {
-								throw new Error(error.message + ' (' + error.cause + ')', { cause });
-							} else {
-								throw new Error(error.message, { cause });
-							}
-						} else {
-							throw new Error(`Database query failed: ${String(error)}`, { cause });
-						}
-					})
+				await this.executeStatement(tx, statement, data);
 			}
-		})
+		});
 
 		return data;
 	}
 
 	/**
-	 * Maps the data type IDs returned from the database to the corresponding NotebookType.
-	 * This function is used to determine the data type of each column in the query results.
+	 * Executes a SQL query within a transaction.
 	 *
-	 * @param fields - The fields returned from the database query.
-	 * @returns The column definitions with the appropriate data types.
+	 * @param {Transaction} tx - The transaction object.
+	 * @param {string} statement - The SQL statement to be executed.
+	 * @param {QueryResult[]} data - The array to store the results of the executed query.
+	 *
+	 * @throws {Error} Will throw an Error if the query execution fails.
 	 */
-	#columnToTypes(fields: Results['fields']): QueryResult['cols'] {
+	private async executeStatement(tx: Transaction, statement: string, data: QueryResult[]): Promise<void> {
+		try {
+			const result = await tx.query(statement);
+			if (result.fields.length > 0) {
+				data.push({
+					rows: result.rows,
+					cols: this.mapPostgresTypesToNotebookTypes(result.fields),
+				});
+			}
+		} catch (error) {
+			await tx.rollback();
+			if (error instanceof Error)
+				throw new Error(
+					error.cause ? `${error.message} (${error.cause})` : error.message,
+					{ cause: statement }
+				);
+
+			throw new Error(`Database query failed: ${String(error)}`, { cause: statement });
+		}
+	}
+
+	/**
+	 * Parses a SQL query into individual statements.
+	 *
+	 * @param {string} query - The SQL query to be parsed.
+	 * @returns {string[]} An array of individual SQL statements.
+	 */
+	private parseStatements(query: string): string[] {
+		return format(query, this.#sqlFormatConfig)
+			.split(';')
+			.map(stmt => stmt.trim())
+			.filter(stmt => stmt.length > 0);
+	}
+
+	/**
+	 * Maps PostgreSQL column types to Notebook types.
+	 *
+	 * @param {Results['fields']} fields - The array of PostgreSQL fields to be mapped.
+	 * @returns {QueryResult['cols']} The array of columns with mapped Notebook types.
+	 */
+	private mapPostgresTypesToNotebookTypes(fields: Results['fields']): QueryResult['cols'] {
 		const cols = [];
 
 		for (const { name, dataTypeID } of fields) {
