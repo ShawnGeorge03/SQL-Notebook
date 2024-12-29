@@ -7,6 +7,6 @@ export default defineConfig({
 		format: 'es'
 	},
 	optimizeDeps: {
-		exclude: ['@electric-sql/pglite', 'wa-sqlite']
+		exclude: ['wa-sqlite']
 	}
 });

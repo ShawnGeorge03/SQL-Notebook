@@ -1,12 +1,15 @@
+import type { PGliteOptions, Results, Transaction } from '@electric-sql/pglite';
+// Ensure that all non type imports are from a CDN else the final bundle will include the PostgreSQL WASM file.
 import {
 	IdbFs,
 	MemoryFS,
 	PGlite,
 	types,
-	type PGliteOptions,
-	type Results,
-	type Transaction
-} from '@electric-sql/pglite';
+} from
+	// eslint-disable-next-line @typescript-eslint/ban-ts-comment
+	// @ts-ignore
+	'https://cdn.jsdelivr.net/npm/@electric-sql/pglite@0.2.15/dist/index.min.js';
+
 import { format, type FormatOptionsWithLanguage } from 'sql-formatter';
 import { DBEngine } from '../worker/types';
 import { NotebookType, type DBOptions, type DBStrategy, type QueryResult } from './types';
