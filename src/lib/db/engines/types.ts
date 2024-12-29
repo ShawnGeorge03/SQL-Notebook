@@ -1,19 +1,19 @@
 export type DBOptions = {
-    persistent: boolean;
+	persistent: boolean;
 };
 
 export enum NotebookType {
-    BOOLEAN = 'boolean',
-    NUMBER = 'number',
-    DATE = 'date',
-    TIME = 'time',
-    DATETIME = 'datetime',
-    STRING = 'string',
+	BOOLEAN = 'boolean',
+	NUMBER = 'number',
+	DATE = 'date',
+	TIME = 'time',
+	DATETIME = 'datetime',
+	STRING = 'string'
 }
 
 export type QueryResult = {
-    rows: unknown[];
-    cols: { name: string, type: NotebookType }[]
+	rows: unknown[];
+	cols: { name: string; type: NotebookType }[];
 };
 
 /**
@@ -22,7 +22,7 @@ export type QueryResult = {
  * @interface
  */
 export interface DBStrategy {
-    init(): Promise<void>;
-    exec(query: string): Promise<QueryResult[]>;
-    close(): Promise<void>;
+	init(): Promise<void>;
+	exec(query: string): Promise<QueryResult[]>;
+	close(): Promise<void>;
 }

@@ -1,4 +1,12 @@
-import { IdbFs, MemoryFS, PGlite, types, type PGliteOptions, type Results, type Transaction } from '@electric-sql/pglite';
+import {
+	IdbFs,
+	MemoryFS,
+	PGlite,
+	types,
+	type PGliteOptions,
+	type Results,
+	type Transaction
+} from '@electric-sql/pglite';
 import { format, type FormatOptionsWithLanguage } from 'sql-formatter';
 import { DBEngine } from '../worker/types';
 import { NotebookType, type DBOptions, type DBStrategy, type QueryResult } from './types';
@@ -88,22 +96,25 @@ export class PostgreSQL implements DBStrategy {
 	 *
 	 * @throws {Error} Will throw an Error if the query execution fails.
 	 */
-	private async executeStatement(tx: Transaction, statement: string, data: QueryResult[]): Promise<void> {
+	private async executeStatement(
+		tx: Transaction,
+		statement: string,
+		data: QueryResult[]
+	): Promise<void> {
 		try {
 			const result = await tx.query(statement);
 			if (result.fields.length > 0) {
 				data.push({
 					rows: result.rows,
-					cols: this.mapPostgresTypesToNotebookTypes(result.fields),
+					cols: this.mapPostgresTypesToNotebookTypes(result.fields)
 				});
 			}
 		} catch (error) {
 			await tx.rollback();
 			if (error instanceof Error)
-				throw new Error(
-					error.cause ? `${error.message} (${error.cause})` : error.message,
-					{ cause: statement }
-				);
+				throw new Error(error.cause ? `${error.message} (${error.cause})` : error.message, {
+					cause: statement
+				});
 
 			throw new Error(`Database query failed: ${String(error)}`, { cause: statement });
 		}
@@ -118,8 +129,8 @@ export class PostgreSQL implements DBStrategy {
 	private parseStatements(query: string): string[] {
 		return format(query, this.#sqlFormatConfig)
 			.split(';')
-			.map(stmt => stmt.trim())
-			.filter(stmt => stmt.length > 0);
+			.map((stmt) => stmt.trim())
+			.filter((stmt) => stmt.length > 0);
 	}
 
 	/**
@@ -134,7 +145,7 @@ export class PostgreSQL implements DBStrategy {
 		for (const { name, dataTypeID } of fields) {
 			switch (dataTypeID) {
 				case types.BOOL:
-					cols.push({ name, type: NotebookType.BOOLEAN })
+					cols.push({ name, type: NotebookType.BOOLEAN });
 					break;
 				case types.INT2:
 				case types.INT4:
@@ -143,19 +154,19 @@ export class PostgreSQL implements DBStrategy {
 				case types.FLOAT8:
 				case types.MONEY:
 				case types.NUMERIC:
-					cols.push({ name, type: NotebookType.NUMBER })
+					cols.push({ name, type: NotebookType.NUMBER });
 					break;
 				case types.DATE:
-					cols.push({ name, type: NotebookType.DATE })
+					cols.push({ name, type: NotebookType.DATE });
 					break;
 				case types.TIME:
 				case types.TIMETZ:
-					cols.push({ name, type: NotebookType.TIME })
+					cols.push({ name, type: NotebookType.TIME });
 					break;
 				case types.ABSTIME:
 				case types.TIMESTAMP:
 				case types.TIMESTAMPTZ:
-					cols.push({ name, type: NotebookType.DATETIME })
+					cols.push({ name, type: NotebookType.DATETIME });
 					break;
 				case types.TEXT:
 				case types.CHAR:
@@ -164,10 +175,10 @@ export class PostgreSQL implements DBStrategy {
 				case types.RELTIME:
 				case types.INTERVAL:
 				case types.UUID:
-					cols.push({ name, type: NotebookType.STRING })
+					cols.push({ name, type: NotebookType.STRING });
 					break;
 				default:
-					cols.push({ name, type: NotebookType.STRING })
+					cols.push({ name, type: NotebookType.STRING });
 					break;
 			}
 		}
