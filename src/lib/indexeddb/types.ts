@@ -1,40 +1,40 @@
-import type { QueryResult } from "$lib/db/engines/types";
-import type { DBEngine } from "$lib/db/worker/types";
+import type { QueryResult } from '$lib/db/engines/types';
+import type { DBEngine } from '$lib/db/worker/types';
 
 interface BaseTable {
-    id: number;
-    name: string;
-    createdBy: 'user' | 'sql-notebook'
-    createdOn: string;
-    modifiedOn: string;
-};
+	id: number;
+	name: string;
+	createdBy: 'user' | 'sql-notebook';
+	createdOn: string;
+	modifiedOn: string;
+}
 
 type BaseDatabase = Omit<BaseTable, 'id'> & { persistent: boolean };
 
 export type Database =
-    | (BaseDatabase & { engine: DBEngine.PGSQL; system: 'pglite' })
-    | (BaseDatabase & { engine: DBEngine.SQLITE; system: 'wa-sqlite' });
+	| (BaseDatabase & { engine: DBEngine.PGSQL; system: 'pglite' })
+	| (BaseDatabase & { engine: DBEngine.SQLITE; system: 'wa-sqlite' });
 
 export type Project = BaseTable & { notebookIDs: number[] };
 
 type NotebookCell =
-    | {
-        id: string;
-        name?: string;
-        cell: 'sql';
-        content: {
-            query: string;
-            result: QueryResult;
-        }
-    }
-    | {
-        id: string;
-        name: string;
-        cell: 'text';
-        content: string;
-    }
+	| {
+			id: string;
+			name?: string;
+			cell: 'sql';
+			content: {
+				query: string;
+				result: QueryResult;
+			};
+	  }
+	| {
+			id: string;
+			name: string;
+			cell: 'text';
+			content: string;
+	  };
 
 export type Notebook = BaseTable & {
-    projectID: number;
-    cells: NotebookCell[]
+	projectID: number;
+	cells: NotebookCell[];
 };
