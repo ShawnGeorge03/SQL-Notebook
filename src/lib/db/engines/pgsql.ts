@@ -1,4 +1,14 @@
-import { IdbFs, MemoryFS, PGlite, type PGliteOptions } from '@electric-sql/pglite';
+import type { PGliteOptions, Transaction } from '@electric-sql/pglite';
+// Ensure that all non type imports are from a CDN else the final bundle will include the PostgreSQL WASM file.
+import {
+	IdbFs,
+	MemoryFS,
+	PGlite,
+} from
+	// eslint-disable-next-line @typescript-eslint/ban-ts-comment
+	// @ts-ignore
+	'https://cdn.jsdelivr.net/npm/@electric-sql/pglite@0.2.15/dist/index.min.js';
+
 import type { DBOptions, DBStrategy, QueryResult } from './types';
 
 /** Class representing a PostgreSQL Database.
@@ -62,7 +72,7 @@ export class PostgreSQL implements DBStrategy {
 			const startTime = performance.now();
 			let data;
 
-			await this.db.transaction(async (tx) => {
+			await this.db.transaction(async (tx: Transaction) => {
 				data = await tx.exec(query);
 			});
 
