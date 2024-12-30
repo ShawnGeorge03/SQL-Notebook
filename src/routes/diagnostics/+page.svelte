@@ -1,13 +1,13 @@
 <script lang="ts">
 	import EditorSettings from '$lib/components/Blocks/EditorSettings.svelte';
 	import TextBlock from '$lib/components/Blocks/TextBlock.svelte';
-	import ActiveDBs from '$lib/components/Manager/ActiveDBs.svelte';
-	import AvailableDBs from '$lib/components/Manager/AvailableDBs.svelte';
-	import CloseDB from '$lib/components/Manager/CloseDB.svelte';
-	import CreateDB from '$lib/components/Manager/CreateDB.svelte';
-	import Demo from '$lib/components/Manager/Demo.svelte';
-	import LoadDB from '$lib/components/Manager/LoadDB.svelte';
-	import TerminateDB from '$lib/components/Manager/TerminateDB.svelte';
+	import ActiveDBs from '$lib/components/Diagnostics/ActiveDBs.svelte';
+	import AvailableDBs from '$lib/components/Diagnostics/AvailableDBs.svelte';
+	import CloseDB from '$lib/components/Diagnostics/CloseDB.svelte';
+	import CreateDB from '$lib/components/Diagnostics/CreateDB.svelte';
+	import Demo from '$lib/components/Diagnostics/Demo.svelte';
+	import LoadDB from '$lib/components/Diagnostics/LoadDB.svelte';
+	import TerminateDB from '$lib/components/Diagnostics/TerminateDB.svelte';
 	import Notebook from '$lib/components/Notebook/Notebook.svelte';
 	import { DBWorkerService } from '$lib/db/worker/service';
 
@@ -40,7 +40,7 @@
 	{#if loading}
 		<p>Loading Notebook</p>
 	{:else}
-		<h1 class="mb-6 text-center text-2xl font-bold">Database Manager</h1>
+		<h1 class="mb-6 text-center text-2xl font-bold">Database Diagnostics</h1>
 
 		<div class="grid grid-cols-2 gap-4">
 			<AvailableDBs />
