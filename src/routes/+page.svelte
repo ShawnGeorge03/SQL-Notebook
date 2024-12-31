@@ -10,6 +10,7 @@
 	import TerminateDB from '$lib/components/Manager/TerminateDB.svelte';
 	import Notebook from '$lib/components/Notebook/Notebook.svelte';
 	import { DBWorkerService } from '$lib/db/worker/service';
+	import Sidebar from '$lib/components/Sidebar.svelte';
 
 	import { onMount } from 'svelte';
 
@@ -61,5 +62,6 @@
 		</div>
 
 		<Notebook />
+		<Sidebar />
 	{/if}
 </div>

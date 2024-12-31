@@ -1,52 +1,60 @@
 <script lang="ts">
 	import * as Accordion from '$lib/components/ui/accordion';
 	import { Button } from '$lib/components/ui/button';
+	import { Plus, RefreshCw, Trash, MinusSquare, RotateCw, File, Database } from 'lucide-svelte';
+	import Separator from './ui/separator/separator.svelte';
 
-	// Source this from the backend
-	let notebooks = ['Notebook 1', 'Notebook 2', 'Notebook 3'];
-	let notebook_refs = ['Notebook 1', 'Notebook 2', 'Notebook 3'];
+	// Data sourced from backend
+	let notebooks = [
+		{ name: 'Notebook 1', id: 1 },
+		{ name: 'Notebook 2', id: 2 },
+		{ name: 'Notebook 3', id: 3 }
+	];
+
 	let databases = [
 		{ name: 'Movies', id: 1 },
 		{ name: 'Sample-Chinook', id: 2 }
 	];
 
-	// Mock actions for refresh and add
-
-	function createDatabase() {
-		console.log('Adding a new database...');
+	// Backend actions
+	async function performAction(action: string, id?: number) {
+		console.log(`${action}${id ? ` for ID: ${id}` : ''}`);
+		// Replace with actual backend calls
 	}
 
-	async function loadDatabase(databaseId: number) {
-		console.log(`Loading database with ID: ${databaseId}`);
-		// Call your backend here
-	}
-
-	async function closeDatabase(databaseId: number) {
-		console.log(`Closing database with ID: ${databaseId}`);
-		// Call your backend here
-	}
-
-	async function refreshDatabases() {
-		console.log('Refreshing databases...');
-		// Call your backend here to fetch the latest database list
-	}
-
-	async function terminateDatabase(databaseId: number) {
-		console.log(`Terminating database with ID: ${databaseId}`);
-		// Call your backend here
-	}
+	// Map actions to functions for clarity
+	const actions = {
+		openNotebook: (id: number) => performAction('Opening notebook', id),
+		createDatabase: () => performAction('Adding a new database'),
+		loadDatabase: () => performAction('Loading database'),
+		closeDatabase: (id: number) => performAction('Closing database', id),
+		terminateDatabase: (id: number) => performAction('Terminating database', id),
+		getAllDatabases: () => performAction('Fetching all databases'),
+		getActiveDatabases: () => performAction('Fetching active databases')
+	};
 </script>
 
-<div class="sidebar h-screen w-60 bg-gray-900 p-4 text-white">
+<div class="sidebar h-screen w-80 bg-gray-900 p-4 text-white">
 	<!-- Notebooks Section -->
 	<Accordion.Root>
 		<Accordion.AccordionItem value="notebooks">
-			<Accordion.AccordionTrigger>Notebooks</Accordion.AccordionTrigger>
+			<Accordion.AccordionTrigger>
+				<p class="float-left text-lg font-bold">Notebooks</p>
+			</Accordion.AccordionTrigger>
 			<Accordion.AccordionContent>
 				<ul>
-					{#each notebooks as notebook}
-						<li class="mb-1">
-							<Button class="w-full rounded p-2 text-left hover:bg-gray-700">{notebook}</Button>
+					{#each notebooks as { name, id }}
+						<li class="mb-2 flex items-center justify-between rounded hover:bg-gray-700">
+							<div class="flex space-x-2">
+								<File size="20" />
+								<button
+									class="hover:text-orange"
+									on:click={() => actions.openNotebook(id)}
+									aria-label="Open Notebook"
+								>
+									{name}
+								</button>
+							</div>
 						</li>
 					{/each}
 				</ul>
@@ -54,45 +62,99 @@
 		</Accordion.AccordionItem>
 	</Accordion.Root>
 
-	<!--Databases Section-->
+	<!-- Databases Section -->
 	<div class="databases">
-		<h2 class="mb-2 text-lg font-bold">Databases</h2>
+		<div class="flow-root">
+			<p class="float-left mb-2 mt-2 font-bold">Databases</p>
+			<div class="float-right mb-2 mt-2 flex space-x-2">
+				<button
+					class="hover:text-orange"
+					on:click={actions.createDatabase}
+					aria-label="Create Database"
+				>
+					<Plus size="20" />
+				</button>
+				<button
+					class="hover:text-orange"
+					on:click={actions.getAllDatabases}
+					aria-label="Refresh Databases"
+				>
+					<RotateCw size="20" />
+				</button>
+			</div>
+		</div>
 		<ul>
-			{#each databases as database}
-				<li class="mb-2 flex items-center justify-between rounded p-2 hover:bg-gray-700">
-					<span>{database.name}</span>
+			{#each databases as { name, id }}
+				<li class="mb-2 flex items-center justify-between rounded hover:bg-gray-700">
+					<div class="flex space-x-2">
+						<Database size="20" />
+						<p>{name}</p>
+					</div>
 					<div class="flex space-x-2">
 						<button
-							class="p-2 text-green-500 hover:text-white"
-							on:click={() => loadDatabase(database.id)}
-							aria-label="Open database"
+							class="hover:text-orange"
+							on:click={() => actions.terminateDatabase(id)}
+							aria-label="Terminate Database"
 						>
-							<i class="icon icon-open">Open</i>
-						</button>
-						<button
-							class="p-2 text-red-500 hover:text-white"
-							on:click={() => closeDatabase(database.id)}
-							aria-label="Delete database"
-						>
-							<i class="icon icon-delete">Delete</i>
+							<Trash size="20" />
 						</button>
 					</div>
 				</li>
 			{/each}
 		</ul>
-		<div class="mt-4 flex space-x-2">
-			<button
-				class="rounded bg-blue-600 p-2 text-white hover:bg-blue-700"
-				on:click={createDatabase}
-			>
-				Add
-			</button>
-			<button
-				class="rounded bg-gray-600 p-2 text-white hover:bg-gray-700"
-				on:click={refreshDatabases}
-			>
-				Refresh
-			</button>
+	</div>
+	<Separator />
+
+	<!-- Active Databases Section -->
+	<div class="active-databases">
+		<div class="flow-root">
+			<p class="float-left mb-2 mt-2 font-bold">Active Databases</p>
+			<div class="float-right mb-2 mt-2 flex space-x-2">
+				<button
+					class="hover:text-orange"
+					on:click={actions.loadDatabase}
+					aria-label="Load Database"
+				>
+					<Plus size="20" />
+				</button>
+				<button
+					class="hover:text-orange"
+					on:click={actions.getActiveDatabases}
+					aria-label="Refresh Active Databases"
+				>
+					<RotateCw size="20" />
+				</button>
+			</div>
 		</div>
+		<ul>
+			{#each databases as { name, id }}
+				<li class="mb-2 flex items-center justify-between rounded hover:bg-gray-700">
+					<div class="flex space-x-2">
+						<Database size="20" />
+						<p>{name}</p>
+					</div>
+					<div class="flex space-x-2">
+						<button
+							class="hover:text-orange"
+							on:click={() => actions.closeDatabase(id)}
+							aria-label="Close Database"
+						>
+							<MinusSquare size="20" />
+						</button>
+					</div>
+				</li>
+			{/each}
+		</ul>
 	</div>
 </div>
+
+<style>
+	.sidebar button {
+		background: none;
+		border: none;
+		cursor: pointer;
+	}
+	.sidebar p {
+		margin: 0;
+	}
+</style>
