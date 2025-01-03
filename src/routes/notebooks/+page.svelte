@@ -10,7 +10,9 @@
 		<main class="space-y-4 bg-green-500">
 			<header class="sticky top-0 z-10 bg-red-500 p-4">
 				<Sidebar.Trigger />
-				<ThemeToggle class="float-right" />
+				<div class="float-right flex justify-end gap-4">
+					<ThemeToggle />
+				</div>
 			</header>
 			<p class="h-[512px] bg-purple-500 p-4">Paragraph 1</p>
 			<p class="h-[512px] bg-purple-500 p-4">Paragraph 2</p>
