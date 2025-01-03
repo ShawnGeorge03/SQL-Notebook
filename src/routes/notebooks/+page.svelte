@@ -1,15 +1,13 @@
 <script lang="ts">
+	import AppSidebar from '$lib/components/app-sidebar.svelte';
 	import * as Sidebar from '$lib/components/ui/sidebar/index.js';
-	import SidebarLeft from '$lib/components/ui/sidebar/sidebar-left.svelte';
 </script>
 
 <Sidebar.Provider>
-	<SidebarLeft />
+	<AppSidebar />
 	<Sidebar.Inset>
 		<main class="space-y-4 bg-green-500">
-			<header class="sticky top-0 z-10 bg-red-500 p-4">
-				<Sidebar.Trigger />
-			</header>
+			<header class="sticky top-0 z-10 bg-red-500 p-4"></header>
 			<p class="h-[512px] bg-purple-500 p-4">Paragraph 1</p>
 			<p class="h-[512px] bg-purple-500 p-4">Paragraph 2</p>
 			<p class="h-[512px] bg-purple-500 p-4">Paragraph 3</p>
