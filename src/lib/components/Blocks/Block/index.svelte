@@ -2,6 +2,7 @@
 	import { browser } from '$app/environment';
 	import { onMount } from 'svelte';
 
+	import type { UserPreferences } from '$lib/components/SettingsModal.svelte';
 	import {
 		autocompletion,
 		closeBrackets,
@@ -31,7 +32,6 @@
 		rectangularSelection,
 		type ViewUpdate
 	} from '@codemirror/view';
-	import editorConfig from './store';
 
 	export interface BaseBlockProps {
 		content: string;
@@ -88,6 +88,19 @@
 		])
 	];
 
+	const userPreferences = (e: StorageEvent) => {
+		if (e.key !== 'preferences' || !e.newValue) return;
+		const { editor } = JSON.parse(e.newValue) as UserPreferences;
+		view.dispatch({
+			effects: StateEffect.reconfigure.of([
+				...extensions,
+				editor.showLineNumbers ? lineNumbers() : [],
+				editor.highlightWhitespace ? highlightWhitespace() : [],
+				editor.highlightTrailingWhitespace ? highlightTrailingWhitespace() : []
+			])
+		});
+	};
+
 	onMount(() => {
 		view = new EditorView({
 			parent,
@@ -97,19 +110,10 @@
 			})
 		});
 
-		const unsubscribe = editorConfig.subscribe((config) => {
-			view.dispatch({
-				effects: StateEffect.reconfigure.of([
-					...extensions,
-					config.lineNumbers ? lineNumbers() : [],
-					config.highlightWhitespace ? highlightWhitespace() : [],
-					config.highlightTrailingWhitespace ? highlightTrailingWhitespace() : []
-				])
-			});
-		});
+		addEventListener('storage', userPreferences);
 
 		() => {
-			unsubscribe();
+			removeEventListener('storage', userPreferences);
 			view.destroy();
 		};
 	});
