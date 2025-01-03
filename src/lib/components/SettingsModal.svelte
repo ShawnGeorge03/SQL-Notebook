@@ -93,7 +93,7 @@
 {/snippet}
 
 <Dialog.Root>
-	<Dialog.Trigger>
+	<Dialog.Trigger aria-label="Settings">
 		<Settings size="24" />
 	</Dialog.Trigger>
 	<Dialog.Content>
