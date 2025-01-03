@@ -6,7 +6,11 @@
 	import { cn } from '$lib/utils';
 	import { resetMode, setMode } from 'mode-watcher';
 
-	const { class: className } = $props();
+	export interface ThemeProps {
+		class?: string;
+	}
+
+	const { class: className }: ThemeProps = $props();
 </script>
 
 <DropdownMenu.Root>
