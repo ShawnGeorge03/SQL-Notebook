@@ -1,4 +1,5 @@
 <script lang="ts">
+	import CreateCellDropdown from '$lib/components/Notebook/CreateCellDropdown.svelte';
 	import SettingsModal from '$lib/components/SettingsModal.svelte';
 	import * as Sidebar from '$lib/components/ui/sidebar/index.js';
 	import SidebarLeft from '$lib/components/ui/sidebar/sidebar-left.svelte';
@@ -15,6 +16,7 @@
 				<ThemeToggle />
 			</div>
 		</header>
+		<CreateCellDropdown />
 		<p class="h-[512px] bg-purple-500 p-4">Paragraph 1</p>
 		<p class="h-[512px] bg-purple-500 p-4">Paragraph 2</p>
 		<p class="h-[512px] bg-purple-500 p-4">Paragraph 3</p>
