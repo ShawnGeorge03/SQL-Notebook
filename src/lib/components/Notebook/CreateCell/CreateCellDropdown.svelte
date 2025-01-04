@@ -32,36 +32,6 @@
 		<DropdownMenu.Content
 			class="focus-override w-20 rounded-xl border border-muted bg-background px-1 py-1.5 outline-none focus-visible:outline-none"
 		>
-			<DropdownMenu.Item
-				class="rounded-button flex h-10 select-none items-center py-3 pl-3 pr-1.5 text-sm font-medium !ring-0 !ring-transparent data-[highlighted]:bg-muted"
-			>
-				<div class="flex items-center">
-					<span class="text-foreground-alt mr-2 size-6">
-						{@html MarkdownIcon}
-					</span>
-					Markdown
-				</div>
-			</DropdownMenu.Item>
-			<DropdownMenu.Item
-				class="rounded-button flex h-10 select-none items-center py-3 pl-3 pr-1.5 text-sm font-medium !ring-0 !ring-transparent data-[highlighted]:bg-muted"
-			>
-				<div class="flex items-center">
-					<span class="text-foreground-alt mr-2 size-6">
-						{@html AIIcon}
-					</span>
-					Create with AI
-				</div>
-			</DropdownMenu.Item>
-			<DropdownMenu.Item
-				class="rounded-button flex h-10 select-none items-center py-3 pl-3 pr-1.5 text-sm font-medium !ring-0 !ring-transparent data-[highlighted]:bg-muted"
-			>
-				<div class="flex items-center">
-					<span class="text-foreground-alt mr-2 size-6">
-						{@html ChartIcon}
-					</span>
-					Chart
-				</div>
-			</DropdownMenu.Item>
 			<DropdownMenu.Sub>
 				<DropdownMenu.SubTrigger
 					class="rounded-button flex h-10 select-none items-center py-3 pl-3 pr-1.5 text-sm font-medium !ring-0 !ring-transparent data-[highlighted]:bg-muted data-[state=open]:bg-muted"
@@ -80,6 +50,36 @@
 					<CreateCellDropdownContent />
 				</DropdownMenu.SubContent>
 			</DropdownMenu.Sub>
+			<DropdownMenu.Item
+				class="rounded-button flex h-10 select-none items-center py-3 pl-3 pr-1.5 text-sm font-medium !ring-0 !ring-transparent data-[highlighted]:bg-muted"
+			>
+				<div class="flex items-center">
+					<span class="text-foreground-alt mr-2 size-6">
+						{@html MarkdownIcon}
+					</span>
+					Markdown
+				</div>
+			</DropdownMenu.Item>
+			<DropdownMenu.Item
+				class="rounded-button flex h-10 select-none items-center py-3 pl-3 pr-1.5 text-sm font-medium !ring-0 !ring-transparent data-[highlighted]:bg-muted"
+			>
+				<div class="flex items-center">
+					<span class="text-foreground-alt mr-2 size-6">
+						{@html ChartIcon}
+					</span>
+					Chart
+				</div>
+			</DropdownMenu.Item>
+			<DropdownMenu.Item
+				class="rounded-button flex h-10 select-none items-center py-3 pl-3 pr-1.5 text-sm font-medium !ring-0 !ring-transparent data-[highlighted]:bg-muted"
+			>
+				<div class="flex items-center">
+					<span class="text-foreground-alt mr-2 size-6">
+						{@html AIIcon}
+					</span>
+					Create with AI
+				</div>
+			</DropdownMenu.Item>
 		</DropdownMenu.Content>
 	</DropdownMenu.Root>
 	<hr class=" h-0.5 w-1/2 border-0 bg-muted-foreground" />
