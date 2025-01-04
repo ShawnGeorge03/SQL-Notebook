@@ -1,40 +1,9 @@
 <script lang="ts">
-	import { Badge } from '$lib/components/ui/badge/index.js';
 	import * as DropdownMenu from '$lib/components/ui/dropdown-menu/index.js';
 	import * as Tooltip from '$lib/components/ui/tooltip/index.js';
-
-	import { DBWorkerService } from '$lib/db/worker/service';
-	import type { DBInfo } from '$lib/db/worker/types';
-
-	import PostgreSQLIcon from '$lib/assets/postgresql.svg?raw';
-	import SpinnerIcon from '$lib/assets/spinner.svg?raw';
-	import SQLiteIcon from '$lib/assets/sqlite.svg?raw';
+	import CreateCellDropdownContent from './CreateCellDropdownContent.svelte';
 
 	import { ChartArea, CodeXml, FileType, Plus } from 'lucide-svelte';
-	import { onMount } from 'svelte';
-
-	let dbWorkerService;
-
-	let activeDBs: DBInfo[] = $state([]);
-	let loading: boolean = $state(true);
-
-	onMount(() => {
-		dbWorkerService = DBWorkerService.getInstance();
-
-		const unsubscribe = dbWorkerService.responses.subscribe((response) => {
-			loading = response.status === 'LOADING' && response.command === 'GET_ACTIVE_DBS';
-			if (response.status === 'SUCCESS' && response.command === 'GET_ACTIVE_DBS') {
-				activeDBs = response.data.activeDBs;
-				loading = false;
-			} else if (response.status === 'ERROR' && response.command === 'GET_ACTIVE_DBS') {
-				console.error(response.data);
-			}
-		});
-
-		dbWorkerService.sendMessage({ command: 'GET_ACTIVE_DBS' });
-
-		() => unsubscribe();
-	});
 </script>
 
 <div
@@ -87,44 +56,7 @@
 					class=" h-fit w-52 rounded-xl border border-muted bg-background px-1 py-1.5 !ring-0 !ring-transparent"
 					sideOffset={10}
 				>
-					{#if loading}
-						<DropdownMenu.Item
-							class="rounded-button flex h-10 select-none items-center py-3 pl-3 pr-1.5 text-sm font-medium !ring-0 !ring-transparent data-[highlighted]:bg-muted"
-						>
-							<span class="me-3 inline h-5 w-5 animate-spin text-white">{@html SpinnerIcon}</span>
-							<p>Getting Databases...</p>
-						</DropdownMenu.Item>
-					{:else}
-						{#if activeDBs.length === 0}
-							<DropdownMenu.Item
-								class="rounded-button flex h-10 select-none items-center py-3 pl-3 pr-1.5 text-sm font-medium !ring-0 !ring-transparent data-[highlighted]:bg-muted"
-							>
-								<span>No active databases</span>
-							</DropdownMenu.Item>
-						{/if}
-
-						{#each activeDBs as { name, engine, persistent }}
-							<DropdownMenu.Item
-								class="rounded-button flex h-10 select-none items-center py-6 pl-3 pr-1.5 text-sm font-medium !ring-0 !ring-transparent data-[highlighted]:bg-muted"
-							>
-								<div class="flex items-center">
-									{#if engine === 'pgsql'}
-										<span class="h-10 w-10" aria-hidden="true">{@html PostgreSQLIcon}</span>
-									{:else if engine === 'sqlite'}
-										<span class="h-10 w-10" aria-hidden="true">{@html SQLiteIcon}</span>
-									{/if}
-								</div>
-								<div class="flex w-32 flex-col justify-start">
-									<p class="overflow-hidden text-ellipsis whitespace-nowrap">{name}</p>
-									{#if persistent}
-										<Badge class="w-fit" variant="default">Persistent</Badge>
-									{:else}
-										<Badge class="w-fit" variant="default">In-Memory</Badge>
-									{/if}
-								</div>
-							</DropdownMenu.Item>
-						{/each}
-					{/if}
+					<CreateCellDropdownContent />
 				</DropdownMenu.SubContent>
 			</DropdownMenu.Sub>
 		</DropdownMenu.Content>
