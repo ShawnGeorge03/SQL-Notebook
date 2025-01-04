@@ -3,7 +3,12 @@
 	import * as Tooltip from '$lib/components/ui/tooltip/index.js';
 	import CreateCellDropdownContent from './CreateCellDropdownContent.svelte';
 
-	import { ChartArea, CodeXml, FileType, Plus } from 'lucide-svelte';
+	import AIIcon from '$lib/assets/notebook/actions/ai.svg?raw';
+	import ChartIcon from '$lib/assets/notebook/actions/chart.svg?raw';
+	import MarkdownIcon from '$lib/assets/notebook/actions/markdown.svg?raw';
+	import QueryIcon from '$lib/assets/notebook/actions/query.svg?raw';
+
+	import { Plus } from 'lucide-svelte';
 </script>
 
 <div
@@ -31,7 +36,9 @@
 				class="rounded-button flex h-10 select-none items-center py-3 pl-3 pr-1.5 text-sm font-medium !ring-0 !ring-transparent data-[highlighted]:bg-muted"
 			>
 				<div class="flex items-center">
-					<FileType class="text-foreground-alt mr-2 size-5" />
+					<span class="text-foreground-alt mr-2 size-6">
+						{@html MarkdownIcon}
+					</span>
 					Markdown
 				</div>
 			</DropdownMenu.Item>
@@ -39,7 +46,19 @@
 				class="rounded-button flex h-10 select-none items-center py-3 pl-3 pr-1.5 text-sm font-medium !ring-0 !ring-transparent data-[highlighted]:bg-muted"
 			>
 				<div class="flex items-center">
-					<ChartArea class="text-foreground-alt mr-2 size-5" />
+					<span class="text-foreground-alt mr-2 size-6">
+						{@html AIIcon}
+					</span>
+					Create with AI
+				</div>
+			</DropdownMenu.Item>
+			<DropdownMenu.Item
+				class="rounded-button flex h-10 select-none items-center py-3 pl-3 pr-1.5 text-sm font-medium !ring-0 !ring-transparent data-[highlighted]:bg-muted"
+			>
+				<div class="flex items-center">
+					<span class="text-foreground-alt mr-2 size-6">
+						{@html ChartIcon}
+					</span>
 					Chart
 				</div>
 			</DropdownMenu.Item>
@@ -48,7 +67,9 @@
 					class="rounded-button flex h-10 select-none items-center py-3 pl-3 pr-1.5 text-sm font-medium !ring-0 !ring-transparent data-[highlighted]:bg-muted data-[state=open]:bg-muted"
 				>
 					<div class="flex items-center">
-						<CodeXml class="text-foreground-alt mr-2 size-5" />
+						<span class="text-foreground-alt mr-2 size-6">
+							{@html QueryIcon}
+						</span>
 						Code
 					</div>
 				</DropdownMenu.SubTrigger>
