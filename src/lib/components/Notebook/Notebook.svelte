@@ -7,7 +7,6 @@
 		updateLineNumbers
 	} from '../Blocks/Block/store';
 	import CodeBlock from '../Blocks/CodeBlock.svelte';
-	import CellAdder from './CellAdder.svelte';
 	import type { AddCell } from './type';
 
 	let blocks: NotebookData[] = $state([]);
@@ -50,8 +49,6 @@
 			{/if}
 		{/each}
 	</div>
-
-	<CellAdder bind:cellToAdd />
 
 	{#if blocks.length !== 0}
 		<div class="mt-32 flex flex-col items-center gap-4">
