@@ -1,6 +1,5 @@
 <script lang="ts">
-	import CreateCellButtonGroup from '$lib/components/Notebook/CreateCellButtonGroup.svelte';
-	import CreateCellDropdown from '$lib/components/Notebook/CreateCellDropdown.svelte';
+	import * as CreateCell from '$lib/components/Notebook/CreateCell/index.js';
 	import SettingsModal from '$lib/components/SettingsModal.svelte';
 	import * as Sidebar from '$lib/components/ui/sidebar/index.js';
 	import SidebarLeft from '$lib/components/ui/sidebar/sidebar-left.svelte';
@@ -17,8 +16,8 @@
 				<ThemeToggle />
 			</div>
 		</header>
-		<CreateCellDropdown />
-		<CreateCellButtonGroup />
+		<CreateCell.Dropdown />
+		<CreateCell.ButtonGroup />
 		<p class="h-[512px] bg-purple-500 p-4">Paragraph 1</p>
 		<p class="h-[512px] bg-purple-500 p-4">Paragraph 2</p>
 		<p class="h-[512px] bg-purple-500 p-4">Paragraph 3</p>
