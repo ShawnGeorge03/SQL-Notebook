@@ -1,35 +1,13 @@
 <script lang="ts">
 	import type { NotebookData } from '$lib/data/schema';
-	import { nanoid } from 'nanoid/non-secure';
 	import editorConfig, {
 		updateHighlightTrailingWhitespace,
 		updateHighlightWhitespace,
 		updateLineNumbers
 	} from '../Blocks/Block/store';
 	import CodeBlock from '../Blocks/CodeBlock.svelte';
-	import type { AddCell } from './type';
 
 	let blocks: NotebookData[] = $state([]);
-
-	let cellToAdd: AddCell = $state(undefined);
-
-	$effect(() => {
-		if (cellToAdd) {
-			if (cellToAdd.cell === 'sql') {
-				blocks.push({
-					id: nanoid(),
-					cell: 'sql',
-					dbName: cellToAdd.dbName,
-					engine: cellToAdd.engine,
-					content: {
-						query: '',
-						result: {}
-					}
-				});
-			}
-			cellToAdd = undefined;
-		}
-	});
 </script>
 
 <div class="mt-10 flex flex-col items-center gap-10">
