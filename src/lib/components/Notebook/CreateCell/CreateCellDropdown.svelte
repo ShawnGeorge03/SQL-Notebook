@@ -2,6 +2,7 @@
 	import * as DropdownMenu from '$lib/components/ui/dropdown-menu/index.js';
 	import * as Tooltip from '$lib/components/ui/tooltip/index.js';
 	import CreateCellDropdownContent from './CreateCellDropdownContent.svelte';
+	import { type CreateCellBaseProps } from './type';
 
 	import AIIcon from '$lib/assets/notebook/actions/ai.svg?raw';
 	import ChartIcon from '$lib/assets/notebook/actions/chart.svg?raw';
@@ -9,6 +10,8 @@
 	import QueryIcon from '$lib/assets/notebook/actions/query.svg?raw';
 
 	import { Plus } from 'lucide-svelte';
+
+	let { position, addNewCell }: CreateCellBaseProps = $props();
 </script>
 
 <div
@@ -47,10 +50,11 @@
 					class=" h-fit w-52 rounded-xl border border-muted bg-background px-1 py-1.5 !ring-0 !ring-transparent"
 					sideOffset={10}
 				>
-					<CreateCellDropdownContent />
+					<CreateCellDropdownContent {position} {addNewCell} />
 				</DropdownMenu.SubContent>
 			</DropdownMenu.Sub>
 			<DropdownMenu.Item
+				onclick={() => addNewCell(position, { cellType: 'markdown' })}
 				class="rounded-button flex h-10 select-none items-center py-3 pl-3 pr-1.5 text-sm font-medium !ring-0 !ring-transparent data-[highlighted]:bg-muted"
 			>
 				<div class="flex items-center">

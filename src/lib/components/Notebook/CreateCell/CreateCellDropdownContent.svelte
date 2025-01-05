@@ -10,11 +10,14 @@
 	import SQLiteIcon from '$lib/assets/sqlite.svg?raw';
 
 	import { onMount } from 'svelte';
+	import type { CreateCellBaseProps } from './type';
 
 	let dbWorkerService;
 
 	let activeDBs: DBInfo[] = $state([]);
 	let loading: boolean = $state(true);
+
+	let { position, addNewCell }: CreateCellBaseProps = $props();
 
 	onMount(() => {
 		dbWorkerService = DBWorkerService.getInstance();
@@ -54,6 +57,7 @@
 	{#each activeDBs as { name, engine, persistent }}
 		<DropdownMenu.Item
 			class="rounded-button flex h-10 select-none items-center py-6 pl-3 pr-1.5 text-sm font-medium !ring-0 !ring-transparent data-[highlighted]:bg-muted"
+			onclick={() => addNewCell(position, { cellType: 'query', engine, dbName: name })}
 		>
 			<div class="flex items-center">
 				{#if engine === 'pgsql'}
