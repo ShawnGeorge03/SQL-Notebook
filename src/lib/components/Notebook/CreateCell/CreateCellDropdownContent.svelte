@@ -9,6 +9,8 @@
 	import SpinnerIcon from '$lib/assets/spinner.svg?raw';
 	import SQLiteIcon from '$lib/assets/sqlite.svg?raw';
 
+	import ScrollArea from '$lib/components/ui/scroll-area/scroll-area.svelte';
+	import { cn } from '$lib/utils';
 	import { onMount } from 'svelte';
 	import type { CreateCellBaseProps } from './type';
 
@@ -56,26 +58,28 @@
 		</DropdownMenu.Item>
 	{/if}
 
-	{#each activeDBs as { name, engine, persistent }}
-		<DropdownMenu.Item
-			class="rounded-button flex h-10 select-none items-center py-6 pl-3 pr-1.5 text-sm font-medium !ring-0 !ring-transparent data-[highlighted]:bg-muted"
-			onclick={() => addNewCell(position, { cellType: 'query', engine, dbName: name })}
-		>
-			<div class="flex items-center">
-				{#if engine === 'pgsql'}
-					<span class="h-10 w-10" aria-hidden="true">{@html PostgreSQLIcon}</span>
-				{:else if engine === 'sqlite'}
-					<span class="h-10 w-10" aria-hidden="true">{@html SQLiteIcon}</span>
-				{/if}
-			</div>
-			<div class="flex w-32 flex-col justify-start">
-				<p class="overflow-hidden text-ellipsis whitespace-nowrap">{name}</p>
-				{#if persistent}
-					<Badge class="w-fit" variant="default">Persistent</Badge>
-				{:else}
-					<Badge class="w-fit" variant="default">In-Memory</Badge>
-				{/if}
-			</div>
-		</DropdownMenu.Item>
-	{/each}
+	<ScrollArea class={cn('w-fit rounded-md', { 'h-24': activeDBs.length > 3 })}>
+		{#each activeDBs as { name, engine, persistent }}
+			<DropdownMenu.Item
+				class="rounded-button flex h-10 select-none items-center py-6 pl-3 pr-1.5 text-sm font-medium !ring-0 !ring-transparent data-[highlighted]:bg-muted"
+				onclick={() => addNewCell(position, { cellType: 'query', engine, dbName: name })}
+			>
+				<div class="flex items-center">
+					{#if engine === 'pgsql'}
+						<span class="h-10 w-10" aria-hidden="true">{@html PostgreSQLIcon}</span>
+					{:else if engine === 'sqlite'}
+						<span class="h-10 w-10" aria-hidden="true">{@html SQLiteIcon}</span>
+					{/if}
+				</div>
+				<div class="flex w-32 flex-col justify-start">
+					<p class="overflow-hidden text-ellipsis whitespace-nowrap">{name}</p>
+					{#if persistent}
+						<Badge class="w-fit" variant="default">Persistent</Badge>
+					{:else}
+						<Badge class="w-fit" variant="default">In-Memory</Badge>
+					{/if}
+				</div>
+			</DropdownMenu.Item>
+		{/each}
+	</ScrollArea>
 {/if}
