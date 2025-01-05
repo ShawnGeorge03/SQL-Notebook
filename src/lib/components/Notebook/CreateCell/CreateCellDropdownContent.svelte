@@ -40,6 +40,7 @@
 
 {#if loading}
 	<DropdownMenu.Item
+		disabled
 		class="rounded-button flex h-10 select-none items-center py-3 pl-3 pr-1.5 text-sm font-medium !ring-0 !ring-transparent data-[highlighted]:bg-muted"
 	>
 		<span class="me-3 inline h-5 w-5 animate-spin text-white">{@html SpinnerIcon}</span>
@@ -48,6 +49,7 @@
 {:else}
 	{#if activeDBs.length === 0}
 		<DropdownMenu.Item
+			disabled
 			class="rounded-button flex h-10 select-none items-center py-3 pl-3 pr-1.5 text-sm font-medium !ring-0 !ring-transparent data-[highlighted]:bg-muted"
 		>
 			<span>No active databases</span>
