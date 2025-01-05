@@ -52,7 +52,7 @@
 			disabled
 			class="rounded-button flex h-10 select-none items-center py-3 pl-3 pr-1.5 text-sm font-medium !ring-0 !ring-transparent data-[highlighted]:bg-muted"
 		>
-			<span>No active databases</span>
+			<p>No active databases</p>
 		</DropdownMenu.Item>
 	{/if}
 
