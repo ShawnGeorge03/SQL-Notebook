@@ -4,8 +4,6 @@
 	import CreateCellDropdownContent from './CreateCellDropdownContent.svelte';
 	import { type CreateCellBaseProps } from './type';
 
-	import AIIcon from '$lib/assets/notebook/actions/ai.svg?raw';
-	import ChartIcon from '$lib/assets/notebook/actions/chart.svg?raw';
 	import MarkdownIcon from '$lib/assets/notebook/actions/markdown.svg?raw';
 	import QueryIcon from '$lib/assets/notebook/actions/query.svg?raw';
 
@@ -62,26 +60,6 @@
 						{@html MarkdownIcon}
 					</span>
 					Markdown
-				</div>
-			</DropdownMenu.Item>
-			<DropdownMenu.Item
-				class="rounded-button flex h-10 select-none items-center py-3 pl-3 pr-1.5 text-sm font-medium !ring-0 !ring-transparent data-[highlighted]:bg-muted"
-			>
-				<div class="flex items-center">
-					<span class="text-foreground-alt mr-2 size-6">
-						{@html ChartIcon}
-					</span>
-					Chart
-				</div>
-			</DropdownMenu.Item>
-			<DropdownMenu.Item
-				class="rounded-button flex h-10 select-none items-center py-3 pl-3 pr-1.5 text-sm font-medium !ring-0 !ring-transparent data-[highlighted]:bg-muted"
-			>
-				<div class="flex items-center">
-					<span class="text-foreground-alt mr-2 size-6">
-						{@html AIIcon}
-					</span>
-					Create with AI
 				</div>
 			</DropdownMenu.Item>
 		</DropdownMenu.Content>
