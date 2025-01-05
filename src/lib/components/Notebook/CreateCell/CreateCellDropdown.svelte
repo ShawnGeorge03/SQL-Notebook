@@ -43,7 +43,7 @@
 						<span class="text-foreground-alt mr-2 size-6">
 							{@html QueryIcon}
 						</span>
-						Code
+						Query
 					</div>
 				</DropdownMenu.SubTrigger>
 				<DropdownMenu.SubContent

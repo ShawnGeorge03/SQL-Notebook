@@ -22,7 +22,7 @@
 				<span class="text-foreground-alt mr-2 size-5">
 					{@html QueryIcon}
 				</span>
-				Code
+				Query
 				<span class="ml-2 transition-transform duration-200 {open ? 'rotate-180' : ''}"> ▼ </span>
 			</div>
 		</DropdownMenu.Trigger>
