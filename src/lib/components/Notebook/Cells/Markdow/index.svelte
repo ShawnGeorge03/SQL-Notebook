@@ -1,66 +1,25 @@
 <script lang="ts">
-	import Editor, { type BaseBlockProps } from '$lib/components/Blocks/Block/index.svelte';
+	import { cn } from '$lib/utils';
 	import { markdown } from '@codemirror/lang-markdown';
-	import DOMPurify from 'dompurify';
-	import 'github-markdown-css';
 	import { marked } from 'marked';
 
-	interface TextBlockProps extends BaseBlockProps {
-		content: string;
-		type: 'markdown';
-	}
+	import Cell, { type BaseBlockProps } from '../Cell.svelte';
+	import './github-markdown.css';
 
-	let { class: className, content = $bindable('') }: TextBlockProps = $props();
-	let customExtensions = [markdown()];
-	let htmlContent = $state('');
+	let { class: className, content = $bindable('') }: BaseBlockProps = $props();
 
-	// Function to sanitize and render the Markdown content
-	const renderMarkdown = async () => {
-		const rawHtml = await marked(content);
-		htmlContent = DOMPurify.sanitize(rawHtml);
-	};
+	marked.use({
+		gfm: true
+	});
 </script>
 
-<!-- Using the base Editor component to render Markdown content -->
-<div class="markdown-body">
-	<Editor
-		autocomplete="on"
-		autocorrect="on"
-		autocapitalize="on"
-		spellcheck="on"
-		class={className}
-		bind:content
-		{customExtensions}
-	/>
-	<button class="render-button" onclick={renderMarkdown}>Render Markdown</button>
-	<div class="markdown-preview">
-		<!-- eslint-disable svelte/no-at-html-tags -->
-		{@html htmlContent}
+<div class={cn('flex gap-4', className)}>
+	<Cell class="w-1/2" bind:content customExtensions={[markdown()]} />
+	<div class="markdown-body h-[18.5rem] w-1/2 overflow-y-scroll p-4">
+		{#await marked.parse(content)}
+			<p>Processing Markdown</p>
+		{:then HTML}
+			{@html HTML}
+		{/await}
 	</div>
 </div>
-
-<style>
-	.markdown-body {
-		padding: 1em;
-	}
-
-	.render-button {
-		padding: 0.5em 1em;
-		margin-top: 1em;
-		background-color: #007acc;
-		color: white;
-		border: none;
-		cursor: pointer;
-		border-radius: 4px;
-	}
-
-	.render-button:hover {
-		background-color: #005fa3;
-	}
-
-	.markdown-preview {
-		border-top: 1px solid #ddd;
-		padding-top: 1em;
-		margin-top: 1em;
-	}
-</style>
