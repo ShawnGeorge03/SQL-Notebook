@@ -1,5 +1,4 @@
 <script lang="ts">
-	import EditorSettings from '$lib/components/Blocks/EditorSettings.svelte';
 	import TextBlock from '$lib/components/Blocks/TextBlock.svelte';
 	import ActiveDBs from '$lib/components/Diagnostics/ActiveDBs.svelte';
 	import AvailableDBs from '$lib/components/Diagnostics/AvailableDBs.svelte';
@@ -53,7 +52,6 @@
 
 		<div class="mt-10">
 			<Demo />
-			<div class="mt-10"><EditorSettings /></div>
 			<div class="mt-10 rounded-xl border-4 border-black p-10 shadow-xl">
 				<h2 class="mb-5 text-center text-2xl">Markdown Content</h2>
 				<TextBlock class="markdown-editor" type="markdown" bind:content={markdownContent} />
