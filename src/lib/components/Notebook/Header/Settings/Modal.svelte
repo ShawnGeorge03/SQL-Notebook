@@ -1,18 +1,3 @@
-<script lang="ts" context="module">
-	export type UserPreferences = {
-		general: {
-			openNotebooksInNewWindow: boolean;
-			showDesktopNotifications: boolean;
-		};
-		editor: {
-			theme: string;
-			showLineNumbers: boolean;
-			highlightWhitespace: boolean;
-			highlightTrailingWhitespace: boolean;
-		};
-	};
-</script>
-
 <script lang="ts">
 	import { Checkbox } from '$lib/components/ui/checkbox/index.js';
 	import * as Dialog from '$lib/components/ui/dialog/index.js';
@@ -20,7 +5,7 @@
 	import * as Tabs from '$lib/components/ui/tabs/index.js';
 	import { Settings } from 'lucide-svelte';
 	import { onMount } from 'svelte';
-	import { writable, type Writable } from 'svelte/store';
+	import preferences, { type UserPreferences } from './store';
 
 	const DEFAULT_PREFERENCES: UserPreferences = {
 		general: {
@@ -34,8 +19,6 @@
 			highlightTrailingWhitespace: false
 		}
 	};
-
-	let preferences: Writable<UserPreferences> = writable();
 
 	const updatePreferences = (
 		category: keyof UserPreferences,

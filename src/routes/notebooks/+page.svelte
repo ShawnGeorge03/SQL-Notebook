@@ -1,15 +1,37 @@
 <script lang="ts">
+	import { Markdown } from '$lib/components/Notebook/Cells';
+	import Cell from '$lib/components/Notebook/Cells/Cell.svelte';
 	import * as CreateCell from '$lib/components/Notebook/CreateCell/index';
 	import type { CellMetadata } from '$lib/components/Notebook/CreateCell/type';
-	import Notifications from '$lib/components/Notebook/Notifications.svelte';
-	import SettingsModal from '$lib/components/Notebook/SettingsModal.svelte';
-	import ThemeToggle from '$lib/components/Notebook/ThemeToggle.svelte';
+	import Notifications from '$lib/components/Notebook/Header/Notifications.svelte';
+	import Settings from '$lib/components/Notebook/Header/Settings/Modal.svelte';
+	import ThemeToggle from '$lib/components/Notebook/Header/ThemeToggle.svelte';
 	import * as Sidebar from '$lib/components/ui/sidebar/index.js';
 	import SidebarLeft from '$lib/components/ui/sidebar/sidebar-left.svelte';
+	import { DBEngine } from '$lib/db/worker/types';
 	import type { NotebookCell } from '$lib/indexeddb/types';
 	import { nanoid } from 'nanoid/non-secure';
 
-	const cells: NotebookCell[] = $state<NotebookCell[]>([]);
+	const cells: NotebookCell[] = $state<NotebookCell[]>([
+		{
+			id: nanoid(),
+			cellType: 'markdown',
+			content: {
+				name: 'Markdown',
+				text: 'Hello World, This is Markdown'
+			}
+		},
+		{
+			id: nanoid(),
+			cellType: 'query',
+			content: {
+				name: 'Query',
+				query: "SELECT 'HELLO WORLD'",
+				engine: DBEngine.PGSQL,
+				dbName: 'PP'
+			}
+		}
+	]);
 
 	const addNewCell = (position: number, metadata: CellMetadata) => {
 		switch (metadata.cellType) {
@@ -49,7 +71,7 @@
 			</div>
 			<div class="float-right flex justify-end gap-4">
 				<Notifications />
-				<SettingsModal />
+				<Settings />
 				<ThemeToggle />
 			</div>
 		</header>
@@ -58,15 +80,12 @@
 			{#if cell.cellType === 'markdown'}
 				<div class="h-fit bg-purple-500 p-4">
 					{i + 1}: {cell.content.name} ({cell.id})
-					<p>{cell.content.text}</p>
+					<Markdown bind:content={cell.content.text} />
 				</div>
 			{:else if cell.cellType === 'query'}
 				<div class="h-fit bg-purple-500 p-4">
 					{i + 1}: {cell.content.name} ({cell.id})
-					<p>
-						Running {cell.content.query} on {cell.content.dbName} which is a {cell.content.engine}
-						DB
-					</p>
+					<Cell bind:content={cell.content.query} />
 				</div>
 			{/if}
 			<CreateCell.ButtonGroup

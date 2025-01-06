@@ -27,6 +27,7 @@
 		"mode-watcher": "^0.5.0",
 		"nanoid": "^5.0.9",
 		"sql-formatter": "^15.4.8",
+		"thememirror": "^2.0.1",
 		"wa-sqlite": "github:rhashimoto/wa-sqlite#v1.0.4"
 	},
 	"devDependencies": {

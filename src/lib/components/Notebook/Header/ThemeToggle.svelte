@@ -4,7 +4,7 @@
 	import { buttonVariants } from '$lib/components/ui/button/index.js';
 	import * as DropdownMenu from '$lib/components/ui/dropdown-menu/index.js';
 	import { cn } from '$lib/utils';
-	import { resetMode, setMode } from 'mode-watcher';
+	import { mode, resetMode, setMode } from 'mode-watcher';
 
 	export interface ThemeProps {
 		class?: string;
@@ -26,8 +26,23 @@
 		<span class="sr-only">Toggle theme</span>
 	</DropdownMenu.Trigger>
 	<DropdownMenu.Content align="end">
-		<DropdownMenu.Item onclick={() => setMode('light')}>Light</DropdownMenu.Item>
-		<DropdownMenu.Item onclick={() => setMode('dark')}>Dark</DropdownMenu.Item>
-		<DropdownMenu.Item onclick={() => resetMode()}>System</DropdownMenu.Item>
+		<DropdownMenu.Item
+			onclick={() => {
+				setMode('light');
+				document.body.setAttribute('data-theme', 'light');
+			}}>Light</DropdownMenu.Item
+		>
+		<DropdownMenu.Item
+			onclick={() => {
+				setMode('dark');
+				document.body.setAttribute('data-theme', 'dark');
+			}}>Dark</DropdownMenu.Item
+		>
+		<DropdownMenu.Item
+			onclick={() => {
+				resetMode();
+				document.body.setAttribute('data-theme', $mode as string);
+			}}>System</DropdownMenu.Item
+		>
 	</DropdownMenu.Content>
 </DropdownMenu.Root>

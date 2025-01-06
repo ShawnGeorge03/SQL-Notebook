@@ -10,5 +10,5 @@
 	let { children } = $props();
 </script>
 
-<ModeWatcher />
+<ModeWatcher modeStorageKey="mode" />
 {@render children?.()}
