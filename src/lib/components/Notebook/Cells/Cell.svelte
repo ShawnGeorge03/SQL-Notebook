@@ -38,7 +38,7 @@
 		type ViewUpdate
 	} from '@codemirror/view';
 
-	import type { UserPreferences } from '$lib/components/Notebook/SettingsModal.svelte';
+	import type { UserPreferences } from '$lib/components/Notebook/Header/Settings/Modal.svelte';
 
 	import SpinnerIcon from '$lib/assets/spinner.svg?raw';
 

@@ -1,9 +1,9 @@
 <script lang="ts">
 	import * as CreateCell from '$lib/components/Notebook/CreateCell/index';
 	import type { CellMetadata } from '$lib/components/Notebook/CreateCell/type';
-	import Notifications from '$lib/components/Notebook/Notifications.svelte';
-	import SettingsModal from '$lib/components/Notebook/SettingsModal.svelte';
-	import ThemeToggle from '$lib/components/Notebook/ThemeToggle.svelte';
+	import Notifications from '$lib/components/Notebook/Header/Notifications.svelte';
+	import Settings from '$lib/components/Notebook/Header/Settings/Modal.svelte';
+	import ThemeToggle from '$lib/components/Notebook/Header/ThemeToggle.svelte';
 	import * as Sidebar from '$lib/components/ui/sidebar/index.js';
 	import SidebarLeft from '$lib/components/ui/sidebar/sidebar-left.svelte';
 	import type { NotebookCell } from '$lib/indexeddb/types';
@@ -49,7 +49,7 @@
 			</div>
 			<div class="float-right flex justify-end gap-4">
 				<Notifications />
-				<SettingsModal />
+				<Settings />
 				<ThemeToggle />
 			</div>
 		</header>
