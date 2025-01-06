@@ -1,5 +1,4 @@
 <script lang="ts">
-	import TextBlock from '$lib/components/Blocks/TextBlock.svelte';
 	import ActiveDBs from '$lib/components/Diagnostics/ActiveDBs.svelte';
 	import AvailableDBs from '$lib/components/Diagnostics/AvailableDBs.svelte';
 	import CloseDB from '$lib/components/Diagnostics/CloseDB.svelte';
@@ -13,7 +12,6 @@
 	import { onMount } from 'svelte';
 
 	let loading: boolean = $state(true);
-	let markdownContent: string = $state('');
 
 	let dbWorkerService: DBWorkerService;
 
@@ -54,7 +52,6 @@
 			<Demo />
 			<div class="mt-10 rounded-xl border-4 border-black p-10 shadow-xl">
 				<h2 class="mb-5 text-center text-2xl">Markdown Content</h2>
-				<TextBlock class="markdown-editor" type="markdown" bind:content={markdownContent} />
 			</div>
 		</div>
 
