@@ -6,7 +6,6 @@
 	import Demo from '$lib/components/Diagnostics/Demo.svelte';
 	import LoadDB from '$lib/components/Diagnostics/LoadDB.svelte';
 	import TerminateDB from '$lib/components/Diagnostics/TerminateDB.svelte';
-	import Notebook from '$lib/components/Notebook/Notebook.svelte';
 	import { DBWorkerService } from '$lib/db/worker/service';
 
 	import { onMount } from 'svelte';
@@ -54,7 +53,5 @@
 				<h2 class="mb-5 text-center text-2xl">Markdown Content</h2>
 			</div>
 		</div>
-
-		<Notebook />
 	{/if}
 </div>
