@@ -1,5 +1,5 @@
 <script lang="ts">
-	import CreateCellButtonGroup from '$lib/components/Notebook/CreateCell/ButtonGroup.svelte';
+	import * as CreateCell from '$lib/components/Notebook/CreateCell/index';
 	import type { CellMetadata } from '$lib/components/Notebook/CreateCell/type';
 	import Notifications from '$lib/components/Notebook/Notifications.svelte';
 	import SettingsModal from '$lib/components/Notebook/SettingsModal.svelte';
@@ -41,10 +41,11 @@
 <Sidebar.Provider>
 	<SidebarLeft />
 	<Sidebar.Inset class="space-y-4 bg-green-500">
-		<header class="sticky top-0 z-10 bg-red-500 p-4">
+		<header class="sticky top-0 z-20 bg-red-500 p-4">
 			<div class="float-left flex justify-end gap-4">
 				<Sidebar.Trigger />
-				<CreateCellButtonGroup position={cells.length} {addNewCell} />
+				<CreateCell.QueryCell position={cells.length} {addNewCell} />
+				<CreateCell.MarkdownCell position={cells.length} {addNewCell} />
 			</div>
 			<div class="float-right flex justify-end gap-4">
 				<Notifications />
@@ -52,7 +53,7 @@
 				<ThemeToggle />
 			</div>
 		</header>
-		<CreateCellButtonGroup position={0} {addNewCell} />
+		<CreateCell.ButtonGroup position={0} {addNewCell} />
 		{#each cells as cell, i (cell.id)}
 			{#if cell.cellType === 'markdown'}
 				<div class="h-fit bg-purple-500 p-4">
@@ -68,12 +69,12 @@
 					</p>
 				</div>
 			{/if}
-			<CreateCellButtonGroup
+			<CreateCell.ButtonGroup
 				class={i === cells.length - 1 ? 'pb-24' : ''}
 				position={cells.length}
 				{addNewCell}
 			/>
 		{/each}
-		<footer class="fixed bottom-0 z-10 w-[100%] bg-blue-500 p-4">(footer)</footer>
+		<footer class="fixed bottom-0 z-20 w-[100%] bg-blue-500 p-4">(footer)</footer>
 	</Sidebar.Inset>
 </Sidebar.Provider>
