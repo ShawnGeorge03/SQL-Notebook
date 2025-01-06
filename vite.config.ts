@@ -7,6 +7,6 @@ export default defineConfig({
 		format: 'es'
 	},
 	optimizeDeps: {
-		exclude: ['wa-sqlite']
+		exclude: ['wa-sqlite', 'codemirror']
 	}
 });
