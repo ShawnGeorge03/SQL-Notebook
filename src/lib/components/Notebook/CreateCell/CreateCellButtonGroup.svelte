@@ -1,39 +1,13 @@
 <script lang="ts">
-	import { Button } from '$lib/components/ui/button/index.js';
-	import * as DropdownMenu from '$lib/components/ui/dropdown-menu/index.js';
-	import CreateCellDropdownContent from './CreateCellDropdownContent.svelte';
-
-	import MarkdownIcon from '$lib/assets/notebook/actions/markdown.svg?raw';
-	import QueryIcon from '$lib/assets/notebook/actions/query.svg?raw';
+	import CreateMarkdownCell from './CreateMarkdownCell.svelte';
+	import CreateQueryCell from './CreateQueryCell.svelte';
 	import { type CreateCellBaseProps } from './type';
 
 	let open = $state(false);
 	let { position, addNewCell }: CreateCellBaseProps = $props();
 </script>
 
-<div class="m-auto flex w-fit shadow-md" role="group">
-	<DropdownMenu.Root bind:open>
-		<DropdownMenu.Trigger
-			class="z-10 inline-flex items-center rounded-s-lg border border-gray-200 bg-white px-4 py-2 text-sm font-medium text-gray-900 hover:bg-gray-100 hover:text-blue-700 focus:z-10 focus:text-blue-700 focus:ring-2 focus:ring-blue-700 dark:border-gray-700 dark:bg-gray-800 dark:text-white dark:hover:bg-gray-700 dark:hover:text-white dark:focus:text-white dark:focus:ring-blue-500"
-		>
-			<div class="flex items-center">
-				<span class="text-foreground-alt mr-2 size-5">
-					{@html QueryIcon}
-				</span>
-				Query
-				<span class="ml-2 transition-transform duration-200 {open ? 'rotate-180' : ''}"> ▼ </span>
-			</div>
-		</DropdownMenu.Trigger>
-		<DropdownMenu.Content align="start">
-			<CreateCellDropdownContent {position} {addNewCell} />
-		</DropdownMenu.Content>
-	</DropdownMenu.Root>
-	<Button
-		type="button"
-		onclick={() => addNewCell(position, { cellType: 'markdown' })}
-		class="inline-flex h-fit items-center rounded-l-none border-b border-r border-t border-gray-200 bg-white px-4 py-2 text-sm font-medium text-gray-900 hover:bg-gray-100 hover:text-blue-700 focus:z-10 focus:text-blue-700 focus:ring-2 focus:ring-blue-700 dark:border-gray-700 dark:bg-gray-800 dark:text-white dark:hover:bg-gray-700 dark:hover:text-white dark:focus:text-white dark:focus:ring-blue-500"
-	>
-		{@html MarkdownIcon}
-		Markdown
-	</Button>
+<div class="m-auto flex gap-4" role="group">
+	<CreateQueryCell class="rounded-lg border border-gray-200" {position} {addNewCell} />
+	<CreateMarkdownCell class="rounded-lg border border-gray-200" {position} {addNewCell} />
 </div>
