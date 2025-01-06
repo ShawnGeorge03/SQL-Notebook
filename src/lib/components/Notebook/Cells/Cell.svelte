@@ -24,7 +24,7 @@
 		indentOnInput,
 		syntaxHighlighting
 	} from '@codemirror/language';
-	import { EditorState, StateEffect, type Extension } from '@codemirror/state';
+	import { Compartment, EditorState, StateEffect, type Extension } from '@codemirror/state';
 	import {
 		crosshairCursor,
 		drawSelection,
@@ -37,8 +37,11 @@
 		rectangularSelection,
 		type ViewUpdate
 	} from '@codemirror/view';
+	import { mode } from 'mode-watcher';
+	import { clouds, cobalt } from 'thememirror';
 
 	import SpinnerIcon from '$lib/assets/spinner.svg?raw';
+	import type { Unsubscriber } from 'svelte/store';
 	import preferences from '../Header/Settings/store';
 
 	interface BlockProps extends BaseBlockProps {
@@ -51,6 +54,7 @@
 	// svelte-ignore non_reactive_update
 	let parent: HTMLDivElement;
 
+	const themeConfig = new Compartment();
 	const extensions = [
 		EditorView.updateListener.of((e: ViewUpdate) => {
 			if (e.docChanged) {
@@ -88,6 +92,8 @@
 	];
 
 	onMount(() => {
+		extensions.push(themeConfig.of([$mode === 'dark' ? cobalt : clouds]));
+
 		view = new EditorView({
 			parent,
 			state: EditorState.create({
@@ -96,19 +102,27 @@
 			})
 		});
 
-		const unsubscribe = preferences.subscribe(({ editor }) => {
-			view.dispatch({
-				effects: StateEffect.reconfigure.of([
-					...extensions,
-					editor.showLineNumbers ? lineNumbers() : [],
-					editor.highlightWhitespace ? highlightWhitespace() : [],
-					editor.highlightTrailingWhitespace ? highlightTrailingWhitespace() : []
-				])
-			});
-		});
+		const subscriptions: Unsubscriber[] = [
+			mode.subscribe((theme) => {
+				view.dispatch({
+					effects: themeConfig.reconfigure(theme === 'dark' ? cobalt : clouds)
+				});
+			}),
+
+			preferences.subscribe(({ editor }) => {
+				view.dispatch({
+					effects: StateEffect.reconfigure.of([
+						...extensions,
+						editor.showLineNumbers ? lineNumbers() : [],
+						editor.highlightWhitespace ? highlightWhitespace() : [],
+						editor.highlightTrailingWhitespace ? highlightTrailingWhitespace() : []
+					])
+				});
+			})
+		];
 
 		() => {
-			unsubscribe();
+			subscriptions.map((unsubscribe) => unsubscribe());
 			view.destroy();
 		};
 	});
