@@ -5,6 +5,7 @@ export type CellMetadata =
 	| { cellType: 'markdown' };
 
 export type CreateCellBaseProps = {
+	class?: string;
 	position: number;
 	addNewCell: (
 		position: number,
