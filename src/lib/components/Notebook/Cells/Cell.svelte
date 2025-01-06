@@ -38,9 +38,8 @@
 		type ViewUpdate
 	} from '@codemirror/view';
 
-	import type { UserPreferences } from '$lib/components/Notebook/Header/Settings/Modal.svelte';
-
 	import SpinnerIcon from '$lib/assets/spinner.svg?raw';
+	import preferences from '../Header/Settings/store';
 
 	interface BlockProps extends BaseBlockProps {
 		customExtensions?: Extension[];
@@ -55,7 +54,7 @@
 	const extensions = [
 		EditorView.updateListener.of((e: ViewUpdate) => {
 			if (e.docChanged) {
-				const lines: string[] = [];
+				const lines = [];
 
 				for (const line of e.state.doc.iter()) {
 					lines.push(line.toString());
@@ -88,19 +87,6 @@
 		])
 	];
 
-	const userPreferences = (e: StorageEvent) => {
-		if (e.key !== 'preferences' || !e.newValue) return;
-		const { editor } = JSON.parse(e.newValue) as UserPreferences;
-		view.dispatch({
-			effects: StateEffect.reconfigure.of([
-				...extensions,
-				editor.showLineNumbers ? lineNumbers() : [],
-				editor.highlightWhitespace ? highlightWhitespace() : [],
-				editor.highlightTrailingWhitespace ? highlightTrailingWhitespace() : []
-			])
-		});
-	};
-
 	onMount(() => {
 		view = new EditorView({
 			parent,
@@ -110,10 +96,19 @@
 			})
 		});
 
-		addEventListener('storage', userPreferences);
+		const unsubscribe = preferences.subscribe(({ editor }) => {
+			view.dispatch({
+				effects: StateEffect.reconfigure.of([
+					...extensions,
+					editor.showLineNumbers ? lineNumbers() : [],
+					editor.highlightWhitespace ? highlightWhitespace() : [],
+					editor.highlightTrailingWhitespace ? highlightTrailingWhitespace() : []
+				])
+			});
+		});
 
 		() => {
-			removeEventListener('storage', userPreferences);
+			unsubscribe();
 			view.destroy();
 		};
 	});
