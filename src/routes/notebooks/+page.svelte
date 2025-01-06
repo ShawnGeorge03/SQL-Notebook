@@ -1,5 +1,5 @@
 <script lang="ts">
-	import * as CreateCell from '$lib/components/Notebook/CreateCell/index.js';
+	import CreateCellButtonGroup from '$lib/components/Notebook/CreateCell/ButtonGroup.svelte';
 	import type { CellMetadata } from '$lib/components/Notebook/CreateCell/type';
 	import Notifications from '$lib/components/Notebook/Notifications.svelte';
 	import SettingsModal from '$lib/components/Notebook/SettingsModal.svelte';
@@ -42,31 +42,38 @@
 	<SidebarLeft />
 	<Sidebar.Inset class="space-y-4 bg-green-500">
 		<header class="sticky top-0 z-10 bg-red-500 p-4">
-			<Sidebar.Trigger />
+			<div class="float-left flex justify-end gap-4">
+				<Sidebar.Trigger />
+				<CreateCellButtonGroup position={cells.length} {addNewCell} />
+			</div>
 			<div class="float-right flex justify-end gap-4">
 				<Notifications />
 				<SettingsModal />
 				<ThemeToggle />
 			</div>
 		</header>
+		<CreateCellButtonGroup position={0} {addNewCell} />
 		{#each cells as cell, i (cell.id)}
-			<CreateCell.Dropdown position={i} {addNewCell} />
 			{#if cell.cellType === 'markdown'}
 				<div class="h-fit bg-purple-500 p-4">
-					{i + 1}: {cell.content.name}
+					{i + 1}: {cell.content.name} ({cell.id})
 					<p>{cell.content.text}</p>
 				</div>
 			{:else if cell.cellType === 'query'}
 				<div class="h-fit bg-purple-500 p-4">
-					{i + 1}: {cell.content.name}
+					{i + 1}: {cell.content.name} ({cell.id})
 					<p>
 						Running {cell.content.query} on {cell.content.dbName} which is a {cell.content.engine}
 						DB
 					</p>
 				</div>
 			{/if}
+			<CreateCellButtonGroup
+				class={i === cells.length - 1 ? 'pb-24' : ''}
+				position={cells.length}
+				{addNewCell}
+			/>
 		{/each}
-		<CreateCell.ButtonGroup position={cells.length} {addNewCell} />
 		<footer class="fixed bottom-0 z-10 w-[100%] bg-blue-500 p-4">(footer)</footer>
 	</Sidebar.Inset>
 </Sidebar.Provider>
