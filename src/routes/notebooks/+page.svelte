@@ -1,4 +1,5 @@
 <script lang="ts">
+	import { Markdown } from '$lib/components/Notebook/Cells';
 	import Cell from '$lib/components/Notebook/Cells/Cell.svelte';
 	import * as CreateCell from '$lib/components/Notebook/CreateCell/index';
 	import type { CellMetadata } from '$lib/components/Notebook/CreateCell/type';
@@ -79,7 +80,7 @@
 			{#if cell.cellType === 'markdown'}
 				<div class="h-fit bg-purple-500 p-4">
 					{i + 1}: {cell.content.name} ({cell.id})
-					<Cell bind:content={cell.content.text} />
+					<Markdown bind:content={cell.content.text} />
 				</div>
 			{:else if cell.cellType === 'query'}
 				<div class="h-fit bg-purple-500 p-4">
