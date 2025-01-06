@@ -1,30 +1,80 @@
 <script lang="ts">
-	import Notifications from '$lib/components/Notifications.svelte';
-	import SettingsModal from '$lib/components/SettingsModal.svelte';
+	import * as CreateCell from '$lib/components/Notebook/CreateCell/index';
+	import type { CellMetadata } from '$lib/components/Notebook/CreateCell/type';
+	import Notifications from '$lib/components/Notebook/Notifications.svelte';
+	import SettingsModal from '$lib/components/Notebook/SettingsModal.svelte';
+	import ThemeToggle from '$lib/components/Notebook/ThemeToggle.svelte';
 	import * as Sidebar from '$lib/components/ui/sidebar/index.js';
 	import SidebarLeft from '$lib/components/ui/sidebar/sidebar-left.svelte';
-	import ThemeToggle from '$lib/components/ui/ThemeToggle.svelte';
+	import type { NotebookCell } from '$lib/indexeddb/types';
+	import { nanoid } from 'nanoid/non-secure';
+
+	const cells: NotebookCell[] = $state<NotebookCell[]>([]);
+
+	const addNewCell = (position: number, metadata: CellMetadata) => {
+		switch (metadata.cellType) {
+			case 'markdown':
+				cells.splice(position, 0, {
+					id: nanoid(),
+					cellType: 'markdown',
+					content: {
+						name: '',
+						text: ''
+					}
+				});
+				break;
+			case 'query':
+				cells.splice(position, 0, {
+					id: nanoid(),
+					cellType: 'query',
+					content: {
+						name: '',
+						query: "SELECT 'HELLO WORLD'",
+						engine: metadata.engine,
+						dbName: metadata.dbName
+					}
+				});
+		}
+	};
 </script>
 
 <Sidebar.Provider>
 	<SidebarLeft />
-	<Sidebar.Inset>
-		<main class="space-y-4 bg-green-500">
-			<header class="sticky top-0 z-10 bg-red-500 p-4">
+	<Sidebar.Inset class="space-y-4 bg-green-500">
+		<header class="sticky top-0 z-20 bg-red-500 p-4">
+			<div class="float-left flex justify-end gap-4">
 				<Sidebar.Trigger />
-				<div class="float-right flex justify-end gap-4">
-					<Notifications />
-					<SettingsModal />
-					<ThemeToggle />
+				<CreateCell.QueryCell position={cells.length} {addNewCell} />
+				<CreateCell.MarkdownCell position={cells.length} {addNewCell} />
+			</div>
+			<div class="float-right flex justify-end gap-4">
+				<Notifications />
+				<SettingsModal />
+				<ThemeToggle />
+			</div>
+		</header>
+		<CreateCell.ButtonGroup position={0} {addNewCell} />
+		{#each cells as cell, i (cell.id)}
+			{#if cell.cellType === 'markdown'}
+				<div class="h-fit bg-purple-500 p-4">
+					{i + 1}: {cell.content.name} ({cell.id})
+					<p>{cell.content.text}</p>
 				</div>
-			</header>
-			<p class="h-[512px] bg-purple-500 p-4">Paragraph 1</p>
-			<p class="h-[512px] bg-purple-500 p-4">Paragraph 2</p>
-			<p class="h-[512px] bg-purple-500 p-4">Paragraph 3</p>
-			<p class="h-[512px] bg-purple-500 p-4">Paragraph 4</p>
-			<p class="h-[512px] bg-purple-500 p-4">Paragraph 5</p>
-			<p class="h-[512px] bg-purple-500 p-4">Paragraph 6</p>
-			<footer class="sticky bottom-0 z-10 bg-blue-500 p-4">(footer)</footer>
-		</main>
+			{:else if cell.cellType === 'query'}
+				<div class="h-fit bg-purple-500 p-4">
+					{i + 1}: {cell.content.name} ({cell.id})
+					<p>
+						Running {cell.content.query} on {cell.content.dbName} which is a {cell.content.engine}
+						DB
+					</p>
+				</div>
+			{/if}
+			<CreateCell.ButtonGroup
+				class={i === cells.length - 1 ? 'pb-24' : ''}
+				position={cells.length}
+				{addNewCell}
+			/>
+		{/each}
+		<footer class="fixed bottom-0 z-20 w-[100%] bg-blue-500 p-4">(footer)</footer>
 	</Sidebar.Inset>
 </Sidebar.Provider>

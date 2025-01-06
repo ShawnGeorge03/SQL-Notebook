@@ -17,22 +17,28 @@ export type Database =
 
 export type Project = BaseTable & { notebookIDs: number[] };
 
-type NotebookCell =
-	| {
-			id: string;
-			name?: string;
-			cell: 'sql';
-			content: {
-				query: string;
-				result: QueryResult;
-			};
-	  }
-	| {
-			id: string;
-			name: string;
-			cell: 'text';
-			content: string;
-	  };
+type QueryCell = {
+	id: string;
+	cellType: 'query';
+	content: {
+		name: string;
+		query: string;
+		dbName: string;
+		engine: DBEngine;
+		result?: QueryResult;
+	};
+}
+
+type MarkdownCell = {
+	id: string;
+	cellType: 'markdown';
+	content: {
+		name: string;
+		text: string;
+	};
+}
+
+export type NotebookCell = QueryCell | MarkdownCell;
 
 export type Notebook = BaseTable & {
 	projectID: number;
