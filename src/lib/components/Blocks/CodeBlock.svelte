@@ -8,9 +8,9 @@
 	import type { DBEngine, DBInfo, SuccessResponseData } from '$lib/db/worker/types';
 	import { PostgreSQL, sql, SQLite, StandardSQL } from '@codemirror/lang-sql';
 
-	import PostgreSQLIcon from '$lib/assets/postgresql.svg?raw';
+	import PostgreSQLIcon from '$lib/assets/db/engines/postgresql.svg?raw';
+	import SQLiteIcon from '$lib/assets/db/engines/sqlite.svg?raw';
 	import SpinnerIcon from '$lib/assets/spinner.svg?raw';
-	import SQLiteIcon from '$lib/assets/sqlite.svg?raw';
 
 	interface CodeBlockProps {
 		id: string;
