@@ -1,3 +1,4 @@
+import Actions from "./Actions.svelte";
 import Editor, { type BaseEditorProps } from "./Editor.svelte";
 
-export { Editor, type BaseEditorProps };
+export { Actions, Editor, type BaseEditorProps };
