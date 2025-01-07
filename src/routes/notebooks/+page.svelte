@@ -1,6 +1,5 @@
 <script lang="ts">
-	import { Markdown } from '$lib/components/Notebook/Cells';
-	import Cell from '$lib/components/Notebook/Cells/Cell.svelte';
+	import { Markdown, Query } from '$lib/components/Notebook/Cells';
 	import * as CreateCell from '$lib/components/Notebook/CreateCell/index';
 	import type { CellMetadata } from '$lib/components/Notebook/CreateCell/type';
 	import Notifications from '$lib/components/Notebook/Header/Notifications.svelte';
@@ -83,10 +82,13 @@
 					<Markdown bind:content={cell.content.text} />
 				</div>
 			{:else if cell.cellType === 'query'}
-				<div class="h-fit bg-purple-500 p-4">
-					{i + 1}: {cell.content.name} ({cell.id})
-					<Cell bind:content={cell.content.query} />
-				</div>
+				<Query
+					class="m-4 h-fit"
+					id={cell.id}
+					bind:content={cell.content.query}
+					bind:dbName={cell.content.dbName}
+					bind:engine={cell.content.engine}
+				/>
 			{/if}
 			<CreateCell.ButtonGroup
 				class={i === cells.length - 1 ? 'pb-24' : ''}
