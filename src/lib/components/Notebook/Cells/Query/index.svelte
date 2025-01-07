@@ -6,28 +6,39 @@
 	import { DBWorkerService } from '$lib/db/worker/service';
 	import { onMount } from 'svelte';
 	import SelectDB from '../../SelectDB.svelte';
-	import { Editor } from '../Cell';
+	import { Actions, Editor } from '../Cell';
 
 	import PostgreSQLIcon from '$lib/assets/db/engines/postgresql.svg?raw';
 	import SQLiteIcon from '$lib/assets/db/engines/sqlite.svg?raw';
-	import { ChevronDown } from 'lucide-svelte';
+	import { Button } from '$lib/components/ui/button';
+	import { ChevronDown, PaintbrushVertical } from 'lucide-svelte';
 
 	interface CodeEditorProps {
 		id: string;
+		position: number;
 		class?: string;
 		dbName: string;
 		engine: DBEngine;
 		content: string;
 		result?: Omit<SuccessResponseData['EXEC_QUERY'], 'id'>;
+		moveUpCell: (position: number) => void;
+		moveDownCell: (position: number) => void;
+		copyCell: (position: number) => void;
+		removeCell: (position: number) => void;
 	}
 
 	let {
 		id,
+		position,
 		class: className,
 		content = $bindable(''),
 		dbName = $bindable(''),
 		engine = $bindable(),
-		result = $bindable()
+		result = $bindable(),
+		moveUpCell,
+		moveDownCell,
+		copyCell,
+		removeCell
 	}: CodeEditorProps = $props();
 
 	const customExtensions = [
@@ -65,8 +76,26 @@
 	});
 </script>
 
+{#snippet actions()}
+	<Button
+		variant="secondary"
+		size="icon"
+		class="border-none bg-transparent shadow-none"
+		onclick={() => {}}
+	>
+		<PaintbrushVertical />
+	</Button>
+{/snippet}
+
 <div class={className}>
-	<div class="relative rounded-t-xl bg-primary-foreground py-2 pl-3">
+	<Actions
+		moveUp={() => moveUpCell(position)}
+		moveDown={() => moveDownCell(position)}
+		copy={() => copyCell(position)}
+		run={() => {}}
+		remove={() => removeCell(position)}
+		{actions}
+	>
 		<SelectDB
 			bind:open
 			onSelect={(db) => {
@@ -90,7 +119,7 @@
 				</div>
 			</div>
 		</SelectDB>
-	</div>
+	</Actions>
 	<Editor bind:content {customExtensions} />
 	<div class={!result ? 'hidden' : ''}>
 		{JSON.stringify(result)}

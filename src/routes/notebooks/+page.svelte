@@ -57,6 +57,28 @@
 				});
 		}
 	};
+
+	const moveUpCell = (position: number) => {
+		const cell = cells[position];
+		cells.splice(position, 1);
+		cells.splice(position - 1, 0, cell);
+	};
+
+	const moveDownCell = (position: number) => {
+		const cell = cells[position];
+		cells.splice(position, 1);
+		cells.splice(position + 1, 0, cell);
+	};
+
+	const copyCell = (position: number) => {
+		const cell = $state.snapshot(cells)[position];
+		cell.id = nanoid();
+		cells.splice(position + 1, 0, cell);
+	};
+
+	const removeCell = (position: number) => {
+		cells.splice(position, 1);
+	};
 </script>
 
 <Sidebar.Provider>
@@ -84,10 +106,15 @@
 			{:else if cell.cellType === 'query'}
 				<Query
 					class="m-4 h-fit"
+					position={i}
 					id={cell.id}
 					bind:content={cell.content.query}
 					bind:dbName={cell.content.dbName}
 					bind:engine={cell.content.engine}
+					{moveUpCell}
+					{moveDownCell}
+					{copyCell}
+					{removeCell}
 				/>
 			{/if}
 			<CreateCell.ButtonGroup
