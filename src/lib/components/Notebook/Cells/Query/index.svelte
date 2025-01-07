@@ -1,7 +1,7 @@
 <script lang="ts">
 	import { PostgreSQL, sql, SQLite, StandardSQL } from '@codemirror/lang-sql';
 
-	import type { DBEngine, DBInfo, SuccessResponseData } from '$lib/db/worker/types';
+	import type { DBEngine, SuccessResponseData } from '$lib/db/worker/types';
 
 	import { DBWorkerService } from '$lib/db/worker/service';
 	import { onMount } from 'svelte';
@@ -49,24 +49,29 @@
 	];
 
 	let dbWorkerService: DBWorkerService;
-	let activeDBs: DBInfo[] = $state([]);
 
 	let open = $state(false);
-	let loading: boolean = $state(true);
+	let isRunning = $state(false);
 
 	onMount(() => {
 		dbWorkerService = DBWorkerService.getInstance();
 
-		dbWorkerService.sendMessage({ command: 'GET_ACTIVE_DBS' });
-
 		const unsubscribe = dbWorkerService.responses.subscribe((response) => {
 			if (response.status === 'SUCCESS') {
-				if (response.command === 'GET_ACTIVE_DBS') {
-					loading = false;
-					activeDBs = response.data.activeDBs;
+				if (response.command === 'EXEC_QUERY' && response.data.id === id) {
+					isRunning = false;
+					result = {
+						data: response.data.data,
+						elapsed: response.data.elapsed
+					};
+				} else if (response.command === 'FORMAT_QUERY' && response.data.id === id) {
+					content = response.data.query;
 				}
 			} else if (response.status === 'ERROR') {
-				if (response.command === 'GET_ACTIVE_DBS') {
+				if (response.command === 'EXEC_QUERY') {
+					isRunning = false;
+					console.error(response.data);
+				} else if (response.command === 'FORMAT_QUERY') {
 					console.error(response.data);
 				}
 			}
@@ -81,7 +86,11 @@
 		variant="secondary"
 		size="icon"
 		class="border-none bg-transparent shadow-none"
-		onclick={() => {}}
+		onclick={() =>
+			dbWorkerService.sendMessage({
+				command: 'FORMAT_QUERY',
+				args: { id, engine: engine, query: content }
+			})}
 	>
 		<PaintbrushVertical />
 	</Button>
@@ -92,7 +101,10 @@
 		moveUp={() => moveUpCell(position)}
 		moveDown={() => moveDownCell(position)}
 		copy={() => copyCell(position)}
-		run={() => {}}
+		run={() => {
+			dbWorkerService.sendMessage({ command: 'EXEC_QUERY', args: { id, dbName, query: content } });
+			result = { data: [], elapsed: 0 };
+		}}
 		remove={() => removeCell(position)}
 		{actions}
 	>
@@ -121,7 +133,7 @@
 		</SelectDB>
 	</Actions>
 	<Editor bind:content {customExtensions} />
-	<div class={!result ? 'hidden' : ''}>
+	<div class={isRunning ? 'hidden' : ''}>
 		{JSON.stringify(result)}
 	</div>
 </div>
