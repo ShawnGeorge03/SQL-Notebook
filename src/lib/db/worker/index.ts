@@ -1,11 +1,10 @@
 import iDB, { iDBname } from '$lib/indexeddb/schema';
 import { type DexieError } from 'dexie';
 import { nanoid } from 'nanoid/non-secure';
-import { format } from 'sql-formatter';
+import { format, type FormatOptionsWithLanguage } from 'sql-formatter';
 import { PostgreSQL } from '../engines/pgsql';
 import { SQLite } from '../engines/sqlite';
 import type { DBStrategy } from '../engines/types';
-import getSQLFormatConfig from '../engines/utils';
 import {
 	DBEngine,
 	type DBInfo,
@@ -443,9 +442,17 @@ self.onconnect = async (event: MessageEvent) => {
 				const { id, engine, query } = data.args;
 
 				try {
+					const formatOptions: FormatOptionsWithLanguage = {
+						tabWidth: 2,
+						language: engine === 'pgsql' ? 'postgresql' : engine === 'sqlite' ? 'sqlite' : 'sql',
+						keywordCase: 'upper',
+						logicalOperatorNewline: "after",
+
+					}
+
 					postSuccess(port, 'FORMAT_QUERY', {
 						id,
-						query: format(query, getSQLFormatConfig(engine))
+						query: format(query, formatOptions)
 					});
 				} catch (error) {
 					postError(port, 'FORMAT_QUERY', { id, ...(error as Error) });
@@ -459,4 +466,4 @@ self.onconnect = async (event: MessageEvent) => {
 	};
 };
 
-export {};
+export { };
