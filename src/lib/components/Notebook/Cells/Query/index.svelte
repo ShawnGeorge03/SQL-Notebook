@@ -2,9 +2,9 @@
 	import { PostgreSQL, sql, SQLite, StandardSQL } from '@codemirror/lang-sql';
 
 	import type { DBEngine } from '$lib/db/worker/types';
-	import Cell from '../Cell.svelte';
+	import { Editor } from '../Cell';
 
-	interface CodeBlockProps {
+	interface CodeEditorProps {
 		id: string;
 		class?: string;
 		dbName: string;
@@ -18,7 +18,7 @@
 		content = $bindable(''),
 		dbName = $bindable(''),
 		engine = $bindable()
-	}: CodeBlockProps = $props();
+	}: CodeEditorProps = $props();
 
 	const customExtensions = [
 		sql({
@@ -28,4 +28,4 @@
 	];
 </script>
 
-<Cell class={className} bind:content {customExtensions} />
+<Editor class={className} bind:content {customExtensions} />

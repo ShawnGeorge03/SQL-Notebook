@@ -1,5 +1,5 @@
 <script lang="ts" module>
-	export interface BaseBlockProps {
+	export interface BaseEditorProps {
 		content: string;
 		class?: string;
 	}
@@ -42,13 +42,13 @@
 
 	import SpinnerIcon from '$lib/assets/spinner.svg?raw';
 	import type { Unsubscriber } from 'svelte/store';
-	import preferences from '../Header/Settings/store';
+	import preferences from '../../Header/Settings/store';
 
-	interface BlockProps extends BaseBlockProps {
+	interface EditorProps extends BaseEditorProps {
 		customExtensions?: Extension[];
 	}
 
-	let { class: className, content = $bindable(), customExtensions = [] }: BlockProps = $props();
+	let { class: className, content = $bindable(), customExtensions = [] }: EditorProps = $props();
 
 	let view: EditorView;
 	// svelte-ignore non_reactive_update

@@ -3,10 +3,10 @@
 	import { markdown } from '@codemirror/lang-markdown';
 	import { marked } from 'marked';
 
-	import Cell, { type BaseBlockProps } from '../Cell.svelte';
+	import { Editor, type BaseEditorProps } from '../Cell';
 	import './github-markdown.css';
 
-	let { class: className, content = $bindable('') }: BaseBlockProps = $props();
+	let { class: className, content = $bindable('') }: BaseEditorProps = $props();
 
 	marked.use({
 		gfm: true
@@ -14,7 +14,7 @@
 </script>
 
 <div class={cn('flex gap-4', className)}>
-	<Cell class="w-1/2" bind:content customExtensions={[markdown()]} />
+	<Editor class="w-1/2" bind:content customExtensions={[markdown()]} />
 	<div class="markdown-body h-[18.5rem] w-1/2 overflow-y-scroll p-4">
 		{#await marked.parse(content)}
 			<p>Processing Markdown</p>
