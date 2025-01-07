@@ -23,6 +23,6 @@ export type QueryResult = {
  */
 export interface DBStrategy {
 	init(): Promise<void>;
-	exec(query: string): Promise<QueryResult[]>;
+	exec(query: string): Promise<QueryResult>;
 	close(): Promise<void>;
 }
