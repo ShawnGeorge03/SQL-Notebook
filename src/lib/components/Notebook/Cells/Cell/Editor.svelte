@@ -68,6 +68,10 @@
 			}
 		}),
 		EditorView.lineWrapping,
+		EditorView.theme({
+			'.cm-content, .cm-gutter': { minHeight: '18rem' },
+			'.cm-scroller': { overflow: 'auto' }
+		}),
 		EditorState.allowMultipleSelections.of(true),
 		history(),
 		foldGutter(),
