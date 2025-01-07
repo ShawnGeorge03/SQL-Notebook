@@ -15,7 +15,7 @@
 
 <div class={cn('flex gap-4', className)}>
 	<Editor class="w-1/2" bind:content customExtensions={[markdown()]} />
-	<div class="markdown-body h-[18.5rem] w-1/2 overflow-y-scroll p-4">
+	<div class="markdown-body w-1/2 overflow-y-scroll p-2">
 		{#await marked.parse(content)}
 			<p>Processing Markdown</p>
 		{:then HTML}
