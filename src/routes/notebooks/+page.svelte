@@ -92,7 +92,7 @@
 			{/if}
 			<CreateCell.ButtonGroup
 				class={i === cells.length - 1 ? 'pb-24' : ''}
-				position={cells.length}
+				position={i + 1}
 				{addNewCell}
 			/>
 		{/each}
