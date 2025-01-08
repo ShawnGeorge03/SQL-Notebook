@@ -5,8 +5,16 @@
 	import QueryIcon from '$lib/assets/notebook/actions/query.svg?raw';
 	import { ChevronDown } from 'lucide-svelte';
 
-	let { class: className, position, addNewCell }: CreateCellBaseProps = $props();
-	let open = $state(false);
+	interface CreateMarkdownCellProps extends CreateCellBaseProps {
+		open?: boolean;
+	}
+
+	let {
+		class: className,
+		position,
+		addNewCell,
+		open = $bindable(false)
+	}: CreateMarkdownCellProps = $props();
 </script>
 
 <SelectDB
