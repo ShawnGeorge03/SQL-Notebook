@@ -1,4 +1,6 @@
 <script lang="ts">
+	import ScrollArea from '$lib/components/ui/scroll-area/scroll-area.svelte';
+	import * as Table from '$lib/components/ui/table/index.js';
 	import { PostgreSQL, sql, SQLite, StandardSQL } from '@codemirror/lang-sql';
 
 	import type { DBEngine, SuccessResponseData } from '$lib/db/worker/types';
@@ -104,6 +106,7 @@
 		moveDown={() => moveDownCell(position)}
 		copy={() => copyCell(position)}
 		run={() => {
+			isRunning = true;
 			dbWorkerService.sendMessage({ command: 'EXEC_QUERY', args: { id, dbName, query: content } });
 			result = DEFAULT_RESULT;
 		}}
@@ -139,7 +142,47 @@
 		bind:content
 		{customExtensions}
 	/>
-	<div class={isRunning ? 'hidden' : ''}>
-		{JSON.stringify(result)}
-	</div>
+	<ScrollArea
+		class={`${result.data.rows.length < 10 ? 'max-h-96' : 'h-96'} w-[400px] rounded-ee-md rounded-es-md bg-primary-foreground p-5 transition-[width] duration-300 ease-in-out md:w-[500px] lg:w-[700px] xl:w-[1000px] `}
+		orientation="both"
+	>
+		<Table.Root
+			class={`${result.data.cols.length === 0 && 'hidden'} min-w-full border border-gray-300 bg-gray-100 p-6 dark:border-gray-600 dark:bg-gray-800`}
+		>
+			<Table.Header>
+				<Table.Row class="bg-green-600 text-white">
+					{#each result.data.cols as col}
+						<Table.Head
+							class="border border-gray-300 px-4 py-2 text-left font-bold dark:border-gray-600"
+						>
+							<p class="text-lg font-bold text-white">{col.name}</p>
+							<span class="text-xs text-gray-200">{col.type} </span>
+						</Table.Head>
+					{/each}
+					<Table.Head
+						class="w-1/2 border border-gray-300 px-4 py-2 text-center dark:border-gray-600"
+					></Table.Head>
+				</Table.Row>
+			</Table.Header>
+			<Table.Body>
+				{#each result.data.rows as row}
+					<Table.Row
+						class="odd:bg-gray-100 even:bg-white odd:hover:bg-blue-200 even:hover:bg-blue-100 odd:dark:bg-gray-700 even:dark:bg-gray-800 odd:dark:hover:bg-blue-500 even:dark:hover:bg-blue-600"
+					>
+						{#each row as cell}
+							<Table.Cell
+								class="border border-gray-300 px-4 py-2 text-gray-800 dark:border-gray-600 dark:text-gray-200"
+							>
+								{cell}
+							</Table.Cell>
+						{/each}
+
+						<Table.Cell
+							class="border border-gray-300 px-4 py-2 text-gray-800 dark:border-gray-600 dark:text-gray-200"
+						/>
+					</Table.Row>
+				{/each}
+			</Table.Body>
+		</Table.Root>
+	</ScrollArea>
 </div>
