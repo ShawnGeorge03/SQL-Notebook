@@ -1,6 +1,8 @@
 <script lang="ts">
 	import ScrollArea from '$lib/components/ui/scroll-area/scroll-area.svelte';
+	import { Skeleton } from '$lib/components/ui/skeleton';
 	import * as Table from '$lib/components/ui/table/index.js';
+
 	import { PostgreSQL, sql, SQLite, StandardSQL } from '@codemirror/lang-sql';
 
 	import type { DBEngine, SuccessResponseData } from '$lib/db/worker/types';
@@ -147,41 +149,67 @@
 		orientation="both"
 	>
 		<Table.Root
-			class={`${result.data.cols.length === 0 && 'hidden'} min-w-full border border-gray-300 bg-gray-100 p-6 dark:border-gray-600 dark:bg-gray-800`}
+			class={`${!isRunning && result.data.cols.length === 0 && 'hidden'} min-w-full border border-gray-300 bg-gray-100 p-6 dark:border-gray-600 dark:bg-gray-800`}
 		>
 			<Table.Header>
 				<Table.Row class="bg-green-600 text-white">
-					{#each result.data.cols as col}
+					{#if isRunning}
+						{#each { length: 8 }}
+							<Table.Head
+								class="border border-gray-300 px-4 py-2 text-left font-bold dark:border-gray-600"
+							>
+								<Skeleton class="ml-auto bg-slate-100 p-2 dark:bg-slate-600" />
+							</Table.Head>
+						{/each}
+					{:else}
+						{#each result.data.cols as col}
+							<Table.Head
+								class="border border-gray-300 px-4 py-2 text-left font-bold dark:border-gray-600"
+							>
+								<p class="text-lg font-bold text-white">{col.name}</p>
+								<span class="text-xs text-gray-200">{col.type} </span>
+							</Table.Head>
+						{/each}
 						<Table.Head
-							class="border border-gray-300 px-4 py-2 text-left font-bold dark:border-gray-600"
-						>
-							<p class="text-lg font-bold text-white">{col.name}</p>
-							<span class="text-xs text-gray-200">{col.type} </span>
-						</Table.Head>
-					{/each}
-					<Table.Head
-						class="w-1/2 border border-gray-300 px-4 py-2 text-center dark:border-gray-600"
-					></Table.Head>
+							class="w-1/2 border border-gray-300 px-4 py-2 text-center dark:border-gray-600"
+						/>
+					{/if}
 				</Table.Row>
 			</Table.Header>
 			<Table.Body>
-				{#each result.data.rows as row}
-					<Table.Row
-						class="odd:bg-gray-100 even:bg-white odd:hover:bg-blue-200 even:hover:bg-blue-100 odd:dark:bg-gray-700 even:dark:bg-gray-800 odd:dark:hover:bg-blue-500 even:dark:hover:bg-blue-600"
-					>
-						{#each row as cell}
+				{#if isRunning}
+					{#each { length: 4 }}
+						<Table.Row
+							class="odd:bg-gray-100 even:bg-white odd:hover:bg-blue-200 even:hover:bg-blue-100 odd:dark:bg-gray-700 even:dark:bg-gray-800 odd:dark:hover:bg-blue-500 even:dark:hover:bg-blue-600"
+						>
+							{#each { length: 8 }}
+								<Table.Cell
+									class="border border-gray-300 px-4 py-2 text-gray-800 dark:border-gray-600 dark:text-gray-200"
+								>
+									<Skeleton class="ml-auto bg-slate-200 p-1 dark:bg-gray-400" />
+								</Table.Cell>
+							{/each}
+						</Table.Row>
+					{/each}
+				{:else}
+					{#each result.data.rows as row}
+						<Table.Row
+							class="odd:bg-gray-100 even:bg-white odd:hover:bg-blue-200 even:hover:bg-blue-100 odd:dark:bg-gray-700 even:dark:bg-gray-800 odd:dark:hover:bg-blue-500 even:dark:hover:bg-blue-600"
+						>
+							{#each row as cell}
+								<Table.Cell
+									class="border border-gray-300 px-4 py-2 text-gray-800 dark:border-gray-600 dark:text-gray-200"
+								>
+									{cell}
+								</Table.Cell>
+							{/each}
+
 							<Table.Cell
 								class="border border-gray-300 px-4 py-2 text-gray-800 dark:border-gray-600 dark:text-gray-200"
-							>
-								{cell}
-							</Table.Cell>
-						{/each}
-
-						<Table.Cell
-							class="border border-gray-300 px-4 py-2 text-gray-800 dark:border-gray-600 dark:text-gray-200"
-						/>
-					</Table.Row>
-				{/each}
+							/>
+						</Table.Row>
+					{/each}
+				{/if}
 			</Table.Body>
 		</Table.Root>
 	</ScrollArea>
