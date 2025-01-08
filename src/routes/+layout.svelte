@@ -1,4 +1,6 @@
 <script lang="ts">
+	import { ModeWatcher } from 'mode-watcher';
+
 	import { dev } from '$app/environment';
 	import { injectSpeedInsights } from '@vercel/speed-insights/sveltekit';
 	import '../app.css';
@@ -8,6 +10,5 @@
 	let { children } = $props();
 </script>
 
-<main>
-	{@render children?.()}
-</main>
+<ModeWatcher modeStorageKey="mode" />
+{@render children?.()}

@@ -1,12 +1,12 @@
-import { type FormatOptionsWithLanguage } from 'sql-formatter';
-import type { DBEngine } from '../worker/types';
+const isValidQuery = (query: string, keywords: RegExp) => {
 
-const getSQLFormatConfig = (engine: DBEngine): FormatOptionsWithLanguage => {
-	return {
-		language: engine === 'pgsql' ? 'postgresql' : engine === 'sqlite' ? 'sqlite' : 'sql',
-		keywordCase: 'upper',
-		newlineBeforeSemicolon: true
-	};
-};
+    const statements = (query.match(keywords) || []).length;
 
-export default getSQLFormatConfig;
+    if (statements === 0) {
+        throw new Error('No valid SQL statements found in the query.');
+    } else if (statements > 1) {
+        throw new Error('Only single statements are allowed');
+    }
+}
+
+export { isValidQuery };

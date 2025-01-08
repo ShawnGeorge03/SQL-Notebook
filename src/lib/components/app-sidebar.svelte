@@ -1,15 +1,15 @@
 <script lang="ts">
-	import * as Sidebar from '$lib/components/ui/sidebar/index.js';
-	import * as Dialog from '$lib/components/ui/dialog/index.js';
-	import * as Select from '$lib/components/ui/select/index.js';
-	import { Input } from '$lib/components/ui/input/index.js';
 	import { Badge } from '$lib/components/ui/badge/index.js';
+	import * as Dialog from '$lib/components/ui/dialog/index.js';
+	import { Input } from '$lib/components/ui/input/index.js';
+	import * as Select from '$lib/components/ui/select/index.js';
+	import * as Sidebar from '$lib/components/ui/sidebar/index.js';
 
-	import { Plus, CircleDot, Ellipsis } from 'lucide-svelte';
+	import { CircleDot, Ellipsis, Plus } from 'lucide-svelte';
 
-	import SQLiteIcon from '$lib/assets/sqlite.svg?raw';
-	import PostgreSQLIcon from '$lib/assets/postgresql.svg?raw';
-	import databaseIcon from '$lib/assets/database.svg?raw';
+	import PostgreSQLIcon from '$lib/assets/db/engines/postgresql.svg?raw';
+	import SQLiteIcon from '$lib/assets/db/engines/sqlite.svg?raw';
+	import { DBEngine } from '$lib/db/worker/types';
 	import Button from './ui/button/button.svelte';
 
 	let notebooks = $state([
@@ -34,18 +34,6 @@
 	// Notebook Dialog
 	let showCreateNBDialog = $state(false);
 	let newNotebookName = $state('');
-
-	// Function to get the icon for the database engine
-	function getDatabaseIcon(engine: string) {
-		switch (engine) {
-			case 'pgsql':
-				return PostgreSQLIcon;
-			case 'sqlite':
-				return SQLiteIcon;
-			default:
-				return databaseIcon;
-		}
-	}
 
 	// Backend actions
 	async function performAction(action: string, id?: number) {
@@ -208,7 +196,11 @@
 					{#each databases as database (database.id)}
 						<Sidebar.MenuItem>
 							<Sidebar.MenuButton>
-								{@html getDatabaseIcon(database.engine)}
+								{#if database.engine === DBEngine.SQLITE}
+									{@html SQLiteIcon}
+								{:else}
+									{@html PostgreSQLIcon}
+								{/if}
 								<span class="ml-2">{database.name}</span>
 								{#if database.status === 'active'}
 									<CircleDot size="15" class="text-green-500" />
