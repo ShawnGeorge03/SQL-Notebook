@@ -29,6 +29,36 @@
 				engine: DBEngine.PGSQL,
 				dbName: 'PP'
 			}
+		},
+		{
+			id: nanoid(),
+			cellType: 'query',
+			content: {
+				name: 'Query',
+				query: 'SELECT * FROM genre',
+				engine: DBEngine.PGSQL,
+				dbName: 'PP'
+			}
+		},
+		{
+			id: nanoid(),
+			cellType: 'query',
+			content: {
+				name: 'Query',
+				query: `SELECT
+  *
+FROM
+  pg_catalog.pg_type
+WHERE
+  typtype = 'b' OR
+  typtype = 'c' OR
+  typtype = 'p' OR
+  typtype = 'e'
+ORDER BY
+  typname;`,
+				engine: DBEngine.PGSQL,
+				dbName: 'PP'
+			}
 		}
 	]);
 
