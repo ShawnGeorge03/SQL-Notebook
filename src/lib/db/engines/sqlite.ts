@@ -75,28 +75,20 @@ export class SQLite implements DBStrategy {
 
 		isValidQuery(query, this.KEYWORDS)
 
-		try {
-			return await this.#sqlite3
-				.exec(this.#db, 'BEGIN TRANSACTION;')
-				.then(async () => await this.executeQuery(query))
-				.then(async (data) => {
-					await this.#sqlite3.exec(this.#db, 'COMMIT;');
-					return data;
-				})
-				.catch(async (error) => {
-					await this.#sqlite3.exec(this.#db, 'ROLLBACK;');
-					if (error instanceof Error) {
-						throw new Error(error.cause ? `${error.message} (${error.cause})` : error.message);
-					}
-					throw new Error(`Database query failed: ${String(error)}`);
-				});
-		} catch (error) {
-			await this.#sqlite3.exec(this.#db, 'ROLLBACK;');
-			if (error instanceof Error) {
-				throw new Error(error.cause ? `${error.message} (${error.cause})` : error.message);
-			}
-			throw new Error(`Database query failed: ${String(error)}`);
-		}
+		return await this.#sqlite3
+			.exec(this.#db, 'BEGIN TRANSACTION;')
+			.then(async () => await this.executeQuery(query))
+			.then(async (data) => {
+				await this.#sqlite3.exec(this.#db, 'COMMIT;');
+				return data;
+			})
+			.catch(async (error) => {
+				await this.#sqlite3.exec(this.#db, 'ROLLBACK;')
+				if (error instanceof Error) {
+					throw new Error(error.cause ? `${error.message} (${error.cause})` : error.message);
+				}
+				throw new Error(`Database query failed: ${String(error)}`);
+			});
 	}
 
 	/**
