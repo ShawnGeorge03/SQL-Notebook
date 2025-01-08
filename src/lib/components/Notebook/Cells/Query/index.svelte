@@ -5,13 +5,14 @@
 
 	import { PostgreSQL, sql, SQLite, StandardSQL } from '@codemirror/lang-sql';
 
-	import type { DBEngine, SuccessResponseData } from '$lib/db/worker/types';
+	import type { DBEngine, ErrorResponseData, SuccessResponseData } from '$lib/db/worker/types';
 
 	import { DBWorkerService } from '$lib/db/worker/service';
 	import { onMount } from 'svelte';
 	import SelectDB from '../../SelectDB.svelte';
 	import { Actions, Editor } from '../Cell';
 
+	import { dev } from '$app/environment';
 	import PostgreSQLIcon from '$lib/assets/db/engines/postgresql.svg?raw';
 	import SQLiteIcon from '$lib/assets/db/engines/sqlite.svg?raw';
 	import { Button } from '$lib/components/ui/button';
@@ -23,8 +24,9 @@
 		class?: string;
 		dbName: string;
 		engine: DBEngine;
-		content: string;
+		query: string;
 		result?: Omit<SuccessResponseData['EXEC_QUERY'], 'id'>;
+		error?: Omit<ErrorResponseData['EXEC_QUERY'], 'id'>;
 		moveUpCell: (position: number) => void;
 		moveDownCell: (position: number) => void;
 		copyCell: (position: number) => void;
@@ -37,10 +39,11 @@
 		id,
 		position,
 		class: className,
-		content = $bindable(''),
+		query = $bindable(''),
 		dbName = $bindable(''),
 		engine = $bindable(),
 		result = $bindable(DEFAULT_RESULT),
+		error = $bindable(),
 		moveUpCell,
 		moveDownCell,
 		copyCell,
@@ -71,14 +74,12 @@
 						elapsed: response.data.elapsed
 					};
 				} else if (response.command === 'FORMAT_QUERY' && response.data.id === id) {
-					content = response.data.query;
+					query = response.data.query;
 				}
 			} else if (response.status === 'ERROR') {
-				if (response.command === 'EXEC_QUERY') {
+				if (response.command === 'EXEC_QUERY' && response.data.id === id) {
 					isRunning = false;
-					console.error(response.data);
-				} else if (response.command === 'FORMAT_QUERY') {
-					console.error(response.data);
+					error = response.data;
 				}
 			}
 		});
@@ -95,7 +96,7 @@
 		onclick={() =>
 			dbWorkerService.sendMessage({
 				command: 'FORMAT_QUERY',
-				args: { id, engine: engine, query: content }
+				args: { id, engine: engine, query: query }
 			})}
 	>
 		<PaintbrushVertical />
@@ -109,7 +110,8 @@
 		copy={() => copyCell(position)}
 		run={() => {
 			isRunning = true;
-			dbWorkerService.sendMessage({ command: 'EXEC_QUERY', args: { id, dbName, query: content } });
+			error = undefined;
+			dbWorkerService.sendMessage({ command: 'EXEC_QUERY', args: { id, dbName, query: query } });
 			result = DEFAULT_RESULT;
 		}}
 		remove={() => removeCell(position)}
@@ -141,11 +143,30 @@
 	</Actions>
 	<Editor
 		class="w-[400px] transition-[width] duration-300 ease-in-out md:w-[500px] lg:w-[700px] xl:w-[1000px]"
-		bind:content
+		bind:content={query}
 		{customExtensions}
 	/>
+	{#if error}
+		<div
+			class="w-[400px] rounded-ee-md rounded-es-md border bg-primary-foreground p-4 text-red-500 transition-[width] duration-300 ease-in-out dark:text-red-600 md:w-[500px] lg:w-[700px] xl:w-[1000px]"
+		>
+			<p class="text-xl font-bold">
+				{error.name
+					.toLocaleLowerCase()
+					.split('_')
+					.map((word) => word.charAt(0).toUpperCase() + word.slice(1))
+					.join(' ')}
+			</p>
+			<div class="pl-2">
+				<p class="text-lg">{error.message}</p>
+				{#if dev}
+					<pre class="text-sm">{error.stack}</pre>
+				{/if}
+			</div>
+		</div>
+	{/if}
 	<ScrollArea
-		class={`${result.data.rows.length < 10 ? 'max-h-96' : 'h-96'} w-[400px] rounded-ee-md rounded-es-md bg-primary-foreground p-5 transition-[width] duration-300 ease-in-out md:w-[500px] lg:w-[700px] xl:w-[1000px] `}
+		class={`${result.data.rows.length < 10 ? 'max-h-96' : 'h-96'} ${error && 'hidden'} w-[400px] rounded-ee-md rounded-es-md bg-primary-foreground p-5 transition-[width] duration-300 ease-in-out md:w-[500px] lg:w-[700px] xl:w-[1000px]`}
 		orientation="both"
 	>
 		<Table.Root

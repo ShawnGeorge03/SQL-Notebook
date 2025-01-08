@@ -140,7 +140,7 @@ ORDER BY
 						class="py-4"
 						position={i}
 						id={cell.id}
-						bind:content={cell.content.query}
+						bind:query={cell.content.query}
 						bind:dbName={cell.content.dbName}
 						bind:engine={cell.content.engine}
 						{moveUpCell}
