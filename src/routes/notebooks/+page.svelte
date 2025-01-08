@@ -63,31 +63,27 @@ ORDER BY
 	]);
 
 	const addNewCell = (position: number, metadata: CellMetadata) => {
+		const cell = { id: nanoid(), cellType: metadata.cellType, content: {} };
+
 		switch (metadata.cellType) {
 			case 'markdown':
-				cells.splice(position, 0, {
-					id: nanoid(),
-					cellType: 'markdown',
-					content: {
-						name: '',
-						text: ''
-					}
-				});
+				cell.content = {
+					name: cell.id,
+					text: ''
+				};
 				break;
 			case 'query':
-				cells.splice(position, 0, {
-					id: nanoid(),
-					cellType: 'query',
-					content: {
-						name: '',
-						query: "SELECT 'HELLO WORLD'",
-						engine: metadata.engine,
-						dbName: metadata.dbName
-					}
-				});
+				cell.content = {
+					name: cell.id,
+					query: "SELECT 'HELLO WORLD'",
+					engine: metadata.engine,
+					dbName: metadata.dbName
+				};
+				break;
 		}
-	};
 
+		cells.splice(position, 0, cell as NotebookCell);
+	};
 	const moveUpCell = (position: number) => {
 		const cell = cells[position];
 		cells.splice(position, 1);
@@ -140,6 +136,7 @@ ORDER BY
 						class="py-4"
 						position={i}
 						id={cell.id}
+						bind:name={cell.content.name}
 						bind:query={cell.content.query}
 						bind:dbName={cell.content.dbName}
 						bind:engine={cell.content.engine}

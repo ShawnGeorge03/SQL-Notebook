@@ -1,4 +1,5 @@
 <script lang="ts">
+	import { Input } from '$lib/components/ui/input';
 	import ScrollArea from '$lib/components/ui/scroll-area/scroll-area.svelte';
 	import { Skeleton } from '$lib/components/ui/skeleton';
 	import * as Table from '$lib/components/ui/table/index.js';
@@ -20,6 +21,7 @@
 
 	interface CodeEditorProps {
 		id: string;
+		name: string;
 		position: number;
 		class?: string;
 		dbName: string;
@@ -37,6 +39,7 @@
 
 	let {
 		id,
+		name = $bindable(''),
 		position,
 		class: className,
 		query = $bindable(''),
@@ -117,29 +120,33 @@
 		remove={() => removeCell(position)}
 		{actions}
 	>
-		<SelectDB
-			bind:open
-			onSelect={(db) => {
-				dbName = db.name;
-				engine = db.engine;
-			}}
-		>
-			<div class="flex items-center gap-3">
-				<div class="float-left">
-					{#if engine === 'pgsql'}
-						<span class="h-10 w-10" aria-hidden="true">{@html PostgreSQLIcon}</span>
-					{:else if engine === 'sqlite'}
-						<span class="h-10 w-10" aria-hidden="true">{@html SQLiteIcon}</span>
-					{/if}
+		<div class="flex items-center justify-between gap-5">
+			<SelectDB
+				bind:open
+				onSelect={(db) => {
+					dbName = db.name;
+					engine = db.engine;
+				}}
+			>
+				<div class="flex items-center gap-3">
+					<div class="float-left">
+						{#if engine === 'pgsql'}
+							<span class="h-10 w-10" aria-hidden="true">{@html PostgreSQLIcon}</span>
+						{:else if engine === 'sqlite'}
+							<span class="h-10 w-10" aria-hidden="true">{@html SQLiteIcon}</span>
+						{/if}
+					</div>
+					<div class="flex max-w-32">
+						<p class="overflow-hidden text-ellipsis whitespace-nowrap">{dbName}</p>
+						<span class="ml-2 transition-transform duration-200 {open ? 'rotate-180' : ''}">
+							<ChevronDown />
+						</span>
+					</div>
 				</div>
-				<div class="flex max-w-32">
-					<p class="overflow-hidden text-ellipsis whitespace-nowrap">{dbName}</p>
-					<span class="ml-2 transition-transform duration-200 {open ? 'rotate-180' : ''}">
-						<ChevronDown />
-					</span>
-				</div>
-			</div>
-		</SelectDB>
+			</SelectDB>
+
+			<Input type="text" placeholder="Name" class="mr-4 w-1/5" bind:value={name} />
+		</div>
 	</Actions>
 	<Editor
 		class="w-[400px] transition-[width] duration-300 ease-in-out md:w-[500px] lg:w-[700px] xl:w-[1000px]"

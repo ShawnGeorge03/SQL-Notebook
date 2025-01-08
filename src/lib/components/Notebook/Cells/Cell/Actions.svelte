@@ -34,7 +34,7 @@
 	)}
 >
 	<div
-		class="absolute -top-4 right-4 flex items-center rounded-md bg-muted-foreground px-1 py-1 opacity-0 outline outline-2 outline-gray-50 transition-opacity duration-200 ease-in-out group-hover:opacity-100"
+		class="absolute -top-8 right-4 flex items-center rounded-md bg-muted-foreground px-1 py-1 opacity-0 outline outline-2 outline-gray-50 transition-opacity duration-200 ease-in-out group-hover:opacity-100"
 	>
 		<Button
 			variant="secondary"
