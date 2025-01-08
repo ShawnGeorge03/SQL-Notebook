@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { Markdown } from '$lib/components/Notebook/Cells';
+	import Markdown from '$lib/components/Notebook/Cells/Markdown/index.svelte';
 	import Cell from '$lib/components/Notebook/Cells/Cell.svelte';
 	import * as CreateCell from '$lib/components/Notebook/CreateCell/index';
 	import type { CellMetadata } from '$lib/components/Notebook/CreateCell/type';
@@ -40,7 +40,7 @@
 					id: nanoid(),
 					cellType: 'markdown',
 					content: {
-						name: '',
+						name: 'Markdown',
 						text: ''
 					}
 				});
@@ -50,8 +50,8 @@
 					id: nanoid(),
 					cellType: 'query',
 					content: {
-						name: '',
-						query: "SELECT 'HELLO WORLD'",
+						name: 'Query',
+						query: '',
 						engine: metadata.engine,
 						dbName: metadata.dbName
 					}

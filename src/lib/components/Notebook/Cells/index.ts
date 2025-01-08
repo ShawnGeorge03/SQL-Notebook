@@ -1,3 +1,3 @@
-import Markdown from './Markdow/index.svelte';
+import Markdown from './Markdown/index.svelte';
 
 export { Markdown };
