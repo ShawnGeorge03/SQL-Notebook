@@ -27,6 +27,8 @@
 		removeCell: (position: number) => void;
 	}
 
+	const DEFAULT_RESULT = { data: { rows: [], cols: [] }, elapsed: 0 };
+
 	let {
 		id,
 		position,
@@ -34,7 +36,7 @@
 		content = $bindable(''),
 		dbName = $bindable(''),
 		engine = $bindable(),
-		result = $bindable(),
+		result = $bindable(DEFAULT_RESULT),
 		moveUpCell,
 		moveDownCell,
 		copyCell,
@@ -103,7 +105,7 @@
 		copy={() => copyCell(position)}
 		run={() => {
 			dbWorkerService.sendMessage({ command: 'EXEC_QUERY', args: { id, dbName, query: content } });
-			result = { data: [], elapsed: 0 };
+			result = DEFAULT_RESULT;
 		}}
 		remove={() => removeCell(position)}
 		{actions}
