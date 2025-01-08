@@ -112,7 +112,7 @@ export class SQLite implements DBStrategy {
 			const colNames = this.#sqlite3.column_names(statement);
 			const { rows, colTypes } = await this.executeStatement(statement, colNames);
 			if (rows.length > 0 || colNames.length > 0) {
-				return { rows, cols: this.getColumnMetadata(colNames, colTypes) };
+				return { rows: rows as unknown[][], cols: this.getColumnMetadata(colNames, colTypes) };
 			}
 		}
 		return { rows: [], cols: [] };
