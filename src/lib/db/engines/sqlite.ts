@@ -3,6 +3,7 @@ import SQLiteESMFactory from 'wa-sqlite/dist/wa-sqlite-async.mjs';
 import IDBBatchAtomicVFS from './thrid-party/wa-sqlite/IDBBatchAtomicVFS.js';
 import MemoryAsyncVFS from './thrid-party/wa-sqlite/MemoryAsyncVFS.js';
 import { NotebookType, type DBOptions, type DBStrategy, type QueryResult } from './types';
+import { isValidQuery } from './utils.js';
 
 type ColTypes = Record<string, Record<NotebookType, number>>;
 
@@ -16,6 +17,9 @@ export class SQLite implements DBStrategy {
 	#dbName: string;
 	#dbOptions: DBOptions;
 	#sqlite3!: SQLiteAPI;
+
+	KEYWORDS = /\b(SELECT|INSERT|UPDATE|DELETE|CREATE|ALTER|DROP|WITH|BEGIN|END|PRAGMA|EXPLAIN|ANALYZE|ATTACH|DETACH|VACUUM|REINDEX|SAVEPOINT|RELEASE|ROLLBACK|COMMIT|CLUSTER|TRANSACTION)\b/gi;
+
 
 	/**
 	 * Creates a SQLite object.
@@ -63,24 +67,28 @@ export class SQLite implements DBStrategy {
 	 *
 	 * @param {string} query - The query to be run.
 	 *
-	 * @returns {Promise{QueryResult[]}} - Promise Object reprsenting the query results.
+	 * @returns {Promise{QueryResult}} - Promise Object reprsenting the query results.
 	 */
-	async exec(query: string): Promise<QueryResult[]> {
+	async exec(query: string): Promise<QueryResult> {
 		if (!this.#db) throw new Error('Database not initialized');
 
-		try {
-			let data: QueryResult[] = [];
-			await this.#sqlite3
-				.exec(this.#db, 'BEGIN TRANSACTION;')
-				.then(async () => (data = await this.executeQuery(query)));
-			return await this.#sqlite3.exec(this.#db, 'COMMIT;').then(() => data);
-		} catch (error) {
-			await this.#sqlite3.exec(this.#db, 'ROLLBACK;');
-			if (error instanceof Error) {
-				throw new Error(error.cause ? `${error.message} (${error.cause})` : error.message);
-			}
-			throw new Error(`Database query failed: ${String(error)}`);
-		}
+
+		isValidQuery(query, this.KEYWORDS)
+
+		return await this.#sqlite3
+			.exec(this.#db, 'BEGIN TRANSACTION;')
+			.then(async () => await this.executeQuery(query))
+			.then(async (data) => {
+				await this.#sqlite3.exec(this.#db, 'COMMIT;');
+				return data;
+			})
+			.catch(async (error) => {
+				await this.#sqlite3.exec(this.#db, 'ROLLBACK;')
+				if (error instanceof Error) {
+					throw new Error(error.cause ? `${error.message} (${error.cause})` : error.message);
+				}
+				throw new Error(`Database query failed: ${String(error)}`);
+			});
 	}
 
 	/**
@@ -88,22 +96,19 @@ export class SQLite implements DBStrategy {
 	 *
 	 * @param {string} query - The SQL query to be executed.
 	 *
-	 * @returns {Promise{QueryResult[]}} - A Promise that resolves to an array of
+	 * @returns {Promise{QueryResult}} - A Promise that resolves to an array of
 	 * `QueryResult` objects representing the results of the executed query.
 	 */
-	private async executeQuery(query: string): Promise<QueryResult[]> {
-		const data: QueryResult[] = [];
-
+	private async executeQuery(query: string): Promise<QueryResult> {
 		for await (const statement of this.#sqlite3.statements(this.#db, query)) {
 			const colNames = this.#sqlite3.column_names(statement);
 			const { rows, colTypes } = await this.executeStatement(statement, colNames);
-			if (rows.length > 0 || colNames.length > 0)
-				data.push({ rows, cols: this.getColumnMetadata(colNames, colTypes) });
+			if (rows.length > 0 || colNames.length > 0) {
+				return { rows: rows as unknown[][], cols: this.getColumnMetadata(colNames, colTypes) };
+			}
 		}
-
-		return data;
+		return { rows: [], cols: [] };
 	}
-
 	/**
 	 * Executes a SQL statement and returns the results.
 	 *

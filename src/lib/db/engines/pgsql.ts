@@ -10,10 +10,8 @@ import {
 	// @ts-ignore
 	'https://cdn.jsdelivr.net/npm/@electric-sql/pglite@0.2.15/dist/index.min.js';
 
-import { format, type FormatOptionsWithLanguage } from 'sql-formatter';
-import { DBEngine } from '../worker/types';
 import { NotebookType, type DBOptions, type DBStrategy, type QueryResult } from './types';
-import getSQLFormatConfig from './utils';
+import { isValidQuery } from './utils';
 
 /** Class representing a PostgreSQL Database.
  *
@@ -25,8 +23,7 @@ export class PostgreSQL implements DBStrategy {
 	#dbName: string;
 	#dbOptions: PGliteOptions;
 
-	#sqlFormatConfig: FormatOptionsWithLanguage;
-
+	KEYWORDS = /\b(SELECT|INSERT|UPDATE|DELETE|TRUNCATE|CREATE|ALTER|DROP|WITH|DO|BEGIN|END|DECLARE|EXECUTE|EXPLAIN|VACUUM|ANALYZE|GRANT|REVOKE)\b/gi;
 	/**
 	 * Creates a PostgreSQL object.
 	 *
@@ -38,8 +35,6 @@ export class PostgreSQL implements DBStrategy {
 		this.#dbOptions = {
 			fs: dbOptions.persistent ? new IdbFs(this.#dbName) : new MemoryFS()
 		};
-
-		this.#sqlFormatConfig = getSQLFormatConfig(DBEngine.PGSQL);
 	}
 
 	/**
@@ -68,74 +63,39 @@ export class PostgreSQL implements DBStrategy {
 	 *
 	 * @param {string} query - The SQL query to be executed.
 	 *
-	 * @returns {Promise<QueryResult[]>} - A Promise that resolves to an array of
+	 * @returns {Promise<QueryResult>} - A Promise that resolves to an array of
 	 * 	`QueryResult` objects representing the results of the executed query.
 	 *
 	 * @throws {Error} Will throw an Error if the database is not initialized.
 	 * @throws {Error} Will throw an Error if the query execution fails.
 	 *
 	 */
-	async exec(query: string): Promise<QueryResult[]> {
-		if (!this.#db) throw new Error('Database not initialized');
+	async exec(query: string): Promise<QueryResult> {
+		if (!this.#db) {
+			throw new Error('Database not initialized');
+		}
 
-		const statements = this.parseStatements(query);
-		const data: QueryResult[] = [];
+		isValidQuery(query, this.KEYWORDS)
 
-		await this.#db.transaction(async (tx: Transaction) => {
-			for (const statement of statements) {
-				await this.executeStatement(tx, statement, data);
+		return this.#db.transaction(async (tx: Transaction) => {
+			try {
+				const result = await tx.query(query);
+
+				return {
+					rows: result.rows.map((row) => Object.values(row as Record<string, unknown>)),
+					cols: this.mapPostgresTypesToNotebookTypes(result.fields)
+				};
+			} catch (error) {
+				await tx.rollback();
+				if (error instanceof Error)
+					throw new Error(error.cause ? `${error.message} (${error.cause})` : error.message, {
+						cause: query
+					});
+
+				throw new Error(`Database query failed: ${String(error)}`, { cause: query });
 			}
 		});
-
-		return data;
 	}
-
-	/**
-	 * Executes a SQL query within a transaction.
-	 *
-	 * @param {Transaction} tx - The transaction object.
-	 * @param {string} statement - The SQL statement to be executed.
-	 * @param {QueryResult[]} data - The array to store the results of the executed query.
-	 *
-	 * @throws {Error} Will throw an Error if the query execution fails.
-	 */
-	private async executeStatement(
-		tx: Transaction,
-		statement: string,
-		data: QueryResult[]
-	): Promise<void> {
-		try {
-			const result = await tx.query(statement);
-			if (result.fields.length > 0) {
-				data.push({
-					rows: result.rows,
-					cols: this.mapPostgresTypesToNotebookTypes(result.fields)
-				});
-			}
-		} catch (error) {
-			await tx.rollback();
-			if (error instanceof Error)
-				throw new Error(error.cause ? `${error.message} (${error.cause})` : error.message, {
-					cause: statement
-				});
-
-			throw new Error(`Database query failed: ${String(error)}`, { cause: statement });
-		}
-	}
-
-	/**
-	 * Parses a SQL query into individual statements.
-	 *
-	 * @param {string} query - The SQL query to be parsed.
-	 * @returns {string[]} An array of individual SQL statements.
-	 */
-	private parseStatements(query: string): string[] {
-		return format(query, this.#sqlFormatConfig)
-			.split(';')
-			.map((stmt) => stmt.trim())
-			.filter((stmt) => stmt.length > 0);
-	}
-
 	/**
 	 * Maps PostgreSQL column types to Notebook types.
 	 *

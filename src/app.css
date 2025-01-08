@@ -75,14 +75,3 @@
 		@apply bg-background text-foreground;
 	}
 }
-
-.cm-content,
-.cm-gutter {
-	@apply min-h-72 !important;
-}
-.cm-gutters {
-	@apply m-1 !important;
-}
-.cm-scroller {
-	@apply overflow-auto !important;
-}
