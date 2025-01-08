@@ -132,7 +132,11 @@
 			</div>
 		</SelectDB>
 	</Actions>
-	<Editor bind:content {customExtensions} />
+	<Editor
+		class="w-[400px] transition-[width] duration-300 ease-in-out md:w-[500px] lg:w-[700px] xl:w-[1000px]"
+		bind:content
+		{customExtensions}
+	/>
 	<div class={isRunning ? 'hidden' : ''}>
 		{JSON.stringify(result)}
 	</div>

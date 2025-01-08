@@ -27,7 +27,12 @@
 	}: CellActionsProps = $props();
 </script>
 
-<div class={cn('group relative rounded-t-xl bg-primary-foreground py-2 pl-3', className)}>
+<div
+	class={cn(
+		'group relative w-[400px] rounded-t-xl bg-primary-foreground py-2 pl-3 transition-[width] duration-300 ease-in-out md:w-[500px] lg:w-[700px] xl:w-[1000px]',
+		className
+	)}
+>
 	<div
 		class="absolute -top-4 right-4 flex items-center rounded-md bg-muted-foreground px-1 py-1 opacity-0 outline outline-2 outline-gray-50 transition-opacity duration-200 ease-in-out group-hover:opacity-100"
 	>
