@@ -82,7 +82,7 @@ export class PostgreSQL implements DBStrategy {
 				const result = await tx.query(query);
 
 				return {
-					rows: result.rows,
+					rows: result.rows.map((row) => Object.values(row as Record<string, unknown>)),
 					cols: this.mapPostgresTypesToNotebookTypes(result.fields)
 				};
 			} catch (error) {
