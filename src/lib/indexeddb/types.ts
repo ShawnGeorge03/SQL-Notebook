@@ -41,6 +41,5 @@ type MarkdownCell = {
 export type NotebookCell = QueryCell | MarkdownCell;
 
 export type Notebook = BaseTable & {
-	projectID: number;
 	cells: NotebookCell[];
 };
