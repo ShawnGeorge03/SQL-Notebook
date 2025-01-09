@@ -11,8 +11,7 @@ const iDB = new Dexie(iDBname) as Dexie & {
 
 iDB.version(1).stores({
 	databases: '&name, createdBy, createdOn, modifiedOn, engine, system',
-	notebooks: '++id, name, createdBy, createdOn, modifiedOn, projectID',
-	projects: '++id, name, createdBy, createdOn, modifiedOn, *notebookIDs'
+	notebooks: '++id, name, createdBy, createdOn, modifiedOn'
 });
 
 export default iDB;
