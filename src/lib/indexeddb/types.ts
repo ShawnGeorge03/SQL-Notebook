@@ -1,8 +1,8 @@
 import type { QueryResult } from '$lib/db/engines/types';
 import type { DBEngine } from '$lib/db/worker/types';
 
-interface BaseTable {
-	id: number;
+export interface BaseTable {
+	id: string;
 	name: string;
 	createdBy: 'user' | 'sql-notebook';
 	createdOn: string;
