@@ -28,7 +28,7 @@
 
 <div class={cn('flex gap-4', className)}>
 	<div
-		class="markdown-cell w-full flex-col"
+		class="w-full flex-col"
 		onkeydown={handleKeydown}
 		role="button"
 		tabindex="0"
@@ -38,8 +38,7 @@
 			<Button onclick={() => (editable = !editable)} class="ml-auto">
 				{#if editable}
 					<Play size="15" />Render Markdown
-				{/if}
-				{#if !editable}
+				{:else}
 					<Pen size="15" />Edit Markdown
 				{/if}
 			</Button>
@@ -52,11 +51,4 @@
 			</div>
 		{/if}
 	</div>
-	<!-- <div class="markdown-body h-[18.5rem] w-1/2 overflow-y-scroll p-4">
-		{#await marked.parse(content)}
-			<p>Processing Markdown</p>
-		{:then HTML}
-			{@html HTML}
-		{/await}
-	</div> -->
 </div>

@@ -2,7 +2,6 @@
 	export interface BaseBlockProps {
 		content: string;
 		class?: string;
-		editable?: boolean;
 	}
 </script>
 

@@ -1,5 +1,5 @@
 <script lang="ts">
-	import Markdown from '$lib/components/Notebook/Cells/Markdown/index.svelte';
+	import { Markdown } from '$lib/components/Notebook/Cells';
 	import Cell from '$lib/components/Notebook/Cells/Cell.svelte';
 	import * as CreateCell from '$lib/components/Notebook/CreateCell/index';
 	import type { CellMetadata } from '$lib/components/Notebook/CreateCell/type';
