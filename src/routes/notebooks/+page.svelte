@@ -1,12 +1,10 @@
 <script lang="ts">
-	import AppSidebar from '$lib/components/app-sidebar.svelte';
 	import { Markdown, Query } from '$lib/components/Notebook/Cells';
 	import * as CreateCell from '$lib/components/Notebook/CreateCell/index';
 	import type { CellMetadata } from '$lib/components/Notebook/CreateCell/type';
 	import Notifications from '$lib/components/Notebook/Header/Notifications.svelte';
 	import Settings from '$lib/components/Notebook/Header/Settings/Modal.svelte';
 	import ThemeToggle from '$lib/components/Notebook/Header/ThemeToggle.svelte';
-	import * as Sidebar from '$lib/components/ui/sidebar/index.js';
 	import { DBEngine } from '$lib/db/worker/types';
 	import type { NotebookCell } from '$lib/indexeddb/types';
 	import { nanoid } from 'nanoid/non-secure';
@@ -107,51 +105,46 @@ ORDER BY
 	};
 </script>
 
-<Sidebar.Provider>
-	<AppSidebar />
-	<Sidebar.Inset class="bg-green-500">
-		<header class="sticky top-0 z-20 bg-red-500 p-4">
-			<div class="float-left flex justify-end gap-4">
-				<CreateCell.QueryCell position={cells.length} {addNewCell} />
-				<CreateCell.MarkdownCell position={cells.length} {addNewCell} />
-			</div>
-			<div class="float-right flex justify-end gap-4">
-				<Notifications />
-				<Settings />
-				<ThemeToggle />
-			</div>
-		</header>
-		<div class="flex flex-col items-center justify-center">
-			<CreateCell.ButtonGroup
-				class="w-[400px] py-5 transition-[width] duration-300 ease-in-out md:w-[500px] lg:w-[700px] xl:w-[1000px]"
-				position={0}
-				{addNewCell}
+<header class="sticky top-0 z-20 bg-red-500 p-4">
+	<div class="float-left flex justify-end gap-4">
+		<CreateCell.QueryCell position={cells.length} {addNewCell} />
+		<CreateCell.MarkdownCell position={cells.length} {addNewCell} />
+	</div>
+	<div class="float-right flex justify-end gap-4">
+		<Notifications />
+		<Settings />
+		<ThemeToggle />
+	</div>
+</header>
+<div class="flex flex-col items-center justify-center">
+	<CreateCell.ButtonGroup
+		class="w-[400px] py-5 transition-[width] duration-300 ease-in-out md:w-[500px] lg:w-[700px] xl:w-[1000px]"
+		position={0}
+		{addNewCell}
+	/>
+	{#each cells as cell, i (cell.id)}
+		{#if cell.cellType === 'markdown'}
+			<Markdown class="py-4" bind:content={cell.content.text} />
+		{:else if cell.cellType === 'query'}
+			<Query
+				class="py-4"
+				position={i}
+				id={cell.id}
+				bind:name={cell.content.name}
+				bind:query={cell.content.query}
+				bind:dbName={cell.content.dbName}
+				bind:engine={cell.content.engine}
+				{moveUpCell}
+				{moveDownCell}
+				{copyCell}
+				{removeCell}
 			/>
-			{#each cells as cell, i (cell.id)}
-				{#if cell.cellType === 'markdown'}
-					<Markdown class="py-4" bind:content={cell.content.text} />
-				{:else if cell.cellType === 'query'}
-					<Query
-						class="py-4"
-						position={i}
-						id={cell.id}
-						bind:name={cell.content.name}
-						bind:query={cell.content.query}
-						bind:dbName={cell.content.dbName}
-						bind:engine={cell.content.engine}
-						{moveUpCell}
-						{moveDownCell}
-						{copyCell}
-						{removeCell}
-					/>
-				{/if}
-				<CreateCell.ButtonGroup
-					class={`w-[400px] transition-[width] duration-300 ease-in-out md:w-[500px] lg:w-[700px] xl:w-[1000px] ${i === cells.length - 1 ? 'pb-24' : ''}`}
-					position={i + 1}
-					{addNewCell}
-				/>
-			{/each}
-		</div>
-		<footer class="fixed bottom-0 z-20 w-[100%] bg-blue-500 p-4">(footer)</footer>
-	</Sidebar.Inset>
-</Sidebar.Provider>
+		{/if}
+		<CreateCell.ButtonGroup
+			class={`w-[400px] transition-[width] duration-300 ease-in-out md:w-[500px] lg:w-[700px] xl:w-[1000px] ${i === cells.length - 1 ? 'pb-24' : ''}`}
+			position={i + 1}
+			{addNewCell}
+		/>
+	{/each}
+</div>
+<footer class="fixed bottom-0 z-20 w-[100%] bg-blue-500 p-4">(footer)</footer>
