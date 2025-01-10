@@ -9,7 +9,7 @@
 	let isMenuOpen = false;
 </script>
 
-<nav class="fixed top-0 w-full bg-white shadow dark:bg-gray-900">
+<nav class="fixed top-0 z-10 w-full bg-white shadow dark:bg-gray-900">
 	<div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
 		<div class="flex h-16 items-center">
 			<!-- Logo -->
@@ -19,7 +19,7 @@
 						>{@html LogoLight}</span
 					>
 
-					<span class="inline-hidden h-[45px] w-[200px] dark:block" aria-hidden="true"
+					<span class="hidden h-[45px] w-[200px] dark:inline-block" aria-hidden="true"
 						>{@html LogoDark}</span
 					>
 				</div>
@@ -51,22 +51,22 @@
 				<div class="ml-2 flex items-baseline space-x-4">
 					<a
 						href="/"
-						class="rounded-md px-3 py-2 text-sm font-medium text-gray-900 hover:text-gray-700 dark:text-gray-100 dark:hover:text-gray-300"
+						class="rounded-md px-3 py-2 font-medium text-gray-900 hover:text-gray-700 dark:text-gray-100 dark:hover:text-gray-300"
 						>Home</a
 					>
 					<a
 						href="#features"
-						class="rounded-md px-3 py-2 text-sm font-medium text-gray-900 hover:text-gray-700 dark:text-gray-100 dark:hover:text-gray-300"
+						class="rounded-md px-3 py-2 font-medium text-gray-900 hover:text-gray-700 dark:text-gray-100 dark:hover:text-gray-300"
 						>Features</a
 					>
 					<a
 						href="#contributors"
-						class="rounded-md px-3 py-2 text-sm font-medium text-gray-900 hover:text-gray-700 dark:text-gray-100 dark:hover:text-gray-300"
+						class="rounded-md px-3 py-2 font-medium text-gray-900 hover:text-gray-700 dark:text-gray-100 dark:hover:text-gray-300"
 						>Contributors</a
 					>
 					<a
 						href="#attributions"
-						class="block rounded-md px-3 py-2 text-base font-medium text-gray-900 hover:text-gray-700 dark:text-gray-100 dark:hover:text-gray-300"
+						class="block rounded-md px-3 py-2 font-medium text-gray-900 hover:text-gray-700 dark:text-gray-100 dark:hover:text-gray-300"
 						>Attributions</a
 					>
 				</div>
@@ -104,11 +104,19 @@
 	</div>
 </nav>
 
-<body class="min-h-screen from-gray-50 to-white dark:from-gray-900 dark:to-black">
+<body class="min-h-screen bg-gradient-to-b from-gray-50 to-white dark:from-gray-800 dark:to-black">
 	<main class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
 		<section id="hero" class="py-25 vhpy-20 flex flex-col gap-3 px-7vw">
 			<div class="py-20 text-center">
 				<div class="mb-6 text-title font-bold text-gray-900 dark:text-gray-100">SQL Notebook</div>
+				<div class="rounded-md bg-accent">
+					<img
+						src="src/lib/assets/light_hero.png"
+						alt="SQL Notebook"
+						class="shadow-color-gray-500 z-9 mx-auto rounded-md p-3 pb-2 drop-shadow-2xl"
+					/>
+				</div>
+
 				<p class="mx-auto mb-8 max-w-2xl text-xl text-gray-600 dark:text-gray-400">
 					Run PostgreSQL and SQLite directly in your browser with full SQL support and persistent
 					storage.
