@@ -172,7 +172,7 @@ For more information, see the [LICENSE](./LICENSE) file.
 
 ### Third-Party Licenses
 
-This project uses third-party libraries that are licensed under their respective terms. See the `NOTICE` file for details. Run `pnpm run licenses ls` to generate a list of dependencies and their licenses.
+This project uses third-party libraries that are licensed under their respective terms. See the [NOTICE](./NOTICE) file for details. Run `pnpm run licenses ls` to generate a list of dependencies and their licenses.
 
 ## Contributors
 
