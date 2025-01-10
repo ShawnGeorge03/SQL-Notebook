@@ -28,7 +28,6 @@
 		dbWorkerService = DBWorkerService.getInstance();
 
 		const unsubscribe = dbWorkerService.responses.subscribe((response) => {
-			loading = response.status === 'LOADING' && response.command === 'GET_ACTIVE_DBS';
 			if (response.status === 'SUCCESS' && response.command === 'GET_ACTIVE_DBS') {
 				activeDBs = response.data.activeDBs;
 				loading = false;
