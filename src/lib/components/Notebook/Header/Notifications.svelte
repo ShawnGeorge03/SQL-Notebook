@@ -9,9 +9,9 @@
 
 	import CloseDBIcon from '$lib/assets/db/actions/close-db.svg?raw';
 	import CreateDBIcon from '$lib/assets/db/actions/create-db.svg?raw';
+	import TerminateDBIcon from '$lib/assets/db/actions/drop-db.svg?raw';
 	import LoadDBIcon from '$lib/assets/db/actions/load-db.svg?raw';
 	import QueryDBIcon from '$lib/assets/db/actions/query-db.svg?raw';
-	import TerminateDBIcon from '$lib/assets/db/actions/terminate-db.svg?raw';
 	import { Bell } from 'lucide-svelte';
 
 	interface Notification {
