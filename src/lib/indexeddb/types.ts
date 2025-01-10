@@ -9,7 +9,10 @@ export interface BaseTable {
 	modifiedOn: string;
 }
 
-type BaseDatabase = Omit<BaseTable, 'id'> & { persistent: boolean };
+type BaseDatabase = BaseTable & {
+	persistent: boolean
+	status: 'UNAVAILABLE' | 'LOADING' | 'AVAILABLE'
+};
 
 export type Database =
 	| (BaseDatabase & { engine: DBEngine.PGSQL; system: 'pglite' })

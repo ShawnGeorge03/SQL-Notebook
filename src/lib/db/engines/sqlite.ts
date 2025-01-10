@@ -1,3 +1,4 @@
+import iDB from '$lib/indexeddb/schema.js';
 import * as WaSQLite from 'wa-sqlite';
 import SQLiteESMFactory from 'wa-sqlite/dist/wa-sqlite-async.mjs';
 import IDBBatchAtomicVFS from './thrid-party/wa-sqlite/IDBBatchAtomicVFS.js';
@@ -48,7 +49,9 @@ export class SQLite implements DBStrategy {
 			this.#sqlite3.vfs_register(vfs as SQLiteVFS, true);
 
 			this.#db = await this.#sqlite3.open_v2(this.#dbName);
+			iDB.databases.update(this.#dbName, { status: 'AVAILABLE' });
 		} catch (error) {
+			iDB.databases.update(this.#dbName, { status: 'UNAVAILABLE' });
 			const initError =
 				error instanceof Error
 					? error
