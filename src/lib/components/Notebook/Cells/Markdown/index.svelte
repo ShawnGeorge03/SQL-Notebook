@@ -8,10 +8,30 @@
 	import { Actions, Editor, type BaseEditorProps } from '../Cell';
 	import './github-markdown.css';
 	import Button from '$lib/components/ui/button/button.svelte';
+	import MarkdownIcon from '$lib/assets/notebook/actions/markdown.svg?raw';
 
-	let { class: className, content = $bindable('') }: BaseEditorProps = $props();
-	let editable = $state(true);
+	let editable = $state(false);
 	let markdownDiv: HTMLDivElement;
+
+	interface MarkdownEditorProps {
+		class?: string;
+		content: string;
+		position: number;
+		moveUpCell: (position: number) => void;
+		moveDownCell: (position: number) => void;
+		copyCell: (position: number) => void;
+		removeCell: (position: number) => void;
+	}
+
+	let {
+		class: className,
+		position,
+		content = $bindable(''),
+		moveUpCell,
+		moveDownCell,
+		copyCell,
+		removeCell
+	}: MarkdownEditorProps = $props();
 
 	marked.use({
 		gfm: true
@@ -32,33 +52,62 @@
 	};
 </script>
 
-<div class={cn('flex gap-4', className)}>
-	<div
-		class="w-full flex-col"
-		onkeydown={handleKeydown}
-		role="button"
-		tabindex="0"
-		bind:this={markdownDiv}
+{#snippet actions()}
+	{#if editable}
+		<Button
+			variant="secondary"
+			size="icon"
+			class="border-none bg-transparent shadow-none"
+			onclick={() => {
+				editable = false;
+				markdownDiv.focus();
+			}}
+		>
+			<Play />
+		</Button>
+	{:else}
+		<Button
+			variant="secondary"
+			size="icon"
+			class="border-none bg-transparent shadow-none"
+			onclick={() => {
+				editable = true;
+				markdownDiv.focus();
+			}}
+		>
+			<Pen />
+		</Button>
+	{/if}
+{/snippet}
+
+<div class={cn(className)}>
+	<Actions
+		class="rounded-md"
+		moveUp={() => moveUpCell(position)}
+		moveDown={() => moveDownCell(position)}
+		copy={() => copyCell(position)}
+		remove={() => removeCell(position)}
+		{actions}
 	>
-		<div class="flex">
-			<Button onclick={() => (editable = !editable)} class="ml-auto">
-				{#if editable}
-					<Play size="15" />Render Markdown
-				{:else}
-					<Pen size="15" />Edit Markdown
-				{/if}
-			</Button>
+		{@html MarkdownIcon}
+		<div
+			class="rounded-md pt-2"
+			onkeydown={handleKeydown}
+			role="button"
+			tabindex="0"
+			bind:this={markdownDiv}
+		>
+			{#if editable}
+				<Editor bind:content customExtensions={[markdown()]} />
+			{:else}
+				<div class="markdown-body h-[18.5rem] overflow-y-scroll p-4">
+					{#await sanitizedContent()}
+						<p>Loading...</p>
+					{:then sanitizedContent}
+						{@html sanitizedContent}
+					{/await}
+				</div>
+			{/if}
 		</div>
-		{#if editable}
-			<Editor class="w-full" bind:content customExtensions={[markdown()]} />
-		{:else}
-			<div class="markdown-body h-[18.5rem] w-full overflow-y-scroll p-4">
-				{#await sanitizedContent()}
-					<p>Loading...</p>
-				{:then sanitizedContent}
-					{@html sanitizedContent}
-				{/await}
-			</div>
-		{/if}
-	</div>
+	</Actions>
 </div>

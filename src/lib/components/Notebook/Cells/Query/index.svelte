@@ -17,7 +17,7 @@
 	import PostgreSQLIcon from '$lib/assets/db/engines/postgresql.svg?raw';
 	import SQLiteIcon from '$lib/assets/db/engines/sqlite.svg?raw';
 	import { Button } from '$lib/components/ui/button';
-	import { ChevronDown, PaintbrushVertical } from 'lucide-svelte';
+	import { ChevronDown, PaintbrushVertical, Play } from 'lucide-svelte';
 
 	interface CodeEditorProps {
 		id: string;
@@ -96,6 +96,19 @@
 		variant="secondary"
 		size="icon"
 		class="border-none bg-transparent shadow-none"
+		onclick={() => {
+			isRunning = true;
+			error = undefined;
+			dbWorkerService.sendMessage({ command: 'EXEC_QUERY', args: { id, dbName, query: query } });
+			result = DEFAULT_RESULT;
+		}}
+	>
+		<Play />
+	</Button>
+	<Button
+		variant="secondary"
+		size="icon"
+		class="border-none bg-transparent shadow-none"
 		onclick={() =>
 			dbWorkerService.sendMessage({
 				command: 'FORMAT_QUERY',
@@ -111,12 +124,6 @@
 		moveUp={() => moveUpCell(position)}
 		moveDown={() => moveDownCell(position)}
 		copy={() => copyCell(position)}
-		run={() => {
-			isRunning = true;
-			error = undefined;
-			dbWorkerService.sendMessage({ command: 'EXEC_QUERY', args: { id, dbName, query: query } });
-			result = DEFAULT_RESULT;
-		}}
 		remove={() => removeCell(position)}
 		{actions}
 	>
