@@ -1,15 +1,18 @@
 import type { QueryResult } from '$lib/db/engines/types';
 import type { DBEngine } from '$lib/db/worker/types';
 
-interface BaseTable {
-	id: number;
+export interface BaseTable {
+	id: string;
 	name: string;
 	createdBy: 'user' | 'sql-notebook';
 	createdOn: string;
 	modifiedOn: string;
 }
 
-type BaseDatabase = Omit<BaseTable, 'id'> & { persistent: boolean };
+type BaseDatabase = BaseTable & {
+	persistent: boolean
+	status: 'UNAVAILABLE' | 'LOADING' | 'AVAILABLE'
+};
 
 export type Database =
 	| (BaseDatabase & { engine: DBEngine.PGSQL; system: 'pglite' })
@@ -41,6 +44,5 @@ type MarkdownCell = {
 export type NotebookCell = QueryCell | MarkdownCell;
 
 export type Notebook = BaseTable & {
-	projectID: number;
 	cells: NotebookCell[];
 };
