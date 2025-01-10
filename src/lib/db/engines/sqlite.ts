@@ -186,5 +186,6 @@ export class SQLite implements DBStrategy {
 	 */
 	async close(): Promise<void> {
 		await this.#sqlite3.close(this.#db);
+		await iDB.databases.update(this.#dbName, { status: 'UNAVAILABLE' });
 	}
 }

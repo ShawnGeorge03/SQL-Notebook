@@ -192,7 +192,13 @@
 										{@html LoadDBIcon}
 									</span> Load
 								</DropdownMenu.Item>
-								<DropdownMenu.Item>
+								<DropdownMenu.Item
+									onclick={() =>
+										dbWorkerService.sendMessage({
+											command: 'CLOSE_DB',
+											args: { dbName: database.name }
+										})}
+								>
 									<span class="inline-block h-6 w-6" aria-hidden="true">
 										{@html CloseDBIcon}
 									</span> Close

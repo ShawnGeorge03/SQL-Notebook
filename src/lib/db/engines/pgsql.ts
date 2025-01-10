@@ -158,5 +158,6 @@ export class PostgreSQL implements DBStrategy {
 	 */
 	async close(): Promise<void> {
 		await this.#db.close();
+		await iDB.databases.update(this.#dbName, { status: 'UNAVAILABLE' });
 	}
 }
