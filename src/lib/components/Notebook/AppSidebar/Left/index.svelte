@@ -12,9 +12,11 @@
 	import LoadDBIcon from '$lib/assets/db/actions/load-db.svg?raw';
 	import { BadgePlus, CircleDot, CopyPlus, Ellipsis, NotebookText } from 'lucide-svelte';
 
+	import { DBWorkerService } from '$lib/db/worker/service';
 	import { duplicateNotebook, type NotebookStore } from '$lib/indexeddb/notebook';
 	import iDB from '$lib/indexeddb/schema';
 	import type { Database } from '$lib/indexeddb/types';
+	import { onMount } from 'svelte';
 	import DatabaseIcon from '../../DatabaseIcon.svelte';
 	import * as DatabaseAction from './Database/';
 	import * as NotebookAction from './Notebook/';
@@ -40,6 +42,12 @@
 	let databases = liveQuery<Database[]>(() =>
 		iDB.databases.toArray().finally(() => (databaseLoading = false))
 	);
+
+	let dbWorkerService: DBWorkerService;
+
+	onMount(() => {
+		dbWorkerService = DBWorkerService.getInstance();
+	});
 </script>
 
 <aside
@@ -173,7 +181,13 @@
 								{/snippet}
 							</DropdownMenu.Trigger>
 							<DropdownMenu.Content side="right" align="start" class="min-w-56 rounded-lg">
-								<DropdownMenu.Item>
+								<DropdownMenu.Item
+									onclick={() =>
+										dbWorkerService.sendMessage({
+											command: 'LOAD_DB',
+											args: { dbName: database.name }
+										})}
+								>
 									<span class="inline-block h-6 w-6" aria-hidden="true">
 										{@html LoadDBIcon}
 									</span> Load
