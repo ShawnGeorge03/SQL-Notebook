@@ -23,8 +23,8 @@ export class PostgreSQL implements DBStrategy {
 	#db!: PGlite;
 	#dbName: string;
 	#dbOptions: PGliteOptions;
+	#dbKeywords = /\b(SELECT|INSERT|UPDATE|DELETE|TRUNCATE|CREATE|ALTER|DROP|WITH|DO|BEGIN|END|DECLARE|EXECUTE|EXPLAIN|VACUUM|ANALYZE|GRANT|REVOKE)\b/gi;
 
-	KEYWORDS = /\b(SELECT|INSERT|UPDATE|DELETE|TRUNCATE|CREATE|ALTER|DROP|WITH|DO|BEGIN|END|DECLARE|EXECUTE|EXPLAIN|VACUUM|ANALYZE|GRANT|REVOKE)\b/gi;
 	/**
 	 * Creates a PostgreSQL object.
 	 *
@@ -79,7 +79,7 @@ export class PostgreSQL implements DBStrategy {
 			throw new Error('Database not initialized');
 		}
 
-		isValidQuery(query, this.KEYWORDS)
+		isValidQuery(query, this.#dbKeywords)
 
 		return this.#db.transaction(async (tx: Transaction) => {
 			try {

@@ -18,9 +18,7 @@ export class SQLite implements DBStrategy {
 	#dbName: string;
 	#dbOptions: DBOptions;
 	#sqlite3!: SQLiteAPI;
-
-	KEYWORDS = /\b(SELECT|INSERT|UPDATE|DELETE|CREATE|ALTER|DROP|WITH|BEGIN|END|PRAGMA|EXPLAIN|ANALYZE|ATTACH|DETACH|VACUUM|REINDEX|SAVEPOINT|RELEASE|ROLLBACK|COMMIT|CLUSTER|TRANSACTION)\b/gi;
-
+	#dbKeywords = /\b(SELECT|INSERT|UPDATE|DELETE|CREATE|ALTER|DROP|WITH|BEGIN|END|PRAGMA|EXPLAIN|ANALYZE|ATTACH|DETACH|VACUUM|REINDEX|SAVEPOINT|RELEASE|ROLLBACK|COMMIT|CLUSTER|TRANSACTION)\b/gi;
 
 	/**
 	 * Creates a SQLite object.
@@ -79,7 +77,7 @@ export class SQLite implements DBStrategy {
 		if (!this.#db) throw new Error('Database not initialized');
 
 
-		isValidQuery(query, this.KEYWORDS)
+		isValidQuery(query, this.#dbKeywords)
 
 		return await this.#sqlite3
 			.exec(this.#db, 'BEGIN TRANSACTION;')
