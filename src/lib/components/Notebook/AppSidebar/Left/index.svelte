@@ -10,12 +10,14 @@
 	import CreateDBIcon from '$lib/assets/db/actions/create-db.svg?raw';
 	import DropDBIcon from '$lib/assets/db/actions/drop-db.svg?raw';
 	import LoadDBIcon from '$lib/assets/db/actions/load-db.svg?raw';
-	import { BadgePlus, CopyPlus, Ellipsis, Info, NotebookText, Plus } from 'lucide-svelte';
+	import { BadgePlus, CircleDot, CopyPlus, Ellipsis, Info, NotebookText } from 'lucide-svelte';
 
-	import * as NotebookAction from '$lib/components/Notebook/AppSidebar/Left/Notebook/';
 	import { duplicateNotebook, type NotebookStore } from '$lib/indexeddb/notebook';
 	import iDB from '$lib/indexeddb/schema';
 	import type { Database } from '$lib/indexeddb/types';
+	import DatabaseIcon from '../../DatabaseIcon.svelte';
+	import * as DatabaseAction from './Database/';
+	import * as NotebookAction from './Notebook/';
 
 	let notebookLoading = $state(true);
 	let databaseLoading = $state(true);
@@ -122,11 +124,11 @@
 	<div class="h-fit max-h-[19.5rem] w-full border-b border-t border-sidebar-border pt-2">
 		<div class="flex items-center justify-between px-1 pb-1">
 			<p class="pl-2 text-xl font-bold">Databases</p>
-			<Plus class="ml-auto mr-2 h-5 w-5 shrink-0" />
+			<DatabaseAction.Create />
 		</div>
 		<ScrollArea class="h-[15rem] w-full p-2">
 			<Sidebar.Menu>
-				{#if notebookLoading}
+				{#if databaseLoading}
 					{#each { length: 8 }, i}
 						<Sidebar.MenuItem
 							class="flex h-8 w-full items-center justify-between gap-2 overflow-hidden rounded-md p-2 hover:bg-sidebar-accent hover:text-sidebar-accent-foreground [&>svg]:size-4 [&>svg]:shrink-0"
@@ -153,7 +155,19 @@
 							<DropdownMenu.Trigger>
 								{#snippet child({ props })}
 									<Sidebar.MenuButton {...props}>
-										{database.name}
+										<DatabaseIcon class="min-h-6 min-w-6" engine={database.engine} />
+										<p
+											class="overflow-hidden text-ellipsis whitespace-nowrap text-lg font-semibold"
+										>
+											{database.name}
+										</p>
+										{#if database.status === 'AVAILABLE'}
+											<CircleDot size="15" class="text-green-500" />
+										{:else if database.status === 'LOADING'}
+											<CircleDot size="15" class="text-yellow-500" />
+										{:else if database.status === 'UNAVAILABLE'}
+											<CircleDot size="15" class="text-red-500" />
+										{/if}
 										<Ellipsis class="ml-auto" />
 									</Sidebar.MenuButton>
 								{/snippet}
