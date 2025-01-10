@@ -1,6 +1,6 @@
 <script lang="ts">
-	import CircleDot from 'lucide-svelte/icons/circle-dot.svelte';
-	import Info from 'lucide-svelte/icons/info.svelte';
+	import CircleDot from 'lucide-svelte/icons/circle-dot';
+	import Info from 'lucide-svelte/icons/info';
 
 	import * as Dialog from '$lib/components/ui/dialog/';
 	import { Label } from '$lib/components/ui/label/';

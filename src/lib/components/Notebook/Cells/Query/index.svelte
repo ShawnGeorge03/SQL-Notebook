@@ -4,8 +4,8 @@
 	import { onMount } from 'svelte';
 
 	import DatabaseIcon from '$lib/components/Notebook/DatabaseIcon.svelte';
-	import ChevronDown from 'lucide-svelte/icons/chevron-down.svelte';
-	import PaintbrushVertical from 'lucide-svelte/icons/paintbrush-vertical.svelte';
+	import ChevronDown from 'lucide-svelte/icons/chevron-down';
+	import PaintbrushVertical from 'lucide-svelte/icons/paintbrush-vertical';
 
 	import { Button } from '$lib/components/ui/button';
 	import { Input } from '$lib/components/ui/input';

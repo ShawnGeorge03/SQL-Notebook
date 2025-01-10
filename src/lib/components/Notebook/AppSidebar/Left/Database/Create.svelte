@@ -8,7 +8,7 @@
 	import { Label } from '$lib/components/ui/label/';
 	import * as Select from '$lib/components/ui/select';
 
-	import Plus from 'lucide-svelte/icons/plus.svelte';
+	import Plus from 'lucide-svelte/icons/plus';
 
 	import DatabaseIcon from '$lib/components/Notebook/DatabaseIcon.svelte';
 	import { DBWorkerService } from '$lib/db/worker/service';
