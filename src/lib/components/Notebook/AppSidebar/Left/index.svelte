@@ -122,7 +122,7 @@
 	</div>
 
 	<div class="h-fit max-h-[19.5rem] w-full border-b border-t border-sidebar-border pt-2">
-		<div class="flex items-center justify-between px-1 pb-1">
+		<div class="flex items-center justify-between pb-1 pl-1 pr-3">
 			<p class="pl-2 text-xl font-bold">Databases</p>
 			<DatabaseAction.Create />
 		</div>
