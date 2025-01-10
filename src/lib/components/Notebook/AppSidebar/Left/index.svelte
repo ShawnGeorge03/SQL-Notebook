@@ -11,11 +11,11 @@
 	import DropDBIcon from '$lib/assets/db/actions/drop-db.svg?raw';
 	import LoadDBIcon from '$lib/assets/db/actions/load-db.svg?raw';
 
-	import BadgePlus from 'lucide-svelte/icons/badge-plus.svelte';
-	import CircleDot from 'lucide-svelte/icons/circle-dot.svelte';
-	import CopyPlus from 'lucide-svelte/icons/copy-plus.svelte';
-	import Ellipsis from 'lucide-svelte/icons/ellipsis.svelte';
-	import NotebookText from 'lucide-svelte/icons/notepad-text';
+	import BadgePlus from 'lucide-svelte/icons/badge-plus';
+	import CircleDot from 'lucide-svelte/icons/circle-dot';
+	import CopyPlus from 'lucide-svelte/icons/copy-plus';
+	import Ellipsis from 'lucide-svelte/icons/ellipsis';
+	import NotebookText from 'lucide-svelte/icons/notebook-text';
 
 	import { DBWorkerService } from '$lib/db/worker/service';
 	import { duplicateNotebook, type NotebookStore } from '$lib/indexeddb/notebook';

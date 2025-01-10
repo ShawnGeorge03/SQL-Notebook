@@ -1,5 +1,5 @@
 <script lang="ts">
-	import Trash from 'lucide-svelte/icons/trash.svelte';
+	import Trash from 'lucide-svelte/icons/trash';
 
 	import * as AlertDialog from '$lib/components/ui/alert-dialog';
 	import { deleteNotebook } from '$lib/indexeddb/notebook';

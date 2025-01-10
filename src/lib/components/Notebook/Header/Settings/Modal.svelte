@@ -1,7 +1,7 @@
 <script lang="ts">
 	import { onMount } from 'svelte';
 
-	import Settings from 'lucide-svelte/icons/settings.svelte';
+	import Settings from 'lucide-svelte/icons/settings';
 
 	import { Checkbox } from '$lib/components/ui/checkbox/index.js';
 	import * as Dialog from '$lib/components/ui/dialog/index.js';
