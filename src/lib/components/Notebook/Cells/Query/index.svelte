@@ -94,21 +94,6 @@
 	});
 </script>
 
-{#snippet actions()}
-	<Button
-		variant="secondary"
-		size="icon"
-		class="border-none bg-transparent shadow-none"
-		onclick={() =>
-			dbWorkerService.sendMessage({
-				command: 'FORMAT_QUERY',
-				args: { id, engine: engine, query: query }
-			})}
-	>
-		<PaintbrushVertical />
-	</Button>
-{/snippet}
-
 <div class={className}>
 	<Actions
 		moveUp={() => moveUpCell(position)}
@@ -121,7 +106,6 @@
 			result = DEFAULT_RESULT;
 		}}
 		remove={() => removeCell(position)}
-		{actions}
 	>
 		<div class="flex items-center justify-between gap-5">
 			<SelectDB
@@ -144,6 +128,21 @@
 
 			<Input type="text" placeholder="Name" class="mr-4 w-1/5" bind:value={name} />
 		</div>
+
+		{#snippet actions()}
+			<Button
+				variant="secondary"
+				size="icon"
+				class="border-none bg-transparent shadow-none"
+				onclick={() =>
+					dbWorkerService.sendMessage({
+						command: 'FORMAT_QUERY',
+						args: { id, engine: engine, query: query }
+					})}
+			>
+				<PaintbrushVertical />
+			</Button>
+		{/snippet}
 	</Actions>
 	<Editor
 		class="w-[400px] transition-[width] duration-300 ease-in-out md:w-[500px] lg:w-[700px] xl:w-[1000px]"
