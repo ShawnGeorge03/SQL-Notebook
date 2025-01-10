@@ -1,10 +1,12 @@
 <script lang="ts">
-	import { Moon, Sun } from 'lucide-svelte';
+	import { mode, resetMode, setMode } from 'mode-watcher';
+
+	import Moon from 'lucide-svelte/icons/moon';
+	import Sun from 'lucide-svelte/icons/sun';
 
 	import { buttonVariants } from '$lib/components/ui/button/index.js';
 	import * as DropdownMenu from '$lib/components/ui/dropdown-menu/index.js';
 	import { cn } from '$lib/utils';
-	import { mode, resetMode, setMode } from 'mode-watcher';
 
 	export interface ThemeProps {
 		class?: string;

@@ -1,23 +1,28 @@
 <script lang="ts">
+	import { dev } from '$app/environment';
+	import { PostgreSQL, sql, SQLite, StandardSQL } from '@codemirror/lang-sql';
+	import { onMount } from 'svelte';
+
+	import DatabaseIcon from '$lib/components/Notebook/DatabaseIcon.svelte';
+	import ChevronDown from 'lucide-svelte/icons/chevron-down';
+	import PaintbrushVertical from 'lucide-svelte/icons/paintbrush-vertical';
+	import Play from 'lucide-svelte/icons/play';
+
+	import { Button } from '$lib/components/ui/button';
 	import { Input } from '$lib/components/ui/input';
 	import ScrollArea from '$lib/components/ui/scroll-area/scroll-area.svelte';
 	import { Skeleton } from '$lib/components/ui/skeleton';
 	import * as Table from '$lib/components/ui/table/index.js';
 
-	import { PostgreSQL, sql, SQLite, StandardSQL } from '@codemirror/lang-sql';
-
-	import type { DBEngine, ErrorResponseData, SuccessResponseData } from '$lib/db/worker/types';
+	import type {
+		DBEngine,
+		DBWorkerErrorResponse,
+		DBWorkerSuccessResponse
+	} from '$lib/db/worker/types';
 
 	import { DBWorkerService } from '$lib/db/worker/service';
-	import { onMount } from 'svelte';
 	import SelectDB from '../../SelectDB.svelte';
 	import { Actions, Editor } from '../Cell';
-
-	import { dev } from '$app/environment';
-	import PostgreSQLIcon from '$lib/assets/db/engines/postgresql.svg?raw';
-	import SQLiteIcon from '$lib/assets/db/engines/sqlite.svg?raw';
-	import { Button } from '$lib/components/ui/button';
-	import { ChevronDown, PaintbrushVertical, Play } from 'lucide-svelte';
 
 	interface CodeEditorProps {
 		id: string;
@@ -27,8 +32,8 @@
 		dbName: string;
 		engine: DBEngine;
 		query: string;
-		result?: Omit<SuccessResponseData['EXEC_QUERY'], 'id'>;
-		error?: Omit<ErrorResponseData['EXEC_QUERY'], 'id'>;
+		result?: Omit<DBWorkerSuccessResponse['EXEC_QUERY'], 'id'>;
+		error?: Omit<DBWorkerErrorResponse['EXEC_QUERY'], 'id'>;
 		moveUpCell: (position: number) => void;
 		moveDownCell: (position: number) => void;
 		copyCell: (position: number) => void;
@@ -91,41 +96,12 @@
 	});
 </script>
 
-{#snippet actions()}
-	<Button
-		variant="secondary"
-		size="icon"
-		class="border-none bg-transparent shadow-none"
-		onclick={() => {
-			isRunning = true;
-			error = undefined;
-			dbWorkerService.sendMessage({ command: 'EXEC_QUERY', args: { id, dbName, query: query } });
-			result = DEFAULT_RESULT;
-		}}
-	>
-		<Play />
-	</Button>
-	<Button
-		variant="secondary"
-		size="icon"
-		class="border-none bg-transparent shadow-none"
-		onclick={() =>
-			dbWorkerService.sendMessage({
-				command: 'FORMAT_QUERY',
-				args: { id, engine: engine, query: query }
-			})}
-	>
-		<PaintbrushVertical />
-	</Button>
-{/snippet}
-
 <div class={className}>
 	<Actions
 		moveUp={() => moveUpCell(position)}
 		moveDown={() => moveDownCell(position)}
 		copy={() => copyCell(position)}
 		remove={() => removeCell(position)}
-		{actions}
 	>
 		<div class="flex items-center justify-between gap-5">
 			<SelectDB
@@ -136,24 +112,54 @@
 				}}
 			>
 				<div class="flex items-center gap-3">
-					<div class="float-left">
-						{#if engine === 'pgsql'}
-							<span class="h-10 w-10" aria-hidden="true">{@html PostgreSQLIcon}</span>
-						{:else if engine === 'sqlite'}
-							<span class="h-10 w-10" aria-hidden="true">{@html SQLiteIcon}</span>
-						{/if}
-					</div>
+					<DatabaseIcon class="float-left h-6 w-6" {engine} />
 					<div class="flex max-w-32">
 						<p class="overflow-hidden text-ellipsis whitespace-nowrap">{dbName}</p>
-						<span class="ml-2 transition-transform duration-200 {open ? 'rotate-180' : ''}">
+						<span class="ml-2 transition-transform duration-200 {open && 'rotate-180'}">
 							<ChevronDown />
 						</span>
 					</div>
 				</div>
 			</SelectDB>
 
-			<Input type="text" placeholder="Name" class="mr-4 w-1/5" bind:value={name} />
+			<Input
+				type="text"
+				placeholder="Name"
+				class="mr-4 w-1/5 bg-primary-foreground"
+				bind:value={name}
+			/>
 		</div>
+
+		{#snippet actions()}
+			<Button
+				variant="secondary"
+				size="icon"
+				class="border-none bg-transparent shadow-none"
+				onclick={() => {
+					isRunning = true;
+					error = undefined;
+					dbWorkerService.sendMessage({
+						command: 'EXEC_QUERY',
+						args: { id, dbName, query: query }
+					});
+					result = DEFAULT_RESULT;
+				}}
+			>
+				<Play />
+			</Button>
+			<Button
+				variant="secondary"
+				size="icon"
+				class="border-none bg-transparent shadow-none"
+				onclick={() =>
+					dbWorkerService.sendMessage({
+						command: 'FORMAT_QUERY',
+						args: { id, engine: engine, query: query }
+					})}
+			>
+				<PaintbrushVertical />
+			</Button>
+		{/snippet}
 	</Actions>
 	<Editor
 		class="w-[400px] transition-[width] duration-300 ease-in-out md:w-[500px] lg:w-[700px] xl:w-[1000px]"
@@ -180,18 +186,18 @@
 		</div>
 	{/if}
 	<ScrollArea
-		class={`${result.data.rows.length < 10 ? 'max-h-96' : 'h-96'} ${error && 'hidden'} w-[400px] rounded-ee-md rounded-es-md bg-primary-foreground p-5 transition-[width] duration-300 ease-in-out md:w-[500px] lg:w-[700px] xl:w-[1000px]`}
+		class={`${result.data.rows.length < 10 ? 'max-h-96' : 'h-96'} ${error && 'hidden'} w-[400px] rounded-ee-md rounded-es-md bg-accent p-5 transition-[width] duration-300 ease-in-out md:w-[500px] lg:w-[700px] xl:w-[1000px]`}
 		orientation="both"
 	>
 		<Table.Root
 			class={`${!isRunning && result.data.cols.length === 0 && 'hidden'} min-w-full border border-gray-300 bg-gray-100 p-6 dark:border-gray-600 dark:bg-gray-800`}
 		>
 			<Table.Header>
-				<Table.Row class="bg-green-600 text-white">
+				<Table.Row class="bg-gray-800 dark:bg-secondary dark:text-secondary-foreground">
 					{#if isRunning}
 						{#each { length: 8 }}
 							<Table.Head
-								class="border border-gray-300 px-4 py-2 text-left font-bold dark:border-gray-600"
+								class="border border-gray-300 px-4 py-2 text-left font-semibold dark:border-gray-600"
 							>
 								<Skeleton class="ml-auto bg-slate-100 p-2 dark:bg-slate-600" />
 							</Table.Head>

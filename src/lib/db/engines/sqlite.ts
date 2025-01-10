@@ -1,3 +1,4 @@
+import iDB from '$lib/indexeddb/schema.js';
 import * as WaSQLite from 'wa-sqlite';
 import SQLiteESMFactory from 'wa-sqlite/dist/wa-sqlite-async.mjs';
 import IDBBatchAtomicVFS from './thrid-party/wa-sqlite/IDBBatchAtomicVFS.js';
@@ -17,9 +18,7 @@ export class SQLite implements DBStrategy {
 	#dbName: string;
 	#dbOptions: DBOptions;
 	#sqlite3!: SQLiteAPI;
-
-	KEYWORDS = /\b(SELECT|INSERT|UPDATE|DELETE|CREATE|ALTER|DROP|WITH|BEGIN|END|PRAGMA|EXPLAIN|ANALYZE|ATTACH|DETACH|VACUUM|REINDEX|SAVEPOINT|RELEASE|ROLLBACK|COMMIT|CLUSTER|TRANSACTION)\b/gi;
-
+	#dbKeywords = /\b(SELECT|INSERT|UPDATE|DELETE|CREATE|ALTER|DROP|WITH|BEGIN|END|PRAGMA|EXPLAIN|ANALYZE|ATTACH|DETACH|VACUUM|REINDEX|SAVEPOINT|RELEASE|ROLLBACK|COMMIT|CLUSTER|TRANSACTION)\b/gi;
 
 	/**
 	 * Creates a SQLite object.
@@ -39,6 +38,8 @@ export class SQLite implements DBStrategy {
 	 */
 	async init(): Promise<void> {
 		try {
+			await iDB.databases.update(this.#dbName, { status: 'LOADING' })
+
 			const module = await SQLiteESMFactory();
 			this.#sqlite3 = WaSQLite.Factory(module);
 
@@ -48,7 +49,10 @@ export class SQLite implements DBStrategy {
 			this.#sqlite3.vfs_register(vfs as SQLiteVFS, true);
 
 			this.#db = await this.#sqlite3.open_v2(this.#dbName);
+
+			await iDB.databases.update(this.#dbName, { status: 'AVAILABLE' });
 		} catch (error) {
+			iDB.databases.update(this.#dbName, { status: 'UNAVAILABLE' });
 			const initError =
 				error instanceof Error
 					? error
@@ -73,7 +77,7 @@ export class SQLite implements DBStrategy {
 		if (!this.#db) throw new Error('Database not initialized');
 
 
-		isValidQuery(query, this.KEYWORDS)
+		isValidQuery(query, this.#dbKeywords)
 
 		return await this.#sqlite3
 			.exec(this.#db, 'BEGIN TRANSACTION;')
@@ -182,5 +186,6 @@ export class SQLite implements DBStrategy {
 	 */
 	async close(): Promise<void> {
 		await this.#sqlite3.close(this.#db);
+		await iDB.databases.update(this.#dbName, { status: 'UNAVAILABLE' });
 	}
 }

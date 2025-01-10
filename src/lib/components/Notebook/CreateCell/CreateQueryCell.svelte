@@ -1,9 +1,9 @@
 <script lang="ts">
+	import QueryIcon from '$lib/assets/notebook/actions/query.svg?raw';
+	import ChevronDown from 'lucide-svelte/icons/chevron-down';
+
 	import SelectDB from '../SelectDB.svelte';
 	import { type CreateCellBaseProps } from './type';
-
-	import QueryIcon from '$lib/assets/notebook/actions/query.svg?raw';
-	import { ChevronDown } from 'lucide-svelte';
 
 	interface CreateMarkdownCellProps extends CreateCellBaseProps {
 		open?: boolean;

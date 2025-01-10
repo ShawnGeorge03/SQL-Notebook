@@ -1,18 +1,19 @@
 <script lang="ts">
-	import * as DropdownMenu from '$lib/components/ui/dropdown-menu/index.js';
-	import { ScrollArea } from '$lib/components/ui/scroll-area/index.js';
-	import { DBWorkerService } from '$lib/db/worker/service';
-	import type { DBWorkerCommand } from '$lib/db/worker/types';
-	import { cn } from '$lib/utils';
 	import { useId } from 'bits-ui';
 	import { onMount } from 'svelte';
 
 	import CloseDBIcon from '$lib/assets/db/actions/close-db.svg?raw';
 	import CreateDBIcon from '$lib/assets/db/actions/create-db.svg?raw';
+	import TerminateDBIcon from '$lib/assets/db/actions/drop-db.svg?raw';
 	import LoadDBIcon from '$lib/assets/db/actions/load-db.svg?raw';
 	import QueryDBIcon from '$lib/assets/db/actions/query-db.svg?raw';
-	import TerminateDBIcon from '$lib/assets/db/actions/terminate-db.svg?raw';
-	import { Bell } from 'lucide-svelte';
+	import Bell from 'lucide-svelte/icons/bell';
+
+	import * as DropdownMenu from '$lib/components/ui/dropdown-menu/index.js';
+	import { ScrollArea } from '$lib/components/ui/scroll-area/index.js';
+	import { DBWorkerService } from '$lib/db/worker/service';
+	import type { DBWorkerCommand } from '$lib/db/worker/types';
+	import { cn } from '$lib/utils';
 
 	interface Notification {
 		id: string;
@@ -42,7 +43,7 @@
 			title: 'Successfully Closed Database',
 			description: `Database ${dbName} has been closed successfully.`
 		}),
-		TERMINATE_DB: (dbName: string) => ({
+		DROP_DB: (dbName: string) => ({
 			title: 'Successfully Terminated Database',
 			description: `Database ${dbName} has been terminated successfully.`
 		})
@@ -65,7 +66,7 @@
 			title: 'Failed to close Database',
 			description: message
 		}),
-		TERMINATE_DB: (message: string) => ({
+		DROP_DB: (message: string) => ({
 			title: 'Failed to terminate Database',
 			description: message
 		})
@@ -80,7 +81,7 @@
 					case 'CREATE_DB':
 					case 'LOAD_DB':
 					case 'CLOSE_DB':
-					case 'TERMINATE_DB':
+					case 'DROP_DB':
 						notifications.push({
 							id: useId(),
 							status: response.status,
@@ -102,7 +103,7 @@
 					case 'CREATE_DB':
 					case 'LOAD_DB':
 					case 'CLOSE_DB':
-					case 'TERMINATE_DB':
+					case 'DROP_DB':
 						notifications.push({
 							id: useId(),
 							status: response.status,
@@ -164,7 +165,7 @@
 							<span class="h-6 w-6 text-white">{@html QueryDBIcon}</span>
 						{:else if command === 'CLOSE_DB'}
 							<span class="h-6 w-6 text-white">{@html CloseDBIcon}</span>
-						{:else if command === 'TERMINATE_DB'}
+						{:else if command === 'DROP_DB'}
 							<span class="h-6 w-6 text-white">{@html TerminateDBIcon}</span>
 						{/if}
 					</span>
