@@ -72,12 +72,7 @@ const getActiveDBs = async () => {
 		});
 };
 
-const createDB = async (
-	port: MessagePort,
-	dbName: string,
-	engine: DBEngine,
-	persistent: boolean
-): Promise<SuccessResponseData['CREATE_DB'] | ErrorResponseData['CREATE_DB']> => {
+const createDB = async (dbName: string, engine: DBEngine, persistent: boolean): Promise<SuccessResponseData['CREATE_DB'] | ErrorResponseData['CREATE_DB']> => {
 	if (!dbName || dbName.trim() === '')
 		return {
 			name: 'INVALID_ARGS',
@@ -184,10 +179,7 @@ const createDB = async (
 		});
 };
 
-const loadDB = async (
-	port: MessagePort,
-	dbName: string
-): Promise<SuccessResponseData['LOAD_DB'] | ErrorResponseData['LOAD_DB']> => {
+const loadDB = async (dbName: string): Promise<SuccessResponseData['LOAD_DB'] | ErrorResponseData['LOAD_DB']> => {
 	if (dbName in DBS)
 		return {
 			name: 'DB_IN_USE',
@@ -238,12 +230,7 @@ const loadDB = async (
 	return { dbName };
 };
 
-const execQuery = async (
-	port: MessagePort,
-	id: string,
-	dbName: string,
-	query: string
-): Promise<SuccessResponseData['EXEC_QUERY'] | ErrorResponseData['EXEC_QUERY']> => {
+const execQuery = async (id: string, dbName: string, query: string): Promise<SuccessResponseData['EXEC_QUERY'] | ErrorResponseData['EXEC_QUERY']> => {
 	if (!(dbName in DBS))
 		return {
 			id,
@@ -276,10 +263,7 @@ const execQuery = async (
 	}
 };
 
-const closeDB = async (
-	port: MessagePort,
-	dbName: string
-): Promise<SuccessResponseData['CLOSE_DB'] | ErrorResponseData['CLOSE_DB']> => {
+const closeDB = async (dbName: string): Promise<SuccessResponseData['CLOSE_DB'] | ErrorResponseData['CLOSE_DB']> => {
 	if (!(dbName in DBS))
 		return {
 			name: 'DB_NOT_IN_USE',
@@ -331,25 +315,25 @@ self.onconnect = async (event: MessageEvent) => {
 			}
 			case 'CREATE_DB': {
 				const { dbName, engine, persistent } = data.args;
-				const response = await createDB(port, dbName, engine, persistent);
+				const response = await createDB(dbName, engine, persistent);
 				postResponse(port, 'CREATE_DB', response);
 				break;
 			}
 			case 'LOAD_DB': {
 				const { dbName } = data.args;
-				const response = await loadDB(port, dbName);
+				const response = await loadDB(dbName);
 				postResponse(port, 'LOAD_DB', response);
 				break;
 			}
 			case 'EXEC_QUERY': {
 				const { id, dbName, query } = data.args;
-				const response = await execQuery(port, id, dbName, query);
+				const response = await execQuery(id, dbName, query);
 				postResponse(port, 'EXEC_QUERY', response);
 				break;
 			}
 			case 'CLOSE_DB': {
 				const { dbName } = data.args;
-				const response = await closeDB(port, dbName);
+				const response = await closeDB(dbName);
 				postResponse(port, 'CLOSE_DB', response);
 				break;
 			}
@@ -412,15 +396,15 @@ self.onconnect = async (event: MessageEvent) => {
 
 					const query = await response.text();
 
-					const dbResult = await createDB(port, dbName, engine, false);
+					const dbResult = await createDB(dbName, engine, false);
 					if ('name' in dbResult) {
 						postError(port, 'CREATE_DEMO', dbResult);
 						return;
 					}
 
-					const queryResult = await execQuery(port, nanoid(), dbName, query);
+					const queryResult = await execQuery(nanoid(), dbName, query);
 					if ('name' in queryResult) {
-						await closeDB(port, dbName);
+						await closeDB(dbName);
 						postError(port, 'CREATE_DEMO', queryResult);
 						return;
 					}
@@ -433,7 +417,7 @@ self.onconnect = async (event: MessageEvent) => {
 						cause: `Supported Sample Database for ${DBEngine.PGSQL}, ${DBEngine.SQLITE}`
 					});
 
-					if (DBS[dbName]) await closeDB(port, dbName);
+					if (DBS[dbName]) await closeDB(dbName);
 				}
 
 				break;
