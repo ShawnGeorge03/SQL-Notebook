@@ -10,16 +10,7 @@
 	import CreateDBIcon from '$lib/assets/db/actions/create-db.svg?raw';
 	import DropDBIcon from '$lib/assets/db/actions/drop-db.svg?raw';
 	import LoadDBIcon from '$lib/assets/db/actions/load-db.svg?raw';
-	import {
-		BadgePlus,
-		CopyPlus,
-		Ellipsis,
-		Info,
-		NotebookText,
-		Pencil,
-		Plus,
-		Trash
-	} from 'lucide-svelte';
+	import { BadgePlus, CopyPlus, Ellipsis, Info, NotebookText, Pencil, Plus } from 'lucide-svelte';
 
 	import * as NotebookAction from '$lib/components/Notebook/AppSidebar/Left/Notebook/';
 	import { duplicateNotebook } from '$lib/indexeddb/notebook';
@@ -106,7 +97,9 @@
 									<Pencil /> Rename
 								</DropdownMenu.Item>
 								<DropdownMenu.Item>
-									<Trash /> Delete
+									{#snippet child()}
+										<NotebookAction.Delete id={notebook.id} />
+									{/snippet}
 								</DropdownMenu.Item>
 								<DropdownMenu.Item>
 									<Info /> Info
