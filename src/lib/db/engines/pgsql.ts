@@ -10,6 +10,7 @@ import {
 	// @ts-ignore
 	'https://cdn.jsdelivr.net/npm/@electric-sql/pglite@0.2.15/dist/index.min.js';
 
+import iDB from '$lib/indexeddb/schema';
 import { NotebookType, type DBOptions, type DBStrategy, type QueryResult } from './types';
 import { isValidQuery } from './utils';
 
@@ -44,8 +45,11 @@ export class PostgreSQL implements DBStrategy {
 	 */
 	async init(): Promise<void> {
 		try {
+			await iDB.databases.update(this.#dbName, { status: 'LOADING' });
 			this.#db = await PGlite.create(this.#dbOptions);
+			await iDB.databases.update(this.#dbName, { status: 'AVAILABLE' });
 		} catch (error) {
+			iDB.databases.update(this.#dbName, { status: 'UNAVAILABLE' });
 			const initError =
 				error instanceof Error
 					? error
