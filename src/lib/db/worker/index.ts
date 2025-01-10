@@ -126,7 +126,7 @@ const createDB = async (dbName: string, engine: DBEngine, persistent: boolean): 
 		};
 	}
 
-	const curr = new Date().toLocaleString();
+	const curr = new Date().toISOString();
 
 	return await iDB
 		.transaction('readwrite', iDB.databases, async () => {
@@ -222,7 +222,7 @@ const loadDB = async (dbName: string): Promise<DBWorkerSuccessResponse['LOAD_DB'
 
 	DBS[dbName] = {
 		db,
-		modifiedOn: new Date().toLocaleString()
+		modifiedOn: new Date().toISOString()
 	};
 
 	await getAvailableDBs();
@@ -249,7 +249,7 @@ const execQuery = async (id: string, dbName: string, query: string): Promise<DBW
 			elapsed: performance.now() - startTime
 		};
 
-		DBS[dbName].modifiedOn = new Date().toLocaleString();
+		DBS[dbName].modifiedOn = new Date().toISOString();
 
 		return results;
 	} catch (error) {
