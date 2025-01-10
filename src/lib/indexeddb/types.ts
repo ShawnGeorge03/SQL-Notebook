@@ -10,8 +10,8 @@ export interface BaseTable {
 }
 
 type BaseDatabase = BaseTable & {
-	persistent: boolean
-	status: 'UNAVAILABLE' | 'LOADING' | 'AVAILABLE'
+	persistent: boolean;
+	status: 'UNAVAILABLE' | 'LOADING' | 'AVAILABLE';
 };
 
 export type Database =
@@ -28,7 +28,7 @@ type QueryCell = {
 		engine: DBEngine;
 		result?: QueryResult;
 	};
-}
+};
 
 type MarkdownCell = {
 	id: string;
@@ -37,7 +37,7 @@ type MarkdownCell = {
 		name: string;
 		text: string;
 	};
-}
+};
 
 export type NotebookCell = QueryCell | MarkdownCell;
 

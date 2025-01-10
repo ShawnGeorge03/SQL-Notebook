@@ -18,7 +18,8 @@ export class SQLite implements DBStrategy {
 	#dbName: string;
 	#dbOptions: DBOptions;
 	#sqlite3!: SQLiteAPI;
-	#dbKeywords = /\b(SELECT|INSERT|UPDATE|DELETE|CREATE|ALTER|DROP|WITH|BEGIN|END|PRAGMA|EXPLAIN|ANALYZE|ATTACH|DETACH|VACUUM|REINDEX|SAVEPOINT|RELEASE|ROLLBACK|COMMIT|CLUSTER|TRANSACTION)\b/gi;
+	#dbKeywords =
+		/\b(SELECT|INSERT|UPDATE|DELETE|CREATE|ALTER|DROP|WITH|BEGIN|END|PRAGMA|EXPLAIN|ANALYZE|ATTACH|DETACH|VACUUM|REINDEX|SAVEPOINT|RELEASE|ROLLBACK|COMMIT|CLUSTER|TRANSACTION)\b/gi;
 
 	/**
 	 * Creates a SQLite object.
@@ -38,7 +39,7 @@ export class SQLite implements DBStrategy {
 	 */
 	async init(): Promise<void> {
 		try {
-			await iDB.databases.update(this.#dbName, { status: 'LOADING' })
+			await iDB.databases.update(this.#dbName, { status: 'LOADING' });
 
 			const module = await SQLiteESMFactory();
 			this.#sqlite3 = WaSQLite.Factory(module);
@@ -76,8 +77,7 @@ export class SQLite implements DBStrategy {
 	async exec(query: string): Promise<QueryResult> {
 		if (!this.#db) throw new Error('Database not initialized');
 
-
-		isValidQuery(query, this.#dbKeywords)
+		isValidQuery(query, this.#dbKeywords);
 
 		return await this.#sqlite3
 			.exec(this.#db, 'BEGIN TRANSACTION;')
@@ -87,7 +87,7 @@ export class SQLite implements DBStrategy {
 				return data;
 			})
 			.catch(async (error) => {
-				await this.#sqlite3.exec(this.#db, 'ROLLBACK;')
+				await this.#sqlite3.exec(this.#db, 'ROLLBACK;');
 				if (error instanceof Error) {
 					throw new Error(error.cause ? `${error.message} (${error.cause})` : error.message);
 				}

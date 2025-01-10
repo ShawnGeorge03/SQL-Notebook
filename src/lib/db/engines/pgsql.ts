@@ -4,11 +4,10 @@ import {
 	IdbFs,
 	MemoryFS,
 	PGlite,
-	types,
-} from
+	types
 	// eslint-disable-next-line @typescript-eslint/ban-ts-comment
 	// @ts-ignore
-	'https://cdn.jsdelivr.net/npm/@electric-sql/pglite@0.2.15/dist/index.min.js';
+} from 'https://cdn.jsdelivr.net/npm/@electric-sql/pglite@0.2.15/dist/index.min.js';
 
 import iDB from '$lib/indexeddb/schema';
 import { NotebookType, type DBOptions, type DBStrategy, type QueryResult } from './types';
@@ -23,7 +22,8 @@ export class PostgreSQL implements DBStrategy {
 	#db!: PGlite;
 	#dbName: string;
 	#dbOptions: PGliteOptions;
-	#dbKeywords = /\b(SELECT|INSERT|UPDATE|DELETE|TRUNCATE|CREATE|ALTER|DROP|WITH|DO|BEGIN|END|DECLARE|EXECUTE|EXPLAIN|VACUUM|ANALYZE|GRANT|REVOKE)\b/gi;
+	#dbKeywords =
+		/\b(SELECT|INSERT|UPDATE|DELETE|TRUNCATE|CREATE|ALTER|DROP|WITH|DO|BEGIN|END|DECLARE|EXECUTE|EXPLAIN|VACUUM|ANALYZE|GRANT|REVOKE)\b/gi;
 
 	/**
 	 * Creates a PostgreSQL object.
@@ -79,7 +79,7 @@ export class PostgreSQL implements DBStrategy {
 			throw new Error('Database not initialized');
 		}
 
-		isValidQuery(query, this.#dbKeywords)
+		isValidQuery(query, this.#dbKeywords);
 
 		return this.#db.transaction(async (tx: Transaction) => {
 			try {

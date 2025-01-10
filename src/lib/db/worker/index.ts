@@ -72,7 +72,11 @@ const getActiveDBs = async () => {
 		});
 };
 
-const createDB = async (dbName: string, engine: DBEngine, persistent: boolean): Promise<DBWorkerSuccessResponse['CREATE_DB'] | DBWorkerErrorResponse['CREATE_DB']> => {
+const createDB = async (
+	dbName: string,
+	engine: DBEngine,
+	persistent: boolean
+): Promise<DBWorkerSuccessResponse['CREATE_DB'] | DBWorkerErrorResponse['CREATE_DB']> => {
 	if (!dbName || dbName.trim() === '')
 		return {
 			name: 'INVALID_ARGS',
@@ -179,7 +183,9 @@ const createDB = async (dbName: string, engine: DBEngine, persistent: boolean): 
 		});
 };
 
-const loadDB = async (dbName: string): Promise<DBWorkerSuccessResponse['LOAD_DB'] | DBWorkerErrorResponse['LOAD_DB']> => {
+const loadDB = async (
+	dbName: string
+): Promise<DBWorkerSuccessResponse['LOAD_DB'] | DBWorkerErrorResponse['LOAD_DB']> => {
 	if (dbName in DBS)
 		return {
 			name: 'DB_IN_USE',
@@ -230,7 +236,11 @@ const loadDB = async (dbName: string): Promise<DBWorkerSuccessResponse['LOAD_DB'
 	return { dbName };
 };
 
-const execQuery = async (id: string, dbName: string, query: string): Promise<DBWorkerSuccessResponse['EXEC_QUERY'] | DBWorkerErrorResponse['EXEC_QUERY']> => {
+const execQuery = async (
+	id: string,
+	dbName: string,
+	query: string
+): Promise<DBWorkerSuccessResponse['EXEC_QUERY'] | DBWorkerErrorResponse['EXEC_QUERY']> => {
 	if (!(dbName in DBS))
 		return {
 			id,
@@ -263,7 +273,9 @@ const execQuery = async (id: string, dbName: string, query: string): Promise<DBW
 	}
 };
 
-const closeDB = async (dbName: string): Promise<DBWorkerSuccessResponse['CLOSE_DB'] | DBWorkerErrorResponse['CLOSE_DB']> => {
+const closeDB = async (
+	dbName: string
+): Promise<DBWorkerSuccessResponse['CLOSE_DB'] | DBWorkerErrorResponse['CLOSE_DB']> => {
 	if (!(dbName in DBS))
 		return {
 			name: 'DB_NOT_IN_USE',
@@ -430,9 +442,8 @@ self.onconnect = async (event: MessageEvent) => {
 						tabWidth: 2,
 						language: engine === 'pgsql' ? 'postgresql' : engine === 'sqlite' ? 'sqlite' : 'sql',
 						keywordCase: 'upper',
-						logicalOperatorNewline: "after",
-
-					}
+						logicalOperatorNewline: 'after'
+					};
 
 					postSuccess(port, 'FORMAT_QUERY', {
 						id,
@@ -450,4 +461,4 @@ self.onconnect = async (event: MessageEvent) => {
 	};
 };
 
-export { };
+export {};

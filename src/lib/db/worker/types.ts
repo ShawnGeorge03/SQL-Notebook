@@ -1,4 +1,4 @@
-import type { QueryResult } from "../engines/types";
+import type { QueryResult } from '../engines/types';
 
 /** Supported database engines */
 export enum DBEngine {
