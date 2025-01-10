@@ -44,7 +44,7 @@ export type DBWorkerMessages =
 	| Message<'FORMAT_QUERY', { id: string; engine: DBEngine; query: string }>;
 
 /** Success response data for each command */
-export interface SuccessResponseData {
+export interface DBWorkerSuccessResponse {
 	GET_ACTIVE_DBS: { activeDBs: DBInfo[] };
 	GET_AVAILABLE_DBS: { availableDBs: DBInfo[] };
 	CREATE_DB: { dbName: string };
@@ -57,7 +57,7 @@ export interface SuccessResponseData {
 }
 
 /** Error response data for each command */
-export interface ErrorResponseData {
+export interface DBWorkerErrorResponse {
 	GET_ACTIVE_DBS: Error;
 	GET_AVAILABLE_DBS: Error;
 	CREATE_DB: Error;
@@ -70,20 +70,19 @@ export interface ErrorResponseData {
 }
 
 /** Response format for each command */
-type Response<C extends DBWorkerCommand> =
-	| { status: 'LOADING'; command: C }
-	| { status: 'SUCCESS'; command: C; data: SuccessResponseData[C] }
-	| { status: 'ERROR'; command: C; data: ErrorResponseData[C] };
+export type DBWorkerResponse<C extends DBWorkerCommand> =
+	| { status: 'SUCCESS'; command: C; data: DBWorkerSuccessResponse[C] }
+	| { status: 'ERROR'; command: C; data: DBWorkerErrorResponse[C] };
 
 /** Consolidated worker responses */
 export type DBWorkerResponses =
 	| { status: 'INITIALIZING' | 'INITIALIZED' }
-	| Response<'GET_ACTIVE_DBS'>
-	| Response<'GET_AVAILABLE_DBS'>
-	| Response<'CREATE_DB'>
-	| Response<'LOAD_DB'>
-	| Response<'EXEC_QUERY'>
-	| Response<'CLOSE_DB'>
-	| Response<'DROP_DB'>
-	| Response<'CREATE_DEMO'>
-	| Response<'FORMAT_QUERY'>;
+	| DBWorkerResponse<'GET_ACTIVE_DBS'>
+	| DBWorkerResponse<'GET_AVAILABLE_DBS'>
+	| DBWorkerResponse<'CREATE_DB'>
+	| DBWorkerResponse<'LOAD_DB'>
+	| DBWorkerResponse<'EXEC_QUERY'>
+	| DBWorkerResponse<'CLOSE_DB'>
+	| DBWorkerResponse<'DROP_DB'>
+	| DBWorkerResponse<'CREATE_DEMO'>
+	| DBWorkerResponse<'FORMAT_QUERY'>;

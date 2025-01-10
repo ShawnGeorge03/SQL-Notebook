@@ -6,7 +6,11 @@
 
 	import { PostgreSQL, sql, SQLite, StandardSQL } from '@codemirror/lang-sql';
 
-	import type { DBEngine, ErrorResponseData, SuccessResponseData } from '$lib/db/worker/types';
+	import type {
+		DBEngine,
+		DBWorkerErrorResponse,
+		DBWorkerSuccessResponse
+	} from '$lib/db/worker/types';
 
 	import { DBWorkerService } from '$lib/db/worker/service';
 	import { onMount } from 'svelte';
@@ -26,8 +30,8 @@
 		dbName: string;
 		engine: DBEngine;
 		query: string;
-		result?: Omit<SuccessResponseData['EXEC_QUERY'], 'id'>;
-		error?: Omit<ErrorResponseData['EXEC_QUERY'], 'id'>;
+		result?: Omit<DBWorkerSuccessResponse['EXEC_QUERY'], 'id'>;
+		error?: Omit<DBWorkerErrorResponse['EXEC_QUERY'], 'id'>;
 		moveUpCell: (position: number) => void;
 		moveDownCell: (position: number) => void;
 		copyCell: (position: number) => void;

@@ -8,9 +8,9 @@ import type { DBStrategy } from '../engines/types';
 import {
 	DBEngine,
 	type DBInfo,
+	type DBWorkerErrorResponse,
 	type DBWorkerMessages,
-	type ErrorResponseData,
-	type SuccessResponseData
+	type DBWorkerSuccessResponse
 } from './types';
 import { broadcastResponse, postError, postResponse, postStatus, postSuccess } from './utils';
 
@@ -72,7 +72,7 @@ const getActiveDBs = async () => {
 		});
 };
 
-const createDB = async (dbName: string, engine: DBEngine, persistent: boolean): Promise<SuccessResponseData['CREATE_DB'] | ErrorResponseData['CREATE_DB']> => {
+const createDB = async (dbName: string, engine: DBEngine, persistent: boolean): Promise<DBWorkerSuccessResponse['CREATE_DB'] | DBWorkerErrorResponse['CREATE_DB']> => {
 	if (!dbName || dbName.trim() === '')
 		return {
 			name: 'INVALID_ARGS',
@@ -179,7 +179,7 @@ const createDB = async (dbName: string, engine: DBEngine, persistent: boolean): 
 		});
 };
 
-const loadDB = async (dbName: string): Promise<SuccessResponseData['LOAD_DB'] | ErrorResponseData['LOAD_DB']> => {
+const loadDB = async (dbName: string): Promise<DBWorkerSuccessResponse['LOAD_DB'] | DBWorkerErrorResponse['LOAD_DB']> => {
 	if (dbName in DBS)
 		return {
 			name: 'DB_IN_USE',
@@ -230,7 +230,7 @@ const loadDB = async (dbName: string): Promise<SuccessResponseData['LOAD_DB'] | 
 	return { dbName };
 };
 
-const execQuery = async (id: string, dbName: string, query: string): Promise<SuccessResponseData['EXEC_QUERY'] | ErrorResponseData['EXEC_QUERY']> => {
+const execQuery = async (id: string, dbName: string, query: string): Promise<DBWorkerSuccessResponse['EXEC_QUERY'] | DBWorkerErrorResponse['EXEC_QUERY']> => {
 	if (!(dbName in DBS))
 		return {
 			id,
@@ -263,7 +263,7 @@ const execQuery = async (id: string, dbName: string, query: string): Promise<Suc
 	}
 };
 
-const closeDB = async (dbName: string): Promise<SuccessResponseData['CLOSE_DB'] | ErrorResponseData['CLOSE_DB']> => {
+const closeDB = async (dbName: string): Promise<DBWorkerSuccessResponse['CLOSE_DB'] | DBWorkerErrorResponse['CLOSE_DB']> => {
 	if (!(dbName in DBS))
 		return {
 			name: 'DB_NOT_IN_USE',
