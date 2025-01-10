@@ -21,17 +21,18 @@
 	let notebookExists = $state(false);
 
 	onMount(async () => {
-		if (!notebookID) {
-			loading = false;
-			return;
+		if (notebookID) {
+			const notebook = await iDB.notebooks.get(notebookID);
+			if (notebook) {
+				cells = notebook.cells;
+				notebookExists = true;
+			}
 		}
-		const notebook = await iDB.notebooks.get(notebookID);
-		if (notebook) cells = notebook.cells;
-		notebookExists = true;
+		loading = false;
 	});
 
 	$effect(() => {
-		if (!notebookID) return;
+		if (!notebookID || !notebookExists) return;
 		const changes = $state.snapshot(cells);
 		iDB.notebooks.update(notebookID, {
 			cells: changes,
@@ -142,7 +143,10 @@
 						{addNewCell}
 					/>
 				{/each}
-			{:else if loading}
+			{:else if !loading && !notebookExists}
+				<h1 class="text-3xl font-bold">Welcom to your project!</h1>
+				<p class="text-xl">You can start by creating or opening a notebook in the left sidebar</p>
+			{:else}
 				{#each { length: 6 }}
 					<div class="w-[400px] py-4 md:w-[500px] lg:w-[700px] xl:w-[1000px]">
 						<div class="h-10 rounded-t-xl bg-muted"></div>
@@ -161,9 +165,6 @@
 						<div class="h-10 rounded-b-xl bg-muted"></div>
 					</div>
 				{/each}
-			{:else}
-				<h1 class="text-3xl font-bold">Welcom to your project!</h1>
-				<p class="text-xl">You can start by creating or opening a notebook in the left sidebar</p>
 			{/if}
 		</div>
 		<!-- <footer class="fixed bottom-0 z-20 w-[100%] bg-blue-500 p-4">(footer)</footer> -->
