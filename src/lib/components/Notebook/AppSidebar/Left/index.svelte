@@ -18,8 +18,11 @@
 	import type { Database } from '$lib/indexeddb/types';
 	import { onMount } from 'svelte';
 	import DatabaseIcon from '../../DatabaseIcon.svelte';
+	import preferences from '../../Header/Settings/store';
 	import * as DatabaseAction from './Database/';
 	import * as NotebookAction from './Notebook/';
+
+	let { notebookID } = $props();
 
 	let notebookLoading = $state(true);
 	let databaseLoading = $state(true);
@@ -87,7 +90,12 @@
 						<Sidebar.MenuItem>
 							<DropdownMenu.Trigger>
 								{#snippet child({ props })}
-									<Sidebar.MenuButton {...props}>
+									<Sidebar.MenuButton
+										{...props}
+										class={notebookID == notebook.id
+											? 'bg-sidebar-accent text-sidebar-accent-foreground'
+											: ''}
+									>
 										{notebook.name}
 										<Ellipsis class="ml-auto" />
 									</Sidebar.MenuButton>
@@ -95,8 +103,16 @@
 							</DropdownMenu.Trigger>
 							<DropdownMenu.Content side="right" align="start" class="min-w-56 rounded-lg">
 								<DropdownMenu.Item>
-									<NotebookText />
-									Open Notebook
+									<a
+										href="notebooks/?id={notebook.id}"
+										target={$preferences.general.openNotebooksInNewWindow ? '_blank' : '_self'}
+										rel="noopener noreferrer"
+									>
+										<DropdownMenu.Item>
+											<NotebookText class="mr-2" />
+											Open Notebook
+										</DropdownMenu.Item>
+									</a>
 								</DropdownMenu.Item>
 								<DropdownMenu.Item onclick={async () => await duplicateNotebook(notebook.id)}>
 									<CopyPlus /> Duplicate
