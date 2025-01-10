@@ -14,8 +14,7 @@
 	import { Actions, Editor } from '../Cell';
 
 	import { dev } from '$app/environment';
-	import PostgreSQLIcon from '$lib/assets/db/engines/postgresql.svg?raw';
-	import SQLiteIcon from '$lib/assets/db/engines/sqlite.svg?raw';
+	import DatabaseIcon from '$lib/components/Notebook/DatabaseIcon.svelte';
 	import { Button } from '$lib/components/ui/button';
 	import { ChevronDown, PaintbrushVertical } from 'lucide-svelte';
 
@@ -129,16 +128,10 @@
 				}}
 			>
 				<div class="flex items-center gap-3">
-					<div class="float-left">
-						{#if engine === 'pgsql'}
-							<span class="h-10 w-10" aria-hidden="true">{@html PostgreSQLIcon}</span>
-						{:else if engine === 'sqlite'}
-							<span class="h-10 w-10" aria-hidden="true">{@html SQLiteIcon}</span>
-						{/if}
-					</div>
+					<DatabaseIcon class="float-left h-6 w-6" {engine} />
 					<div class="flex max-w-32">
 						<p class="overflow-hidden text-ellipsis whitespace-nowrap">{dbName}</p>
-						<span class="ml-2 transition-transform duration-200 {open ? 'rotate-180' : ''}">
+						<span class="ml-2 transition-transform duration-200 {open && 'rotate-180'}">
 							<ChevronDown />
 						</span>
 					</div>
