@@ -25,16 +25,15 @@ export const createNotebook = (name: string) => {
 export const duplicateNotebook = async (id: string) => {
     const notebook = await iDB.notebooks.get(id);
 
-    if (!notebook) return;
-
-    addNotebook({
-        id: nanoid(),
-        name: notebook.name,
-        createdBy: 'user',
-        createdOn: new Date().toISOString(),
-        modifiedOn: new Date().toISOString(),
-        cells: notebook.cells
-    });
+    if (notebook)
+        addNotebook({
+            id: nanoid(),
+            name: notebook.name,
+            createdBy: 'user',
+            createdOn: new Date().toISOString(),
+            modifiedOn: new Date().toISOString(),
+            cells: notebook.cells
+        });
 };
 
 export const renameNotebook = async (id: string, name: string) => {

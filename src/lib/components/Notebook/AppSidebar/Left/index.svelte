@@ -22,6 +22,7 @@
 	} from 'lucide-svelte';
 
 	import * as NotebookAction from '$lib/components/Notebook/AppSidebar/Left/Notebook/';
+	import { duplicateNotebook } from '$lib/indexeddb/notebook';
 	import iDB from '$lib/indexeddb/schema';
 	import type { Database, Notebook } from '$lib/indexeddb/types';
 
@@ -98,7 +99,9 @@
 									<NotebookText />
 									Open Notebook
 								</DropdownMenu.Item>
-								<DropdownMenu.Item><CopyPlus /> Duplicate</DropdownMenu.Item>
+								<DropdownMenu.Item onclick={async () => await duplicateNotebook(notebook.id)}>
+									<CopyPlus /> Duplicate
+								</DropdownMenu.Item>
 								<DropdownMenu.Item>
 									<Pencil /> Rename
 								</DropdownMenu.Item>
