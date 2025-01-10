@@ -29,6 +29,8 @@
 
 **Live Demo**: [https://sql--notebook.vercel.app/](https://sql--notebook.vercel.app/)
 
+**Demo Video**: [https://youtu.be/z0T4EDMFEvo](https://youtu.be/z0T4EDMFEvo)
+
 ---
 
 ## Motivation
