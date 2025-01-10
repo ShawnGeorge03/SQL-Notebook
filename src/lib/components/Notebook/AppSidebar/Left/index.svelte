@@ -13,11 +13,9 @@
 	import { BadgePlus, CopyPlus, Ellipsis, Info, NotebookText, Pencil, Plus } from 'lucide-svelte';
 
 	import * as NotebookAction from '$lib/components/Notebook/AppSidebar/Left/Notebook/';
-	import { duplicateNotebook } from '$lib/indexeddb/notebook';
+	import { duplicateNotebook, type NotebookStore } from '$lib/indexeddb/notebook';
 	import iDB from '$lib/indexeddb/schema';
-	import type { Database, Notebook } from '$lib/indexeddb/types';
-
-	type NotebookStore = Omit<Notebook, 'cells'>;
+	import type { Database } from '$lib/indexeddb/types';
 
 	let notebookLoading = $state(true);
 	let databaseLoading = $state(true);
