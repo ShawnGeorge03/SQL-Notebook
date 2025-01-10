@@ -10,7 +10,7 @@
 	import CreateDBIcon from '$lib/assets/db/actions/create-db.svg?raw';
 	import DropDBIcon from '$lib/assets/db/actions/drop-db.svg?raw';
 	import LoadDBIcon from '$lib/assets/db/actions/load-db.svg?raw';
-	import { BadgePlus, CircleDot, CopyPlus, Ellipsis, Info, NotebookText } from 'lucide-svelte';
+	import { BadgePlus, CircleDot, CopyPlus, Ellipsis, NotebookText } from 'lucide-svelte';
 
 	import { duplicateNotebook, type NotebookStore } from '$lib/indexeddb/notebook';
 	import iDB from '$lib/indexeddb/schema';
@@ -189,7 +189,9 @@
 									</span> Drop
 								</DropdownMenu.Item>
 								<DropdownMenu.Item>
-									<Info class="ml-1" /> Info
+									{#snippet child()}
+										<DatabaseAction.Info {database} />
+									{/snippet}
 								</DropdownMenu.Item>
 							</DropdownMenu.Content>
 						</Sidebar.MenuItem>
