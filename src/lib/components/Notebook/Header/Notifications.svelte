@@ -7,7 +7,7 @@
 	import TerminateDBIcon from '$lib/assets/db/actions/drop-db.svg?raw';
 	import LoadDBIcon from '$lib/assets/db/actions/load-db.svg?raw';
 	import QueryDBIcon from '$lib/assets/db/actions/query-db.svg?raw';
-	import Bell from 'lucide-svelte/icons/bell.svelte';
+	import Bell from 'lucide-svelte/icons/bell';
 
 	import * as DropdownMenu from '$lib/components/ui/dropdown-menu/index.js';
 	import { ScrollArea } from '$lib/components/ui/scroll-area/index.js';
