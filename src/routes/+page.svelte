@@ -155,9 +155,7 @@
 			id="features"
 			class="px-7vw py-25vh flex flex-col gap-3 border-t border-gray-200 dark:border-gray-700"
 		>
-			<h2 class="text-h2 mb-12 mb-4 text-center font-bold text-gray-900 dark:text-gray-100">
-				Features
-			</h2>
+			<h2 class="text-h2 mb-12 text-center font-bold text-gray-900 dark:text-gray-100">Features</h2>
 			<div class="grid gap-8 md:grid-cols-2 lg:grid-cols-3">
 				<div
 					class="group rounded-xl bg-white p-8 shadow-sm transition-all hover:shadow-md dark:bg-gray-800"
