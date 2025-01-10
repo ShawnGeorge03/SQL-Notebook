@@ -109,13 +109,6 @@
 		<section id="hero" class="py-25 vhpy-20 flex flex-col gap-3 px-7vw">
 			<div class="py-20 text-center">
 				<div class="mb-6 text-title font-bold text-gray-900 dark:text-gray-100">SQL Notebook</div>
-				<div class="rounded-md bg-accent">
-					<img
-						src="src/lib/assets/light_hero.png"
-						alt="SQL Notebook"
-						class="shadow-color-gray-500 z-9 mx-auto rounded-md p-3 pb-2 drop-shadow-2xl"
-					/>
-				</div>
 
 				<p class="mx-auto mb-8 max-w-2xl text-xl text-gray-600 dark:text-gray-400">
 					Run PostgreSQL and SQLite directly in your browser with full SQL support and persistent
@@ -394,12 +387,7 @@
 					class="rounded-xl bg-white p-8 shadow-sm transition-all hover:shadow-md dark:bg-gray-800"
 				>
 					<div class="mb-6 flex items-center">
-						<img
-							src="src/lib/assets/shawn.webp?height=96&width=96"
-							alt="Shawn Santhoshgeorge"
-							class="h-16 w-16 rounded-full"
-						/>
-						<div class="ml-4">
+						<div>
 							<h3 class="mb-2.5 text-h3 font-semibold text-gray-900 dark:text-gray-100">
 								Shawn Santhoshgeorge
 							</h3>
@@ -505,12 +493,7 @@
 					class="rounded-xl bg-white p-8 shadow-sm transition-all hover:shadow-md dark:bg-gray-800"
 				>
 					<div class="mb-6 flex items-center">
-						<img
-							src="src/lib/assets/adi.webp?height=96&width=96"
-							alt="Aditya Kulkarni"
-							class="h-16 w-16 rounded-full"
-						/>
-						<div class="ml-4">
+						<div>
 							<h3 class="mb-2.5 text-h3 font-semibold text-gray-900 dark:text-gray-100">
 								Aditya Kulkarni
 							</h3>
