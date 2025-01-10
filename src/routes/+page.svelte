@@ -1,53 +1,119 @@
+<script>
+	import ThemeToggle from '$lib/components/Notebook/Header/ThemeToggle.svelte';
+
+	let isMenuOpen = false;
+
+	const toggleMenu = () => {
+		isMenuOpen = !isMenuOpen;
+	};
+</script>
+
 <nav class="bg-white shadow dark:bg-gray-900">
 	<div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-		<div class="flex h-16 items-center justify-between">
+		<div class="flex h-16 items-center">
+			<!-- Logo -->
 			<div class="flex items-center">
 				<div class="flex-shrink-0">
 					<img
-						class="block h-40 w-40 dark:hidden"
+						class="block h-40 w-auto dark:hidden"
 						src="src/lib/assets/logo_light.svg"
 						alt="Logo (light)"
 					/>
 					<img
-						class="hidden h-40 w-40 dark:block"
+						class="hidden h-40 w-auto dark:block"
 						src="src/lib/assets/logo_dark.svg"
 						alt="Logo (dark)"
 					/>
 				</div>
-				<div class="hidden md:block">
-					<div class="ml-10 flex items-baseline space-x-4">
-						<a
-							href="/"
-							class="rounded-md px-3 py-2 text-sm font-medium text-gray-900 hover:text-gray-700
-						   dark:text-gray-100 dark:hover:text-gray-300">Home</a
-						>
-						<a
-							href="/notebooks"
-							class="rounded-md px-3 py-2 text-sm font-medium text-gray-900 hover:text-gray-700
-						   dark:text-gray-100 dark:hover:text-gray-300">Notebooks</a
-						>
-						<a
-							href="#features"
-							class="rounded-md px-3 py-2 text-sm font-medium text-gray-900 hover:text-gray-700
-						   dark:text-gray-100 dark:hover:text-gray-300">Features</a
-						>
-						<a
-							href="#contributors"
-							class="rounded-md px-3 py-2 text-sm font-medium text-gray-900 hover:text-gray-700
-						   dark:text-gray-100 dark:hover:text-gray-300">Contributors</a
-						>
-					</div>
+			</div>
+
+			<!-- Hamburger Menu Button (visible on mobile) -->
+			<div class="flex md:hidden">
+				<button
+					onclick={toggleMenu}
+					class="inline-flex items-center justify-center rounded-md p-2 text-gray-500 hover:bg-gray-100 hover:text-gray-900 focus:outline-none dark:text-gray-400 dark:hover:bg-gray-800 dark:hover:text-white"
+					aria-controls="mobile-menu"
+					aria-expanded={isMenuOpen}
+				>
+					<span class="sr-only">Open main menu</span>
+					<!-- Hamburger Icon -->
+					<img
+						src="src/lib/assets/main/hamburger.svg"
+						alt="Menu Icon"
+						class={`h-6 w-6 ${isMenuOpen ? 'hidden' : 'block'}`}
+					/>
+					<!-- Close Icon -->
+					<img
+						src="src/lib/assets/main/close.svg"
+						alt="Close Icon"
+						class={`h-6 w-6 ${isMenuOpen ? 'block' : 'hidden'}`}
+					/>
+				</button>
+			</div>
+
+			<!-- Desktop Navigation -->
+			<div class="hidden md:block">
+				<div class="ml-2 flex items-baseline space-x-4">
+					<a
+						href="/"
+						class="rounded-md px-3 py-2 text-sm font-medium text-gray-900 hover:text-gray-700 dark:text-gray-100 dark:hover:text-gray-300"
+						>Home</a
+					>
+					<a
+						href="#features"
+						class="rounded-md px-3 py-2 text-sm font-medium text-gray-900 hover:text-gray-700 dark:text-gray-100 dark:hover:text-gray-300"
+						>Features</a
+					>
+					<a
+						href="#contributors"
+						class="rounded-md px-3 py-2 text-sm font-medium text-gray-900 hover:text-gray-700 dark:text-gray-100 dark:hover:text-gray-300"
+						>Contributors</a
+					>
+					<a
+						href="#attributions"
+						class="block rounded-md px-3 py-2 text-base font-medium text-gray-900 hover:text-gray-700 dark:text-gray-100 dark:hover:text-gray-300"
+						>Attributions</a
+					>
 				</div>
 			</div>
+
+			<!-- Theme Toggle -->
+			<ThemeToggle class="ml-auto" />
+		</div>
+	</div>
+
+	<!-- Mobile Menu -->
+	<div id="mobile-menu" class={`md:hidden ${isMenuOpen ? 'block' : 'hidden'}`}>
+		<div class="space-y-1 px-2 pb-3 pt-2">
+			<a
+				href="/"
+				class="block rounded-md px-3 py-2 text-base font-medium text-gray-900 hover:text-gray-700 dark:text-gray-100 dark:hover:text-gray-300"
+				>Home</a
+			>
+			<a
+				href="#features"
+				class="block rounded-md px-3 py-2 text-base font-medium text-gray-900 hover:text-gray-700 dark:text-gray-100 dark:hover:text-gray-300"
+				>Features</a
+			>
+			<a
+				href="#contributors"
+				class="block rounded-md px-3 py-2 text-base font-medium text-gray-900 hover:text-gray-700 dark:text-gray-100 dark:hover:text-gray-300"
+				>Contributors</a
+			>
+			<a
+				href="#attributions"
+				class="block rounded-md px-3 py-2 text-base font-medium text-gray-900 hover:text-gray-700 dark:text-gray-100 dark:hover:text-gray-300"
+				>Attributions</a
+			>
 		</div>
 	</div>
 </nav>
 
 <body class="min-h-screen from-gray-50 to-white dark:from-gray-900 dark:to-black">
 	<main class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-		<section id="hero" class="py-20">
+		<section id="hero" class="px-7vw py-25 vhpy-20 flex flex-col gap-3">
 			<div class="py-20 text-center">
-				<h1 class="mb-6 text-5xl font-bold text-gray-900 dark:text-gray-100">SQL Notebook</h1>
+				<div class="text-title mb-6 font-bold text-gray-900 dark:text-gray-100">SQL Notebook</div>
 				<p class="mx-auto mb-8 max-w-2xl text-xl text-gray-600 dark:text-gray-400">
 					Run PostgreSQL and SQLite directly in your browser with full SQL support and persistent
 					storage.
@@ -59,7 +125,7 @@
 						 text-base font-medium text-white transition-colors
 						 hover:bg-blue-700 dark:hover:bg-blue-700"
 					>
-						Get Started
+						Notebooks
 					</a>
 					<a
 						href="https://github.com/ShawnGeorge03/SQL-Notebook?tab=readme-ov-file#readme"
@@ -80,19 +146,16 @@
 					<div
 						class="absolute inset-0 bg-gradient-to-tr from-blue-600/20 to-purple-600/20
 						 transition-opacity duration-300 group-hover:opacity-75"
-					>
-						<img
-							src="src/lib/assets/placeholder.svg?height=400&width=800"
-							alt="SQL Notebook Interface Preview"
-							class="h-auto w-full"
-						/>
-					</div>
+					></div>
 				</div>
 			</div>
 		</section>
 
-		<section id="features" class="border-t border-gray-200 py-20 dark:border-gray-700">
-			<h2 class="mb-12 text-center text-3xl font-bold text-gray-900 dark:text-gray-100">
+		<section
+			id="features"
+			class="px-7vw py-25vh flex flex-col gap-3 border-t border-gray-200 dark:border-gray-700"
+		>
+			<h2 class="text-h2 mb-12 mb-4 text-center font-bold text-gray-900 dark:text-gray-100">
 				Features
 			</h2>
 			<div class="grid gap-8 md:grid-cols-2 lg:grid-cols-3">
@@ -100,26 +163,16 @@
 					class="group rounded-xl bg-white p-8 shadow-sm transition-all hover:shadow-md dark:bg-gray-800"
 				>
 					<div
-						class="mb-4 flex h-12 w-12 items-center justify-center rounded-lg bg-blue-50 p-3
-						 transition-colors group-hover:bg-blue-100 dark:bg-blue-900/20 dark:group-hover:bg-blue-800"
+						class="mb-4 flex h-12 w-12 items-center justify-center rounded-lg bg-blue-50 p-3 text-blue-600 transition-colors
+						 group-hover:bg-blue-100 dark:bg-blue-900/20 dark:text-blue-400 dark:group-hover:bg-blue-800"
 					>
-						<svg
+						<img
+							src="src/lib/assets/main/db.svg"
+							alt="Database Icon"
 							class="h-6 w-6 text-blue-600 dark:text-blue-400"
-							fill="none"
-							stroke="currentColor"
-							viewBox="0 0 24 24"
-						>
-							<path
-								stroke-linecap="round"
-								stroke-linejoin="round"
-								stroke-width="2"
-								d="M4 7v10c0 2.21 3.582 4 8 4s8-1.79 8-4V7M4 7c0 2.21 3.582 4 8 4s8-1.79 8-4
-						 M4 7c0-2.21 3.582-4 8-4s8 1.79 8 4m0 5
-						 c0 2.21-3.582 4-8 4s-8-1.79-8-4"
-							></path>
-						</svg>
+						/>
 					</div>
-					<h3 class="mb-3 text-xl font-semibold text-gray-900 dark:text-gray-100">
+					<h3 class="text-h3 mb-2.5 font-semibold text-gray-900 dark:text-gray-100">
 						Local Database Instance
 					</h3>
 					<p class="leading-relaxed text-gray-600 dark:text-gray-400">
@@ -135,23 +188,13 @@
 						class="mb-4 flex h-12 w-12 items-center justify-center rounded-lg bg-blue-50 p-3
 						 transition-colors group-hover:bg-blue-100 dark:bg-blue-900/20 dark:group-hover:bg-blue-800"
 					>
-						<svg
+						<img
+							src="src/lib/assets/main/sql.svg"
+							alt="SQL Icon"
 							class="h-6 w-6 text-blue-600 dark:text-blue-400"
-							fill="none"
-							stroke="currentColor"
-							viewBox="0 0 24 24"
-						>
-							<path
-								stroke-linecap="round"
-								stroke-linejoin="round"
-								stroke-width="2"
-								d="M8 9l3 3-3 3m5 0h3M5 20h14
-						 a2 2 0 002-2V6a2 2 0 00-2-2H5
-						 a2 2 0 00-2 2v12a2 2 0 002 2z"
-							></path>
-						</svg>
+						/>
 					</div>
-					<h3 class="mb-3 text-xl font-semibold text-gray-900 dark:text-gray-100">
+					<h3 class="text-h3 mb-2.5 font-semibold text-gray-900 dark:text-gray-100">
 						Standard SQL Support
 					</h3>
 					<p class="leading-relaxed text-gray-600 dark:text-gray-400">
@@ -167,24 +210,13 @@
 						class="mb-4 flex h-12 w-12 items-center justify-center rounded-lg bg-blue-50 p-3
 						 transition-colors group-hover:bg-blue-100 dark:bg-blue-900/20 dark:group-hover:bg-blue-800"
 					>
-						<svg
+						<img
+							src="src/lib/assets/main/storage.svg"
+							alt="Storage Icon"
 							class="h-6 w-6 text-blue-600 dark:text-blue-400"
-							fill="none"
-							stroke="currentColor"
-							viewBox="0 0 24 24"
-						>
-							<path
-								stroke-linecap="round"
-								stroke-linejoin="round"
-								stroke-width="2"
-								d="M4 7v10
-						 c0 2.21 3.582 4 8 4s8-1.79 8-4V7
-						 M4 7c0 2.21 3.582 4 8 4s8-1.79 8-4
-						 M4 7c0-2.21 3.582-4 8-4s8 1.79 8 4"
-							></path>
-						</svg>
+						/>
 					</div>
-					<h3 class="mb-3 text-xl font-semibold text-gray-900 dark:text-gray-100">
+					<h3 class="text-h3 mb-2.5 font-semibold text-gray-900 dark:text-gray-100">
 						Database Persistence
 					</h3>
 					<p class="leading-relaxed text-gray-600 dark:text-gray-400">
@@ -200,26 +232,13 @@
 						class="mb-4 flex h-12 w-12 items-center justify-center rounded-lg bg-blue-50 p-3
 						 transition-colors group-hover:bg-blue-100 dark:bg-blue-900/20 dark:group-hover:bg-blue-800"
 					>
-						<svg
+						<img
+							src="src/lib/assets/main/terminal.svg"
+							alt="Terminal Icon"
 							class="h-6 w-6 text-blue-600 dark:text-blue-400"
-							fill="none"
-							stroke="currentColor"
-							viewBox="0 0 24 24"
-						>
-							<path
-								stroke-linecap="round"
-								stroke-linejoin="round"
-								stroke-width="2"
-								d="M9.75 17L9 20l-1 1h8
-						 l-1-1-.75-3M3 13h18M5 17h14
-						 a2 2 0 002-2V5
-						 a2 2 0 00-2-2H5
-						 a2 2 0 00-2 2v10
-						 a2 2 0 002 2z"
-							></path>
-						</svg>
+						/>
 					</div>
-					<h3 class="mb-3 text-xl font-semibold text-gray-900 dark:text-gray-100">
+					<h3 class="text-h3 mb-2.5 font-semibold text-gray-900 dark:text-gray-100">
 						Rich Code Editor
 					</h3>
 					<p class="leading-relaxed text-gray-600 dark:text-gray-400">
@@ -235,29 +254,13 @@
 						class="mb-4 flex h-12 w-12 items-center justify-center rounded-lg bg-blue-50 p-3
 						 transition-colors group-hover:bg-blue-100 dark:bg-blue-900/20 dark:group-hover:bg-blue-800"
 					>
-						<svg
+						<img
+							src="src/lib/assets/main/lock.svg"
+							alt="Lock Icon"
 							class="h-6 w-6 text-blue-600 dark:text-blue-400"
-							fill="none"
-							stroke="currentColor"
-							viewBox="0 0 24 24"
-						>
-							<path
-								stroke-linecap="round"
-								stroke-linejoin="round"
-								stroke-width="2"
-								d="M19 11H5m14 0
-						 a2 2 0 012 2v6
-						 a2 2 0 01-2 2H5
-						 a2 2 0 01-2-2v-6
-						 a2 2 0 012-2m14 0V9
-						 a2 2 0 00-2-2M5 11V9
-						 a2 2 0 012-2m0 0V5
-						 a2 2 0 012-2h6
-						 a2 2 0 012 2v2M7 7h10"
-							></path>
-						</svg>
+						/>
 					</div>
-					<h3 class="mb-3 text-xl font-semibold text-gray-900 dark:text-gray-100">
+					<h3 class="text-h3 mb-2.5 font-semibold text-gray-900 dark:text-gray-100">
 						Multiple Notebooks
 					</h3>
 					<p class="leading-relaxed text-gray-600 dark:text-gray-400">
@@ -273,28 +276,13 @@
 						class="mb-4 flex h-12 w-12 items-center justify-center rounded-lg bg-blue-50 p-3
 						 transition-colors group-hover:bg-blue-100 dark:bg-blue-900/20 dark:group-hover:bg-blue-800"
 					>
-						<svg
+						<img
+							src="src/lib/assets/main/undo.svg"
+							alt="Undo Icon"
 							class="h-6 w-6 text-blue-600 dark:text-blue-400"
-							fill="none"
-							stroke="currentColor"
-							viewBox="0 0 24 24"
-						>
-							<path
-								stroke-linecap="round"
-								stroke-linejoin="round"
-								stroke-width="2"
-								d="M8 16H6
-						 a2 2 0 01-2-2V6
-						 a2 2 0 012-2h8
-						 a2 2 0 012 2v2m-6 12h8
-						 a2 2 0 002-2v-8
-						 a2 2 0 00-2-2h-8
-						 a2 2 0 00-2 2v8
-						 a2 2 0 002 2z"
-							></path>
-						</svg>
+						/>
 					</div>
-					<h3 class="mb-3 text-xl font-semibold text-gray-900 dark:text-gray-100">
+					<h3 class="text-h3 mb-2.5 font-semibold text-gray-900 dark:text-gray-100">
 						Export/Import (Coming Soon)
 					</h3>
 					<p class="leading-relaxed text-gray-600 dark:text-gray-400">
@@ -306,8 +294,11 @@
 		</section>
 
 		<!-- Contributors Section -->
-		<section id="contributors" class="border-t border-gray-200 py-20 dark:border-gray-700">
-			<h2 class="mb-12 text-center text-3xl font-bold text-gray-900 dark:text-gray-100">
+		<section
+			id="contributors"
+			class="px-7vw py-25vh flex flex-col gap-3 border-t border-gray-200 dark:border-gray-700"
+		>
+			<h2 class="text-h2 mb-4 text-center font-bold text-gray-900 dark:text-gray-100">
 				Contributors
 			</h2>
 			<div class="grid gap-8 md:grid-cols-2">
@@ -321,7 +312,7 @@
 							class="h-16 w-16 rounded-full"
 						/>
 						<div class="ml-4">
-							<h3 class="text-xl font-semibold text-gray-900 dark:text-gray-100">
+							<h3 class="text-h3 mb-2.5 font-semibold text-gray-900 dark:text-gray-100">
 								Shawn Santhoshgeorge
 							</h3>
 							<p class="text-gray-600 dark:text-gray-400">Developer</p>
@@ -335,19 +326,12 @@
 							class="flex items-center text-gray-600 transition-colors hover:text-blue-600
 						   dark:text-gray-400 dark:hover:text-blue-300"
 						>
-							<svg class="mr-2 h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-								<path
-									stroke-linecap="round"
-									stroke-linejoin="round"
-									stroke-width="2"
-									d="M21 12a9 9 0 01-9 9m9-9
-						   a9 9 0 00-9-9m9 9H3
-						   m9 9a9 9 0 01-9-9m9 9
-						   c1.657 0 3-4.03 3-9s-1.343-9-3-9
-						   m0 18c-1.657 0-3-4.03-3-9
-						   s1.343-9 3-9m-9 9a9 9 0 019-9"
-								></path>
-							</svg>
+							<img
+								src="src/lib/assets/main/website.svg"
+								alt="Website Icon"
+								class="mr-2 h-5 w-5 transition-colors hover:fill-blue-600
+						   dark:stroke-gray-400 dark:hover:stroke-blue-300"
+							/>
 							Website
 						</a>
 						<a
@@ -357,33 +341,12 @@
 							class="flex items-center text-gray-600 transition-colors hover:text-blue-600
 						   dark:text-gray-400 dark:hover:text-blue-300"
 						>
-							<svg class="mr-2 h-5 w-5" fill="currentColor" viewBox="0 0 24 24">
-								<path
-									d="M12 0c-6.626 0-12 5.373-12 12
-						   0 5.302 3.438 9.8 8.207 11.387
-						   .599.111.793-.261.793-.577v-2.234
-						   c-3.338.726-4.033-1.416-4.033-1.416
-						   -.546-1.387-1.333-1.756-1.333-1.756
-						   -1.089-.745.083-.729.083-.729
-						   1.205.084 1.839 1.237 1.839 1.237
-						   1.07 1.834 2.807 1.304 3.492.997
-						   .107-.775.418-1.305.762-1.604
-						   -2.665-.305-5.467-1.334-5.467-5.931
-						   0-1.311.469-2.381 1.236-3.221
-						   -.124-.303-.535-1.524.117-3.176
-						   0 0 1.008-.322 3.301 1.23
-						   .957-.266 1.983-.399 3.003-.404
-						   1.02.005 2.047.138 3.006.404
-						   2.291-1.552 3.297-1.23 3.297-1.23
-						   .653 1.653.242 2.874.118 3.176
-						   .77.84 1.235 1.911 1.235 3.221
-						   0 4.609-2.807 5.624-5.479 5.921
-						   .43.372.823 1.102.823 2.222v3.293
-						   c0 .319.192.694.801.576
-						   4.765-1.589 8.199-6.086 8.199-11.386
-						   0-6.627-5.373-12-12-12z"
-								></path>
-							</svg>
+							<img
+								src="src/lib/assets/main/github.svg"
+								alt="GitHub Icon"
+								class="mr-2 h-5 w-5 transition-colors hover:fill-blue-600
+						   dark:stroke-gray-400 dark:hover:stroke-blue-300"
+							/>
 							GitHub
 						</a>
 						<a
@@ -393,19 +356,11 @@
 							class="flex items-center text-gray-600 transition-colors hover:text-blue-600
 						   dark:text-gray-400 dark:hover:text-blue-300"
 						>
-							<svg class="mr-2 h-5 w-5" fill="currentColor" viewBox="0 0 24 24">
-								<path
-									d="M19 0h-14c-2.761 0-5 2.239-5 5
-						   v14c0 2.761 2.239 5 5 5h14
-						   c2.762 0 5-2.239 5-5v-14
-						   c0-2.761-2.238-5-5-5zm-11 19h-3v-11h3v11zm
-						   -1.5-12.268c-.966 0-1.75-.79-1.75-1.764
-						   s.784-1.764 1.75-1.764 1.75.79 1.75 1.764
-						   -.783 1.764-1.75 1.764zm13.5 12.268h-3v
-						   -5.604c0-3.368-4-3.113-4 0v5.604h-3v-11h3v1.765
-						   c1.396-2.586 7-2.777 7 2.476v6.759z"
-								></path>
-							</svg>
+							<img
+								src="src/lib/assets/main/linkedin.svg"
+								alt="LinkedIn Icon"
+								class="mr-2 h-5 w-5"
+							/>
 							LinkedIn
 						</a>
 					</div>
@@ -421,7 +376,7 @@
 							class="h-16 w-16 rounded-full"
 						/>
 						<div class="ml-4">
-							<h3 class="text-xl font-semibold text-gray-900 dark:text-gray-100">
+							<h3 class="text-h3 mb-2.5 font-semibold text-gray-900 dark:text-gray-100">
 								Aditya Kulkarni
 							</h3>
 							<p class="text-gray-600 dark:text-gray-400">Developer</p>
@@ -435,19 +390,7 @@
 							class="flex items-center text-gray-600 transition-colors hover:text-blue-600
 						   dark:text-gray-400 dark:hover:text-blue-300"
 						>
-							<svg class="mr-2 h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-								<path
-									stroke-linecap="round"
-									stroke-linejoin="round"
-									stroke-width="2"
-									d="M21 12a9 9 0 01-9 9
-						   m9-9a9 9 0 00-9-9m9 9H3
-						   m9 9a9 9 0 01-9-9m9 9
-						   c1.657 0 3-4.03 3-9s-1.343-9-3-9
-						   m0 18c-1.657 0-3-4.03-3-9s1.343-9 3-9
-						   m-9 9a9 9 0 019-9"
-								></path>
-							</svg>
+							<img class="mr-2 h-5 w-5" src="src/lib/assets/main/website.svg" alt="Website Icon" />
 							Website
 						</a>
 						<a
@@ -457,33 +400,7 @@
 							class="flex items-center text-gray-600 transition-colors hover:text-blue-600
 						   dark:text-gray-400 dark:hover:text-blue-300"
 						>
-							<svg class="mr-2 h-5 w-5" fill="currentColor" viewBox="0 0 24 24">
-								<path
-									d="M12 0c-6.626 0-12 5.373-12 12
-						   0 5.302 3.438 9.8 8.207 11.387
-						   .599.111.793-.261.793-.577v-2.234
-						   c-3.338.726-4.033-1.416-4.033-1.416
-						   -.546-1.387-1.333-1.756-1.333-1.756
-						   -1.089-.745.083-.729.083-.729
-						   1.205.084 1.839 1.237 1.839 1.237
-						   1.07 1.834 2.807 1.304 3.492.997
-						   .107-.775.418-1.305.762-1.604
-						   -2.665-.305-5.467-1.334-5.467-5.931
-						   0-1.311.469-2.381 1.236-3.221
-						   -.124-.303-.535-1.524.117-3.176
-						   0 0 1.008-.322 3.301 1.23
-						   .957-.266 1.983-.399 3.003-.404
-						   1.02.005 2.047.138 3.006.404
-						   2.291-1.552 3.297-1.23 3.297-1.23
-						   .653 1.653.242 2.874.118 3.176
-						   .77.84 1.235 1.911 1.235 3.221
-						   0 4.609-2.807 5.624-5.479 5.921
-						   .43.372.823 1.102.823 2.222v3.293
-						   c0 .319.192.694.801.576
-						   4.765-1.589 8.199-6.086 8.199-11.386
-						   0-6.627-5.373-12-12-12z"
-								></path>
-							</svg>
+							<img class="mr-2 h-5 w-5" src="src/lib/assets/main/github.svg" alt="GitHub Icon" />
 							GitHub
 						</a>
 						<a
@@ -493,19 +410,11 @@
 							class="flex items-center text-gray-600 transition-colors hover:text-blue-600
 						   dark:text-gray-400 dark:hover:text-blue-300"
 						>
-							<svg class="mr-2 h-5 w-5" fill="currentColor" viewBox="0 0 24 24">
-								<path
-									d="M19 0h-14c-2.761 0-5 2.239-5 5
-						   v14c0 2.761 2.239 5 5 5h14
-						   c2.762 0 5-2.239 5-5v-14
-						   c0-2.761-2.238-5-5-5zm-11 19h-3v-11h3v11zm
-						   -1.5-12.268c-.966 0-1.75-.79-1.75-1.764
-						   s.784-1.764 1.75-1.764 1.75.79 1.75 1.764
-						   -.783 1.764-1.75 1.764zm13.5 12.268h-3v
-						   -5.604c0-3.368-4-3.113-4 0v5.604h-3v-11h3v1.765
-						   c1.396-2.586 7-2.777 7 2.476v6.759z"
-								></path>
-							</svg>
+							<img
+								class="mr-2 h-5 w-5"
+								src="src/lib/assets/main/linkedin.svg"
+								alt="LinkedIn Icon"
+							/>
 							LinkedIn
 						</a>
 					</div>
@@ -514,8 +423,11 @@
 		</section>
 
 		<!-- Attributions Section -->
-		<section id="attributions" class="border-t border-gray-200 py-20 dark:border-gray-700">
-			<h2 class="mb-12 text-center text-3xl font-bold text-gray-900 dark:text-gray-100">
+		<section
+			id="attributions"
+			class=" px-7vw py-25vh flex flex-col gap-3 border-t border-gray-200 dark:border-gray-700"
+		>
+			<h2 class="text-h2 mb-4 text-center font-bold text-gray-900 dark:text-gray-100">
 				Attributions
 			</h2>
 			<div class="grid gap-6 md:grid-cols-2 lg:grid-cols-4">
@@ -523,56 +435,60 @@
 					href="https://svelte.dev/docs/kit/introduction"
 					class="rounded-xl bg-white p-6 shadow-sm transition-all hover:shadow-md dark:bg-gray-800"
 				>
-					<h3 class="mb-2 text-lg font-semibold text-gray-900 dark:text-gray-100">SvelteKit</h3>
+					<h3 class="text-h3 mb-2.5 font-semibold text-gray-900 dark:text-gray-100">SvelteKit</h3>
 					<p class="text-gray-600 dark:text-gray-400">The fastest way to build Svelte apps</p>
 				</a>
 				<a
 					href="https://svelte.dev/"
 					class="rounded-xl bg-white p-6 shadow-sm transition-all hover:shadow-md dark:bg-gray-800"
 				>
-					<h3 class="mb-2 text-lg font-semibold text-gray-900 dark:text-gray-100">Svelte</h3>
+					<h3 class="text-h3 mb-2.5 font-semibold text-gray-900 dark:text-gray-100">Svelte</h3>
 					<p class="text-gray-600 dark:text-gray-400">Cybernetically enhanced web apps</p>
 				</a>
 				<a
 					href="https://lucide.dev/guide/packages/lucide-svelte"
 					class="rounded-xl bg-white p-6 shadow-sm transition-all hover:shadow-md dark:bg-gray-800"
 				>
-					<h3 class="mb-2 text-lg font-semibold text-gray-900 dark:text-gray-100">lucide-svelte</h3>
+					<h3 class="text-h3 mb-2.5 font-semibold text-gray-900 dark:text-gray-100">
+						lucide-svelte
+					</h3>
 					<p class="text-gray-600 dark:text-gray-400">Beautiful & consistent icon toolkit</p>
 				</a>
 				<a
 					href="https://www.shadcn-svelte.com/"
 					class="rounded-xl bg-white p-6 shadow-sm transition-all hover:shadow-md dark:bg-gray-800"
 				>
-					<h3 class="mb-2 text-lg font-semibold text-gray-900 dark:text-gray-100">shadcn-svelte</h3>
+					<h3 class="text-h3 mb-2.5 font-semibold text-gray-900 dark:text-gray-100">
+						shadcn-svelte
+					</h3>
 					<p class="text-gray-600 dark:text-gray-400">UI components for Svelte</p>
 				</a>
 				<a
 					href="https://pglite.dev/"
 					class="rounded-xl bg-white p-6 shadow-sm transition-all hover:shadow-md dark:bg-gray-800"
 				>
-					<h3 class="mb-2 text-lg font-semibold text-gray-900 dark:text-gray-100">PGLite</h3>
+					<h3 class="text-h3 mb-2.5 font-semibold text-gray-900 dark:text-gray-100">PGLite</h3>
 					<p class="text-gray-600 dark:text-gray-400">PostgreSQL for the browser</p>
 				</a>
 				<a
 					href="https://github.com/rhashimoto/wa-sqlite"
 					class="rounded-xl bg-white p-6 shadow-sm transition-all hover:shadow-md dark:bg-gray-800"
 				>
-					<h3 class="mb-2 text-lg font-semibold text-gray-900 dark:text-gray-100">wa-sqlite</h3>
+					<h3 class="text-h3 mb-2.5 font-semibold text-gray-900 dark:text-gray-100">wa-sqlite</h3>
 					<p class="text-gray-600 dark:text-gray-400">WebAssembly SQLite for the web</p>
 				</a>
 				<a
 					href="https://dexie.org/"
 					class="rounded-xl bg-white p-6 shadow-sm transition-all hover:shadow-md dark:bg-gray-800"
 				>
-					<h3 class="mb-2 text-lg font-semibold text-gray-900 dark:text-gray-100">Dexie</h3>
+					<h3 class="text-h3 mb-2.5 font-semibold text-gray-900 dark:text-gray-100">Dexie</h3>
 					<p class="text-gray-600 dark:text-gray-400">A Minimalistic Wrapper for IndexedDB</p>
 				</a>
 				<a
 					href="https://codemirror.net/"
 					class="rounded-xl bg-white p-6 shadow-sm transition-all hover:shadow-md dark:bg-gray-800"
 				>
-					<h3 class="mb-2 text-lg font-semibold text-gray-900 dark:text-gray-100">CodeMirror</h3>
+					<h3 class="text-h3 mb-2.5 font-semibold text-gray-900 dark:text-gray-100">CodeMirror</h3>
 					<p class="text-gray-600 dark:text-gray-400">Versatile text editor for the browser</p>
 				</a>
 			</div>
