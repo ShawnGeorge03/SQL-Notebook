@@ -98,7 +98,7 @@
 								</DropdownMenu.Item>
 								<DropdownMenu.Item>
 									{#snippet child()}
-										<NotebookAction.Delete id={notebook.id} />
+										<NotebookAction.Delete notebookID={notebook.id} />
 									{/snippet}
 								</DropdownMenu.Item>
 								<DropdownMenu.Item>

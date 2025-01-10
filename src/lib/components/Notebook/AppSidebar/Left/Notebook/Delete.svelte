@@ -5,10 +5,10 @@
 	import { deleteNotebook } from '$lib/indexeddb/notebook';
 
 	interface DeleteNotebookProps {
-		id: string;
+		notebookID: string;
 	}
 
-	let { id }: DeleteNotebookProps = $props();
+	let { notebookID }: DeleteNotebookProps = $props();
 </script>
 
 <AlertDialog.Root>
@@ -27,7 +27,10 @@
 		</AlertDialog.Header>
 		<AlertDialog.Footer>
 			<AlertDialog.Cancel>Cancel</AlertDialog.Cancel>
-			<AlertDialog.Action variant="destructive" onclick={async () => await deleteNotebook(id)}>
+			<AlertDialog.Action
+				variant="destructive"
+				onclick={async () => await deleteNotebook(notebookID)}
+			>
 				Continue
 			</AlertDialog.Action>
 		</AlertDialog.Footer>
