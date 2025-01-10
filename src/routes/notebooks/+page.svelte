@@ -70,7 +70,7 @@
 				<ThemeToggle />
 			</div>
 		</header>
-		<div class="flex h-screen flex-col items-center justify-center">
+		<div class="flex flex-col items-center justify-center max-sm:h-screen">
 			<CreateCell.ButtonGroup
 				class="w-[400px] py-5 transition-[width] duration-300 ease-in-out md:w-[500px] lg:w-[700px] xl:w-[1000px]"
 				position={0}
@@ -101,7 +101,7 @@
 				/>
 			{/each}
 		</div>
-		<footer class="fixed bottom-0 z-20 w-[100%] bg-blue-500 p-4">(footer)</footer>
+		<!-- <footer class="fixed bottom-0 z-20 w-[100%] bg-blue-500 p-4">(footer)</footer> -->
 	</main>
 	<!-- <AppSidebar.Right /> -->
 </div>
