@@ -1,5 +1,4 @@
 <script lang="ts">
-	import { Plus } from 'lucide-svelte';
 	import { onMount } from 'svelte';
 
 	import { Button } from '$lib/components/ui/button';
@@ -8,6 +7,8 @@
 	import { Input } from '$lib/components/ui/input';
 	import { Label } from '$lib/components/ui/label/';
 	import * as Select from '$lib/components/ui/select';
+
+	import Plus from 'lucide-svelte/icons/plus.svelte';
 
 	import DatabaseIcon from '$lib/components/Notebook/DatabaseIcon.svelte';
 	import { DBWorkerService } from '$lib/db/worker/service';

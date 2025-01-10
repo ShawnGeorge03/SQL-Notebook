@@ -1,10 +1,12 @@
 <script lang="ts">
+	import { onMount } from 'svelte';
+
+	import Settings from 'lucide-svelte/icons/settings.svelte';
+
 	import { Checkbox } from '$lib/components/ui/checkbox/index.js';
 	import * as Dialog from '$lib/components/ui/dialog/index.js';
 	import { Label } from '$lib/components/ui/label/index.js';
 	import * as Tabs from '$lib/components/ui/tabs/index.js';
-	import { Settings } from 'lucide-svelte';
-	import { onMount } from 'svelte';
 	import preferences, { type UserPreferences } from './store';
 
 	const DEFAULT_PREFERENCES: UserPreferences = {

@@ -1,10 +1,17 @@
 <script lang="ts">
+	import { dev } from '$app/environment';
+	import { PostgreSQL, sql, SQLite, StandardSQL } from '@codemirror/lang-sql';
+	import { onMount } from 'svelte';
+
+	import DatabaseIcon from '$lib/components/Notebook/DatabaseIcon.svelte';
+	import ChevronDown from 'lucide-svelte/icons/chevron-down.svelte';
+	import PaintbrushVertical from 'lucide-svelte/icons/paintbrush-vertical.svelte';
+
+	import { Button } from '$lib/components/ui/button';
 	import { Input } from '$lib/components/ui/input';
 	import ScrollArea from '$lib/components/ui/scroll-area/scroll-area.svelte';
 	import { Skeleton } from '$lib/components/ui/skeleton';
 	import * as Table from '$lib/components/ui/table/index.js';
-
-	import { PostgreSQL, sql, SQLite, StandardSQL } from '@codemirror/lang-sql';
 
 	import type {
 		DBEngine,
@@ -13,14 +20,8 @@
 	} from '$lib/db/worker/types';
 
 	import { DBWorkerService } from '$lib/db/worker/service';
-	import { onMount } from 'svelte';
 	import SelectDB from '../../SelectDB.svelte';
 	import { Actions, Editor } from '../Cell';
-
-	import { dev } from '$app/environment';
-	import DatabaseIcon from '$lib/components/Notebook/DatabaseIcon.svelte';
-	import { Button } from '$lib/components/ui/button';
-	import { ChevronDown, PaintbrushVertical } from 'lucide-svelte';
 
 	interface CodeEditorProps {
 		id: string;

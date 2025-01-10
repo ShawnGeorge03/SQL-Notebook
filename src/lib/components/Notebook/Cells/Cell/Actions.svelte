@@ -1,8 +1,14 @@
 <script lang="ts">
+	import type { Snippet } from 'svelte';
+
+	import Copy from 'lucide-svelte/icons/copy.svelte';
+	import MoveDown from 'lucide-svelte/icons/move-down.svelte';
+	import MoveUp from 'lucide-svelte/icons/move-up.svelte';
+	import Play from 'lucide-svelte/icons/play.svelte';
+	import Trash from 'lucide-svelte/icons/trash.svelte';
+
 	import { Button } from '$lib/components/ui/button';
 	import { cn } from '$lib/utils';
-	import { Copy, MoveDown, MoveUp, Play, Trash } from 'lucide-svelte';
-	import type { Snippet } from 'svelte';
 
 	interface CellActionsProps {
 		class?: String;

@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { Info } from 'lucide-svelte';
+	import Info from 'lucide-svelte/icons/info.svelte';
 
 	import * as Dialog from '$lib/components/ui/dialog/';
 	import { Label } from '$lib/components/ui/label/';

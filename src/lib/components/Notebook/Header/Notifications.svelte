@@ -1,9 +1,4 @@
 <script lang="ts">
-	import * as DropdownMenu from '$lib/components/ui/dropdown-menu/index.js';
-	import { ScrollArea } from '$lib/components/ui/scroll-area/index.js';
-	import { DBWorkerService } from '$lib/db/worker/service';
-	import type { DBWorkerCommand } from '$lib/db/worker/types';
-	import { cn } from '$lib/utils';
 	import { useId } from 'bits-ui';
 	import { onMount } from 'svelte';
 
@@ -12,7 +7,13 @@
 	import TerminateDBIcon from '$lib/assets/db/actions/drop-db.svg?raw';
 	import LoadDBIcon from '$lib/assets/db/actions/load-db.svg?raw';
 	import QueryDBIcon from '$lib/assets/db/actions/query-db.svg?raw';
-	import { Bell } from 'lucide-svelte';
+	import Bell from 'lucide-svelte/icons/bell.svelte';
+
+	import * as DropdownMenu from '$lib/components/ui/dropdown-menu/index.js';
+	import { ScrollArea } from '$lib/components/ui/scroll-area/index.js';
+	import { DBWorkerService } from '$lib/db/worker/service';
+	import type { DBWorkerCommand } from '$lib/db/worker/types';
+	import { cn } from '$lib/utils';
 
 	interface Notification {
 		id: string;
