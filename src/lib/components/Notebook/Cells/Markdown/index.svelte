@@ -5,11 +5,11 @@
 	import DOMPurify from 'dompurify';
 	import { Play, Pen } from 'lucide-svelte';
 
-	import Cell, { type BaseBlockProps } from '../Cell.svelte';
+	import { Actions, Editor, type BaseEditorProps } from '../Cell';
 	import './github-markdown.css';
 	import Button from '$lib/components/ui/button/button.svelte';
 
-	let { class: className, content = $bindable('') }: BaseBlockProps = $props();
+	let { class: className, content = $bindable('') }: BaseEditorProps = $props();
 	let editable = $state(true);
 	let markdownDiv: HTMLDivElement;
 
@@ -50,7 +50,7 @@
 			</Button>
 		</div>
 		{#if editable}
-			<Cell class="w-full" bind:content customExtensions={[markdown()]} />
+			<Editor class="w-full" bind:content customExtensions={[markdown()]} />
 		{:else}
 			<div class="markdown-body h-[18.5rem] w-full overflow-y-scroll p-4">
 				{#await sanitizedContent()}
