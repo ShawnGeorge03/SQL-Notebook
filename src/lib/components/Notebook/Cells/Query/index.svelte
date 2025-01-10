@@ -6,6 +6,7 @@
 	import DatabaseIcon from '$lib/components/Notebook/DatabaseIcon.svelte';
 	import ChevronDown from 'lucide-svelte/icons/chevron-down';
 	import PaintbrushVertical from 'lucide-svelte/icons/paintbrush-vertical';
+	import Play from 'lucide-svelte/icons/play';
 
 	import { Button } from '$lib/components/ui/button';
 	import { Input } from '$lib/components/ui/input';
@@ -100,12 +101,6 @@
 		moveUp={() => moveUpCell(position)}
 		moveDown={() => moveDownCell(position)}
 		copy={() => copyCell(position)}
-		run={() => {
-			isRunning = true;
-			error = undefined;
-			dbWorkerService.sendMessage({ command: 'EXEC_QUERY', args: { id, dbName, query: query } });
-			result = DEFAULT_RESULT;
-		}}
 		remove={() => removeCell(position)}
 	>
 		<div class="flex items-center justify-between gap-5">
@@ -131,6 +126,22 @@
 		</div>
 
 		{#snippet actions()}
+			<Button
+				variant="secondary"
+				size="icon"
+				class="border-none bg-transparent shadow-none"
+				onclick={() => {
+					isRunning = true;
+					error = undefined;
+					dbWorkerService.sendMessage({
+						command: 'EXEC_QUERY',
+						args: { id, dbName, query: query }
+					});
+					result = DEFAULT_RESULT;
+				}}
+			>
+				<Play />
+			</Button>
 			<Button
 				variant="secondary"
 				size="icon"
