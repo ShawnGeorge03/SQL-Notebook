@@ -126,38 +126,38 @@ const createDB = async (dbName: string, engine: DBEngine, persistent: boolean): 
 		};
 	}
 
-	try {
-		await db.init();
-	} catch (error) {
-		return {
-			name: 'DB_INIT',
-			message: 'Unable to initialize database',
-			cause: error
-		};
-	}
-
 	const curr = new Date().toLocaleString();
 
 	return await iDB
 		.transaction('readwrite', iDB.databases, async () => {
 			await iDB.databases.add({
+				id: nanoid(),
 				name: dbName,
 				persistent,
 				createdBy: 'user',
 				createdOn: curr,
 				modifiedOn: curr,
 				engine,
+				status: 'UNAVAILABLE',
 				system: engine === 'pgsql' ? 'pglite' : 'wa-sqlite'
 			});
 		})
 		.then(async () => {
-			if (persistent) {
-				await db.close();
-			} else {
-				DBS[dbName] = {
-					db,
-					modifiedOn: curr
-				};
+			if (!persistent) {
+				try {
+					await db.init();
+
+					DBS[dbName] = {
+						db,
+						modifiedOn: curr
+					};
+				} catch (error) {
+					return {
+						name: 'DB_INIT',
+						message: 'Unable to initialize database',
+						cause: error
+					};
+				}
 			}
 
 			return { dbName };
