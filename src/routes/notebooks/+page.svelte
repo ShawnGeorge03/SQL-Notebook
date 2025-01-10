@@ -130,7 +130,15 @@ ORDER BY
 			/>
 			{#each cells as cell, i (cell.id)}
 				{#if cell.cellType === 'markdown'}
-					<Markdown class="py-4" bind:content={cell.content.text} />
+					<Markdown
+						class="py-4"
+						position={i}
+						bind:content={cell.content.text}
+						{moveUpCell}
+						{moveDownCell}
+						{copyCell}
+						{removeCell}
+					/>
 				{:else if cell.cellType === 'query'}
 					<Query
 						class="py-4"
