@@ -1,0 +1,14 @@
+# Third-Party Licenses
+
+This project includes third-party dependencies with the following licenses:
+
+- MPL-2.0: dompurify
+- Apache-2.0: @ampproject/remapping, dexie, and others
+- BSD-2-Clause: eslint-scope, espree, esrecurse
+- BSD-3-Clause: @mapbox/node-pre-gyp, esquery
+- MIT: @codemirror/\*, svelte, and others
+- ISC: glob, rimraf, and others
+- CC-BY-4.0: caniuse-lite
+- CC0-1.0: railroad-diagrams
+
+For details, see the respective package documentation.

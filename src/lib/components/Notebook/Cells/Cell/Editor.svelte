@@ -1,12 +1,11 @@
 <script lang="ts" module>
-	export interface BaseBlockProps {
+	export interface BaseEditorProps {
 		content: string;
 		class?: string;
 	}
 </script>
 
 <script lang="ts">
-	import { browser } from '$app/environment';
 	import { onMount } from 'svelte';
 
 	import {
@@ -40,15 +39,16 @@
 	import { mode } from 'mode-watcher';
 	import { clouds, cobalt } from 'thememirror';
 
-	import SpinnerIcon from '$lib/assets/spinner.svg?raw';
+	import { browser } from '$app/environment';
+	import { Skeleton } from '$lib/components/ui/skeleton';
 	import type { Unsubscriber } from 'svelte/store';
-	import preferences from '../Header/Settings/store';
+	import preferences from '../../Header/Settings/store';
 
-	interface BlockProps extends BaseBlockProps {
+	interface EditorProps extends BaseEditorProps {
 		customExtensions?: Extension[];
 	}
 
-	let { class: className, content = $bindable(), customExtensions = [] }: BlockProps = $props();
+	let { class: className, content = $bindable(), customExtensions = [] }: EditorProps = $props();
 
 	let view: EditorView;
 	// svelte-ignore non_reactive_update
@@ -68,6 +68,10 @@
 			}
 		}),
 		EditorView.lineWrapping,
+		EditorView.theme({
+			'.cm-content, .cm-gutter': { minHeight: '1rem' },
+			'.cm-scroller': { overflow: 'auto' }
+		}),
 		EditorState.allowMultipleSelections.of(true),
 		history(),
 		foldGutter(),
@@ -143,10 +147,17 @@
 {#if browser}
 	<div class={className} bind:this={parent}></div>
 {:else}
-	<div class="relative {className}">
-		<div class="flex items-center justify-center text-primary">
-			<span class="me-3 inline h-4 w-4 animate-spin">{@html SpinnerIcon}</span>
-			<p class="scm-loading__text">Loading editor...</p>
+	<div
+		class="mx-auto w-[400px] space-y-4 bg-white dark:bg-blue-950 md:w-[500px] lg:w-[700px] xl:w-[1000px]"
+	>
+		<div class="space-y-4 rounded-lg p-6">
+			<Skeleton class="ml-auto bg-slate-300 p-2 dark:bg-slate-600" />
+			<Skeleton class="ml-auto bg-slate-300 p-2 dark:bg-slate-600" />
+			<Skeleton class="ml-auto bg-slate-300 p-2 dark:bg-slate-600" />
+			<Skeleton class="ml-auto bg-slate-300 p-2 dark:bg-slate-600" />
+			<Skeleton class="ml-auto bg-slate-300 p-2 dark:bg-slate-600" />
+			<Skeleton class="ml-auto bg-slate-300 p-2 dark:bg-slate-600" />
+			<Skeleton class="ml-auto bg-slate-300 p-2 dark:bg-slate-600" />
 		</div>
 	</div>
 {/if}
