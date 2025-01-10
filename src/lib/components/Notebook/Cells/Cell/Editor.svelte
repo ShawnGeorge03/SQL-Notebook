@@ -37,7 +37,7 @@
 		type ViewUpdate
 	} from '@codemirror/view';
 	import { mode } from 'mode-watcher';
-	import { clouds, cobalt } from 'thememirror';
+	import { clouds, dracula } from 'thememirror';
 
 	import { browser } from '$app/environment';
 	import { Skeleton } from '$lib/components/ui/skeleton';
@@ -96,7 +96,7 @@
 	];
 
 	onMount(() => {
-		extensions.push(themeConfig.of([$mode === 'dark' ? cobalt : clouds]));
+		extensions.push(themeConfig.of([$mode === 'dark' ? dracula : clouds]));
 
 		view = new EditorView({
 			parent,
@@ -109,7 +109,7 @@
 		const subscriptions: Unsubscriber[] = [
 			mode.subscribe((theme) => {
 				view.dispatch({
-					effects: themeConfig.reconfigure(theme === 'dark' ? cobalt : clouds)
+					effects: themeConfig.reconfigure(theme === 'dark' ? dracula : clouds)
 				});
 			}),
 

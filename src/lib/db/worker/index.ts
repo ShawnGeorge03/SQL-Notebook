@@ -8,9 +8,9 @@ import type { DBStrategy } from '../engines/types';
 import {
 	DBEngine,
 	type DBInfo,
+	type DBWorkerErrorResponse,
 	type DBWorkerMessages,
-	type ErrorResponseData,
-	type SuccessResponseData
+	type DBWorkerSuccessResponse
 } from './types';
 import { broadcastResponse, postError, postResponse, postStatus, postSuccess } from './utils';
 
@@ -72,12 +72,7 @@ const getActiveDBs = async () => {
 		});
 };
 
-const createDB = async (
-	port: MessagePort,
-	dbName: string,
-	engine: DBEngine,
-	persistent: boolean
-): Promise<SuccessResponseData['CREATE_DB'] | ErrorResponseData['CREATE_DB']> => {
+const createDB = async (dbName: string, engine: DBEngine, persistent: boolean): Promise<DBWorkerSuccessResponse['CREATE_DB'] | DBWorkerErrorResponse['CREATE_DB']> => {
 	if (!dbName || dbName.trim() === '')
 		return {
 			name: 'INVALID_ARGS',
@@ -131,38 +126,38 @@ const createDB = async (
 		};
 	}
 
-	try {
-		await db.init();
-	} catch (error) {
-		return {
-			name: 'DB_INIT',
-			message: 'Unable to initialize database',
-			cause: error
-		};
-	}
-
-	const curr = new Date().toLocaleString();
+	const curr = new Date().toISOString();
 
 	return await iDB
 		.transaction('readwrite', iDB.databases, async () => {
 			await iDB.databases.add({
+				id: nanoid(),
 				name: dbName,
 				persistent,
 				createdBy: 'user',
 				createdOn: curr,
 				modifiedOn: curr,
 				engine,
+				status: 'UNAVAILABLE',
 				system: engine === 'pgsql' ? 'pglite' : 'wa-sqlite'
 			});
 		})
 		.then(async () => {
-			if (persistent) {
-				await db.close();
-			} else {
-				DBS[dbName] = {
-					db,
-					modifiedOn: curr
-				};
+			if (!persistent) {
+				try {
+					await db.init();
+
+					DBS[dbName] = {
+						db,
+						modifiedOn: curr
+					};
+				} catch (error) {
+					return {
+						name: 'DB_INIT',
+						message: 'Unable to initialize database',
+						cause: error
+					};
+				}
 			}
 
 			return { dbName };
@@ -184,10 +179,7 @@ const createDB = async (
 		});
 };
 
-const loadDB = async (
-	port: MessagePort,
-	dbName: string
-): Promise<SuccessResponseData['LOAD_DB'] | ErrorResponseData['LOAD_DB']> => {
+const loadDB = async (dbName: string): Promise<DBWorkerSuccessResponse['LOAD_DB'] | DBWorkerErrorResponse['LOAD_DB']> => {
 	if (dbName in DBS)
 		return {
 			name: 'DB_IN_USE',
@@ -230,7 +222,7 @@ const loadDB = async (
 
 	DBS[dbName] = {
 		db,
-		modifiedOn: new Date().toLocaleString()
+		modifiedOn: new Date().toISOString()
 	};
 
 	await getAvailableDBs();
@@ -238,12 +230,7 @@ const loadDB = async (
 	return { dbName };
 };
 
-const execQuery = async (
-	port: MessagePort,
-	id: string,
-	dbName: string,
-	query: string
-): Promise<SuccessResponseData['EXEC_QUERY'] | ErrorResponseData['EXEC_QUERY']> => {
+const execQuery = async (id: string, dbName: string, query: string): Promise<DBWorkerSuccessResponse['EXEC_QUERY'] | DBWorkerErrorResponse['EXEC_QUERY']> => {
 	if (!(dbName in DBS))
 		return {
 			id,
@@ -262,7 +249,7 @@ const execQuery = async (
 			elapsed: performance.now() - startTime
 		};
 
-		DBS[dbName].modifiedOn = new Date().toLocaleString();
+		DBS[dbName].modifiedOn = new Date().toISOString();
 
 		return results;
 	} catch (error) {
@@ -276,10 +263,7 @@ const execQuery = async (
 	}
 };
 
-const closeDB = async (
-	port: MessagePort,
-	dbName: string
-): Promise<SuccessResponseData['CLOSE_DB'] | ErrorResponseData['CLOSE_DB']> => {
+const closeDB = async (dbName: string): Promise<DBWorkerSuccessResponse['CLOSE_DB'] | DBWorkerErrorResponse['CLOSE_DB']> => {
 	if (!(dbName in DBS))
 		return {
 			name: 'DB_NOT_IN_USE',
@@ -331,33 +315,33 @@ self.onconnect = async (event: MessageEvent) => {
 			}
 			case 'CREATE_DB': {
 				const { dbName, engine, persistent } = data.args;
-				const response = await createDB(port, dbName, engine, persistent);
+				const response = await createDB(dbName, engine, persistent);
 				postResponse(port, 'CREATE_DB', response);
 				break;
 			}
 			case 'LOAD_DB': {
 				const { dbName } = data.args;
-				const response = await loadDB(port, dbName);
+				const response = await loadDB(dbName);
 				postResponse(port, 'LOAD_DB', response);
 				break;
 			}
 			case 'EXEC_QUERY': {
 				const { id, dbName, query } = data.args;
-				const response = await execQuery(port, id, dbName, query);
+				const response = await execQuery(id, dbName, query);
 				postResponse(port, 'EXEC_QUERY', response);
 				break;
 			}
 			case 'CLOSE_DB': {
 				const { dbName } = data.args;
-				const response = await closeDB(port, dbName);
+				const response = await closeDB(dbName);
 				postResponse(port, 'CLOSE_DB', response);
 				break;
 			}
-			case 'TERMINATE_DB': {
+			case 'DROP_DB': {
 				const { dbName } = data.args;
 
 				if (dbName in DBS) {
-					postError(port, 'TERMINATE_DB', {
+					postError(port, 'DROP_DB', {
 						name: 'DB_IN_USE',
 						message: 'Database In Use',
 						cause: `Database with name ${dbName} is alredy in use`
@@ -368,7 +352,7 @@ self.onconnect = async (event: MessageEvent) => {
 				const config = await iDB.databases.get(dbName);
 
 				if (!config) {
-					postError(port, 'TERMINATE_DB', {
+					postError(port, 'DROP_DB', {
 						name: 'DB_DNE',
 						message: 'Database does not exist',
 						cause: `Database with name "${dbName}" does not exist.`
@@ -377,7 +361,7 @@ self.onconnect = async (event: MessageEvent) => {
 				}
 
 				if (config.engine !== DBEngine.PGSQL && config.engine === DBEngine.SQLITE) {
-					postError(port, 'TERMINATE_DB', {
+					postError(port, 'DROP_DB', {
 						name: 'INVALID_DB',
 						message: 'Unknown Database Engine',
 						cause: `Supported Engines: ${DBEngine.PGSQL}, ${DBEngine.SQLITE}`
@@ -394,7 +378,7 @@ self.onconnect = async (event: MessageEvent) => {
 						})
 						.then(async () => {
 							await getAvailableDBs();
-							postSuccess(port, 'TERMINATE_DB', { dbName });
+							postSuccess(port, 'DROP_DB', { dbName });
 						});
 				};
 
@@ -412,15 +396,15 @@ self.onconnect = async (event: MessageEvent) => {
 
 					const query = await response.text();
 
-					const dbResult = await createDB(port, dbName, engine, false);
+					const dbResult = await createDB(dbName, engine, false);
 					if ('name' in dbResult) {
 						postError(port, 'CREATE_DEMO', dbResult);
 						return;
 					}
 
-					const queryResult = await execQuery(port, nanoid(), dbName, query);
+					const queryResult = await execQuery(nanoid(), dbName, query);
 					if ('name' in queryResult) {
-						await closeDB(port, dbName);
+						await closeDB(dbName);
 						postError(port, 'CREATE_DEMO', queryResult);
 						return;
 					}
@@ -433,7 +417,7 @@ self.onconnect = async (event: MessageEvent) => {
 						cause: `Supported Sample Database for ${DBEngine.PGSQL}, ${DBEngine.SQLITE}`
 					});
 
-					if (DBS[dbName]) await closeDB(port, dbName);
+					if (DBS[dbName]) await closeDB(dbName);
 				}
 
 				break;

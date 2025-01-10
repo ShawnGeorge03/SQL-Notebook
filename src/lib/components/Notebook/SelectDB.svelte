@@ -5,9 +5,8 @@
 	import type { DBInfo } from '$lib/db/worker/types';
 	import { cn } from '$lib/utils';
 
-	import PostgreSQLIcon from '$lib/assets/db/engines/postgresql.svg?raw';
-	import SQLiteIcon from '$lib/assets/db/engines/sqlite.svg?raw';
 	import SpinnerIcon from '$lib/assets/spinner.svg?raw';
+	import DatabaseIcon from '$lib/components/Notebook/DatabaseIcon.svelte';
 	import { DBWorkerService } from '$lib/db/worker/service';
 	import { onMount, type Snippet } from 'svelte';
 
@@ -29,7 +28,6 @@
 		dbWorkerService = DBWorkerService.getInstance();
 
 		const unsubscribe = dbWorkerService.responses.subscribe((response) => {
-			loading = response.status === 'LOADING' && response.command === 'GET_ACTIVE_DBS';
 			if (response.status === 'SUCCESS' && response.command === 'GET_ACTIVE_DBS') {
 				activeDBs = response.data.activeDBs;
 				loading = false;
@@ -78,13 +76,7 @@
 						class="rounded-button flex h-10 select-none items-center py-6 pl-3 pr-1.5 text-sm font-medium !ring-0 !ring-transparent data-[highlighted]:bg-muted"
 						onclick={() => onSelect(db)}
 					>
-						<div class="flex items-center">
-							{#if db.engine === 'pgsql'}
-								<span class="h-10 w-10" aria-hidden="true">{@html PostgreSQLIcon}</span>
-							{:else if db.engine === 'sqlite'}
-								<span class="h-10 w-10" aria-hidden="true">{@html SQLiteIcon}</span>
-							{/if}
-						</div>
+						<DatabaseIcon class="flex h-8 w-8 items-center" engine={db.engine} />
 						<div class="flex w-32 flex-col justify-start">
 							<p class="overflow-hidden text-ellipsis whitespace-nowrap">{db.name}</p>
 							<Badge class="w-fit" variant="default">

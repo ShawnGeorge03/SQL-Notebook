@@ -10,6 +10,7 @@ import {
 	// @ts-ignore
 	'https://cdn.jsdelivr.net/npm/@electric-sql/pglite@0.2.15/dist/index.min.js';
 
+import iDB from '$lib/indexeddb/schema';
 import { NotebookType, type DBOptions, type DBStrategy, type QueryResult } from './types';
 import { isValidQuery } from './utils';
 
@@ -22,8 +23,8 @@ export class PostgreSQL implements DBStrategy {
 	#db!: PGlite;
 	#dbName: string;
 	#dbOptions: PGliteOptions;
+	#dbKeywords = /\b(SELECT|INSERT|UPDATE|DELETE|TRUNCATE|CREATE|ALTER|DROP|WITH|DO|BEGIN|END|DECLARE|EXECUTE|EXPLAIN|VACUUM|ANALYZE|GRANT|REVOKE)\b/gi;
 
-	KEYWORDS = /\b(SELECT|INSERT|UPDATE|DELETE|TRUNCATE|CREATE|ALTER|DROP|WITH|DO|BEGIN|END|DECLARE|EXECUTE|EXPLAIN|VACUUM|ANALYZE|GRANT|REVOKE)\b/gi;
 	/**
 	 * Creates a PostgreSQL object.
 	 *
@@ -44,8 +45,11 @@ export class PostgreSQL implements DBStrategy {
 	 */
 	async init(): Promise<void> {
 		try {
+			await iDB.databases.update(this.#dbName, { status: 'LOADING' });
 			this.#db = await PGlite.create(this.#dbOptions);
+			await iDB.databases.update(this.#dbName, { status: 'AVAILABLE' });
 		} catch (error) {
+			iDB.databases.update(this.#dbName, { status: 'UNAVAILABLE' });
 			const initError =
 				error instanceof Error
 					? error
@@ -75,7 +79,7 @@ export class PostgreSQL implements DBStrategy {
 			throw new Error('Database not initialized');
 		}
 
-		isValidQuery(query, this.KEYWORDS)
+		isValidQuery(query, this.#dbKeywords)
 
 		return this.#db.transaction(async (tx: Transaction) => {
 			try {
@@ -154,5 +158,6 @@ export class PostgreSQL implements DBStrategy {
 	 */
 	async close(): Promise<void> {
 		await this.#db.close();
+		await iDB.databases.update(this.#dbName, { status: 'UNAVAILABLE' });
 	}
 }

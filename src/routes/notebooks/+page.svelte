@@ -1,66 +1,44 @@
 <script lang="ts">
+	import { page } from '$app/state';
+	import * as AppSidebar from '$lib/components/Notebook/AppSidebar/';
 	import { Markdown, Query } from '$lib/components/Notebook/Cells';
 	import * as CreateCell from '$lib/components/Notebook/CreateCell/index';
 	import type { CellMetadata } from '$lib/components/Notebook/CreateCell/type';
 	import Notifications from '$lib/components/Notebook/Header/Notifications.svelte';
 	import Settings from '$lib/components/Notebook/Header/Settings/Modal.svelte';
 	import ThemeToggle from '$lib/components/Notebook/Header/ThemeToggle.svelte';
-	import * as Sidebar from '$lib/components/ui/sidebar/index.js';
-	import SidebarLeft from '$lib/components/ui/sidebar/sidebar-left.svelte';
-	import { DBEngine } from '$lib/db/worker/types';
+	import { Skeleton } from '$lib/components/ui/skeleton';
+	import iDB from '$lib/indexeddb/schema';
 	import type { NotebookCell } from '$lib/indexeddb/types';
+	import { cn } from '$lib/utils';
 	import { nanoid } from 'nanoid/non-secure';
+	import { onMount } from 'svelte';
 
-	const cells: NotebookCell[] = $state<NotebookCell[]>([
-		{
-			id: nanoid(),
-			cellType: 'markdown',
-			content: {
-				name: 'Markdown',
-				text: 'Hello World, This is Markdown'
-			}
-		},
-		{
-			id: nanoid(),
-			cellType: 'query',
-			content: {
-				name: 'Query',
-				query: "SELECT 'HELLO WORLD'",
-				engine: DBEngine.PGSQL,
-				dbName: 'PP'
-			}
-		},
-		{
-			id: nanoid(),
-			cellType: 'query',
-			content: {
-				name: 'Query',
-				query: 'SELECT * FROM genre',
-				engine: DBEngine.PGSQL,
-				dbName: 'PP'
-			}
-		},
-		{
-			id: nanoid(),
-			cellType: 'query',
-			content: {
-				name: 'Query',
-				query: `SELECT
-  *
-FROM
-  pg_catalog.pg_type
-WHERE
-  typtype = 'b' OR
-  typtype = 'c' OR
-  typtype = 'p' OR
-  typtype = 'e'
-ORDER BY
-  typname;`,
-				engine: DBEngine.PGSQL,
-				dbName: 'PP'
+	let cells = $state<NotebookCell[]>([]);
+
+	const notebookID = page.url.searchParams.get('id');
+	let loading = $state(true);
+	let notebookExists = $state(false);
+
+	onMount(async () => {
+		if (notebookID) {
+			const notebook = await iDB.notebooks.get(notebookID);
+			if (notebook) {
+				cells = notebook.cells;
+				notebookExists = true;
 			}
 		}
-	]);
+		loading = false;
+	});
+
+	$effect(() => {
+		if (!notebookID || !notebookExists) return;
+		const changes = $state.snapshot(cells);
+		iDB.notebooks.update(notebookID, {
+			cells: changes,
+			modifiedOn: new Date().toISOString()
+		});
+	});
 
 	const addNewCell = (position: number, metadata: CellMetadata) => {
 		const cell = { id: nanoid(), cellType: metadata.cellType, content: {} };
@@ -107,60 +85,89 @@ ORDER BY
 	};
 </script>
 
-<Sidebar.Provider>
-	<SidebarLeft />
-	<Sidebar.Inset class="bg-green-500">
-		<header class="sticky top-0 z-20 bg-red-500 p-4">
-			<div class="float-left flex justify-end gap-4">
-				<Sidebar.Trigger />
-				<CreateCell.QueryCell position={cells.length} {addNewCell} />
-				<CreateCell.MarkdownCell position={cells.length} {addNewCell} />
-			</div>
+<div class="grid grid-cols-1 sm:grid-cols-[auto_1fr]">
+	<AppSidebar.Left {notebookID} />
+	<main class="bg-background">
+		<header class="sticky top-0 z-20 border-b-2 border-r-2 border-t-2 bg-sidebar p-4 pb-14">
+			{#if notebookExists}
+				<div class="float-left flex justify-end gap-4">
+					<CreateCell.QueryCell position={cells.length} {addNewCell} />
+					<CreateCell.MarkdownCell position={cells.length} {addNewCell} />
+				</div>
+			{/if}
 			<div class="float-right flex justify-end gap-4">
 				<Notifications />
 				<Settings />
 				<ThemeToggle />
 			</div>
 		</header>
-		<div class="flex flex-col items-center justify-center">
-			<CreateCell.ButtonGroup
-				class="w-[400px] py-5 transition-[width] duration-300 ease-in-out md:w-[500px] lg:w-[700px] xl:w-[1000px]"
-				position={0}
-				{addNewCell}
-			/>
-			{#each cells as cell, i (cell.id)}
-				{#if cell.cellType === 'markdown'}
-					<Markdown
-						class="py-4"
-						position={i}
-						bind:content={cell.content.text}
-						{moveUpCell}
-						{moveDownCell}
-						{copyCell}
-						{removeCell}
-					/>
-				{:else if cell.cellType === 'query'}
-					<Query
-						class="py-4"
-						position={i}
-						id={cell.id}
-						bind:name={cell.content.name}
-						bind:query={cell.content.query}
-						bind:dbName={cell.content.dbName}
-						bind:engine={cell.content.engine}
-						{moveUpCell}
-						{moveDownCell}
-						{copyCell}
-						{removeCell}
-					/>
-				{/if}
+		<div
+			class={`flex flex-col items-center justify-center ${!notebookExists && !loading ? 'h-screen' : 'max-sm:h-screen'}`}
+		>
+			{#if notebookExists}
 				<CreateCell.ButtonGroup
-					class={`w-[400px] transition-[width] duration-300 ease-in-out md:w-[500px] lg:w-[700px] xl:w-[1000px] ${i === cells.length - 1 ? 'pb-24' : ''}`}
-					position={i + 1}
+					class="w-[400px] py-5 transition-[width] duration-300 ease-in-out md:w-[500px] lg:w-[700px] xl:w-[1000px]"
+					position={0}
 					{addNewCell}
 				/>
-			{/each}
+
+				{#each cells as cell, i (cell.id)}
+					{#if cell.cellType === 'markdown'}
+						<Markdown
+							class="py-4"
+							position={i}
+							bind:content={cell.content.text}
+							{moveUpCell}
+							{moveDownCell}
+							{copyCell}
+							{removeCell}
+						/>
+					{:else if cell.cellType === 'query'}
+						<Query
+							class="py-4"
+							position={i}
+							id={cell.id}
+							bind:name={cell.content.name}
+							bind:query={cell.content.query}
+							bind:dbName={cell.content.dbName}
+							bind:engine={cell.content.engine}
+							{moveUpCell}
+							{moveDownCell}
+							{copyCell}
+							{removeCell}
+						/>
+					{/if}
+					<CreateCell.ButtonGroup
+						class={`w-[400px] transition-[width] duration-300 ease-in-out md:w-[500px] lg:w-[700px] xl:w-[1000px] ${i === cells.length - 1 ? 'pb-24' : ''}`}
+						position={i + 1}
+						{addNewCell}
+					/>
+				{/each}
+			{:else if !loading && !notebookExists}
+				<h1 class="text-3xl font-bold">Welcom to your project!</h1>
+				<p class="text-xl">You can start by creating or opening a notebook in the left sidebar</p>
+			{:else}
+				{#each { length: 6 }}
+					<div class="w-[400px] py-4 md:w-[500px] lg:w-[700px] xl:w-[1000px]">
+						<div class="h-10 rounded-t-xl bg-muted"></div>
+						<div class="flex flex-col gap-4 bg-white p-6 py-4 dark:bg-slate-800">
+							{#each { length: 4 }, i}
+								<Skeleton
+									class={cn('h-4', {
+										'w-1/2': i == 0,
+										'w-96': i == 1,
+										'w-[50rem]': i == 2,
+										'w-[35rem]': i == 3
+									})}
+								/>
+							{/each}
+						</div>
+						<div class="h-10 rounded-b-xl bg-muted"></div>
+					</div>
+				{/each}
+			{/if}
 		</div>
-		<footer class="fixed bottom-0 z-20 w-[100%] bg-blue-500 p-4">(footer)</footer>
-	</Sidebar.Inset>
-</Sidebar.Provider>
+		<!-- <footer class="fixed bottom-0 z-20 w-[100%] bg-blue-500 p-4">(footer)</footer> -->
+	</main>
+	<!-- <AppSidebar.Right /> -->
+</div>
