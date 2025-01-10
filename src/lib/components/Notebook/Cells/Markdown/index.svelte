@@ -2,6 +2,7 @@
 	import { cn } from '$lib/utils';
 	import { markdown } from '@codemirror/lang-markdown';
 	import { marked } from 'marked';
+	import DOMPurify from 'dompurify';
 	import { Play, Pen } from 'lucide-svelte';
 
 	import Cell, { type BaseBlockProps } from '../Cell.svelte';
@@ -23,6 +24,11 @@
 				markdownDiv.focus();
 			}
 		}
+	};
+
+	const sanitizedContent = async () => {
+		const parsedContent = await marked.parse(content);
+		return DOMPurify.sanitize(parsedContent);
 	};
 </script>
 
@@ -47,7 +53,11 @@
 			<Cell class="w-full" bind:content customExtensions={[markdown()]} />
 		{:else}
 			<div class="markdown-body h-[18.5rem] w-full overflow-y-scroll p-4">
-				{@html marked.parse(content)}
+				{#await sanitizedContent()}
+					<p>Loading...</p>
+				{:then sanitizedContent}
+					{@html sanitizedContent}
+				{/await}
 			</div>
 		{/if}
 	</div>
