@@ -112,11 +112,10 @@
 										href="notebooks/?id={notebook.id}"
 										target={$preferences.general.openNotebooksInNewWindow ? '_blank' : '_self'}
 										rel="noopener noreferrer"
+										class="flex items-center"
 									>
-										<DropdownMenu.Item>
-											<NotebookText class="mr-2" />
-											Open Notebook
-										</DropdownMenu.Item>
+										<NotebookText class="mr-2 size-5" />
+										Open Notebook
 									</a>
 								</DropdownMenu.Item>
 								<DropdownMenu.Item onclick={async () => await duplicateNotebook(notebook.id)}>
