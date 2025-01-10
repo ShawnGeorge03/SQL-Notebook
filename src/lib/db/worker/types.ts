@@ -22,7 +22,7 @@ export type DBWorkerCommand =
 	| 'LOAD_DB'
 	| 'EXEC_QUERY'
 	| 'CLOSE_DB'
-	| 'TERMINATE_DB'
+	| 'DROP_DB'
 	| 'CREATE_DEMO'
 	| 'FORMAT_QUERY';
 
@@ -39,7 +39,7 @@ export type DBWorkerMessages =
 	| Message<'LOAD_DB', { dbName: string }>
 	| Message<'EXEC_QUERY', { id: string; dbName: string; query: string }>
 	| Message<'CLOSE_DB', { dbName: string }>
-	| Message<'TERMINATE_DB', { dbName: string }>
+	| Message<'DROP_DB', { dbName: string }>
 	| Message<'CREATE_DEMO', { engine: DBEngine }>
 	| Message<'FORMAT_QUERY', { id: string; engine: DBEngine; query: string }>;
 
@@ -51,7 +51,7 @@ export interface SuccessResponseData {
 	LOAD_DB: { dbName: string };
 	EXEC_QUERY: { id: string; data: QueryResult; elapsed: number };
 	CLOSE_DB: { dbName: string };
-	TERMINATE_DB: { dbName: string };
+	DROP_DB: { dbName: string };
 	CREATE_DEMO: { dbName: string };
 	FORMAT_QUERY: { query: string; id: string };
 }
@@ -64,7 +64,7 @@ export interface ErrorResponseData {
 	LOAD_DB: Error;
 	EXEC_QUERY: Error & { id: string };
 	CLOSE_DB: Error;
-	TERMINATE_DB: Error;
+	DROP_DB: Error;
 	CREATE_DEMO: Error;
 	FORMAT_QUERY: Error & { id: string };
 }
@@ -84,6 +84,6 @@ export type DBWorkerResponses =
 	| Response<'LOAD_DB'>
 	| Response<'EXEC_QUERY'>
 	| Response<'CLOSE_DB'>
-	| Response<'TERMINATE_DB'>
+	| Response<'DROP_DB'>
 	| Response<'CREATE_DEMO'>
 	| Response<'FORMAT_QUERY'>;

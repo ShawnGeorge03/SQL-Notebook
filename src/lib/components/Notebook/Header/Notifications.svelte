@@ -42,7 +42,7 @@
 			title: 'Successfully Closed Database',
 			description: `Database ${dbName} has been closed successfully.`
 		}),
-		TERMINATE_DB: (dbName: string) => ({
+		DROP_DB: (dbName: string) => ({
 			title: 'Successfully Terminated Database',
 			description: `Database ${dbName} has been terminated successfully.`
 		})
@@ -65,7 +65,7 @@
 			title: 'Failed to close Database',
 			description: message
 		}),
-		TERMINATE_DB: (message: string) => ({
+		DROP_DB: (message: string) => ({
 			title: 'Failed to terminate Database',
 			description: message
 		})
@@ -80,7 +80,7 @@
 					case 'CREATE_DB':
 					case 'LOAD_DB':
 					case 'CLOSE_DB':
-					case 'TERMINATE_DB':
+					case 'DROP_DB':
 						notifications.push({
 							id: useId(),
 							status: response.status,
@@ -102,7 +102,7 @@
 					case 'CREATE_DB':
 					case 'LOAD_DB':
 					case 'CLOSE_DB':
-					case 'TERMINATE_DB':
+					case 'DROP_DB':
 						notifications.push({
 							id: useId(),
 							status: response.status,
@@ -164,7 +164,7 @@
 							<span class="h-6 w-6 text-white">{@html QueryDBIcon}</span>
 						{:else if command === 'CLOSE_DB'}
 							<span class="h-6 w-6 text-white">{@html CloseDBIcon}</span>
-						{:else if command === 'TERMINATE_DB'}
+						{:else if command === 'DROP_DB'}
 							<span class="h-6 w-6 text-white">{@html TerminateDBIcon}</span>
 						{/if}
 					</span>

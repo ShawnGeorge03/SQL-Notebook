@@ -19,22 +19,22 @@
 		}
 
 		message = `Terminating ${dbName} Database`;
-		dbWorkerService.sendMessage({ command: 'TERMINATE_DB', args: { dbName } });
+		dbWorkerService.sendMessage({ command: 'DROP_DB', args: { dbName } });
 		disabled = true;
 	};
 
 	const unsubscribe = dbWorkerService.responses.subscribe((response) => {
 		dbName = '';
 		disabled = false;
-		loading = response.status === 'LOADING' && response.command === 'TERMINATE_DB';
+		loading = response.status === 'LOADING' && response.command === 'DROP_DB';
 
 		if (response.status === 'SUCCESS' && response.command === 'GET_AVAILABLE_DBS') {
 			loading = false;
 			availableDBs = response.data.availableDBs;
-		} else if (response.status === 'SUCCESS' && response.command === 'TERMINATE_DB') {
+		} else if (response.status === 'SUCCESS' && response.command === 'DROP_DB') {
 			loading = false;
 			message = 'Terminated DB: ' + response.data.dbName;
-		} else if (response.status === 'ERROR' && response.command === 'TERMINATE_DB') {
+		} else if (response.status === 'ERROR' && response.command === 'DROP_DB') {
 			console.error(response.data);
 			message = response.data.message + ' ' + (response.data.cause && response.data.cause);
 		}

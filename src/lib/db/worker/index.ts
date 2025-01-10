@@ -337,11 +337,11 @@ self.onconnect = async (event: MessageEvent) => {
 				postResponse(port, 'CLOSE_DB', response);
 				break;
 			}
-			case 'TERMINATE_DB': {
+			case 'DROP_DB': {
 				const { dbName } = data.args;
 
 				if (dbName in DBS) {
-					postError(port, 'TERMINATE_DB', {
+					postError(port, 'DROP_DB', {
 						name: 'DB_IN_USE',
 						message: 'Database In Use',
 						cause: `Database with name ${dbName} is alredy in use`
@@ -352,7 +352,7 @@ self.onconnect = async (event: MessageEvent) => {
 				const config = await iDB.databases.get(dbName);
 
 				if (!config) {
-					postError(port, 'TERMINATE_DB', {
+					postError(port, 'DROP_DB', {
 						name: 'DB_DNE',
 						message: 'Database does not exist',
 						cause: `Database with name "${dbName}" does not exist.`
@@ -361,7 +361,7 @@ self.onconnect = async (event: MessageEvent) => {
 				}
 
 				if (config.engine !== DBEngine.PGSQL && config.engine === DBEngine.SQLITE) {
-					postError(port, 'TERMINATE_DB', {
+					postError(port, 'DROP_DB', {
 						name: 'INVALID_DB',
 						message: 'Unknown Database Engine',
 						cause: `Supported Engines: ${DBEngine.PGSQL}, ${DBEngine.SQLITE}`
@@ -378,7 +378,7 @@ self.onconnect = async (event: MessageEvent) => {
 						})
 						.then(async () => {
 							await getAvailableDBs();
-							postSuccess(port, 'TERMINATE_DB', { dbName });
+							postSuccess(port, 'DROP_DB', { dbName });
 						});
 				};
 
