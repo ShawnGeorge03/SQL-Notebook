@@ -8,7 +8,7 @@
 	};
 </script>
 
-<nav class="bg-white shadow dark:bg-gray-900">
+<nav class="fixed top-0 w-full bg-white shadow dark:bg-gray-900">
 	<div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
 		<div class="flex h-16 items-center">
 			<!-- Logo -->
@@ -28,7 +28,7 @@
 			</div>
 
 			<!-- Hamburger Menu Button (visible on mobile) -->
-			<div class="flex md:hidden">
+			<div class="m-auto flex md:hidden">
 				<button
 					onclick={toggleMenu}
 					class="inline-flex items-center justify-center rounded-md p-2 text-gray-500 hover:bg-gray-100 hover:text-gray-900 focus:outline-none dark:text-gray-400 dark:hover:bg-gray-800 dark:hover:text-white"
@@ -52,7 +52,7 @@
 			</div>
 
 			<!-- Desktop Navigation -->
-			<div class="hidden md:block">
+			<div class="m-auto hidden md:block">
 				<div class="ml-2 flex items-baseline space-x-4">
 					<a
 						href="/"
