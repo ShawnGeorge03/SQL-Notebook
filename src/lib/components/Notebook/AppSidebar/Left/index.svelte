@@ -21,6 +21,7 @@
 		Trash
 	} from 'lucide-svelte';
 
+	import * as NotebookAction from '$lib/components/Notebook/AppSidebar/Left/Notebook/';
 	import iDB from '$lib/indexeddb/schema';
 	import type { Database, Notebook } from '$lib/indexeddb/types';
 
@@ -54,9 +55,9 @@
 >
 	<div class="invisible h-[3.45rem] w-full border-b border-sidebar-border"></div>
 	<div class="h-fit max-h-[19.5rem] w-full border-b border-t border-sidebar-border pt-2">
-		<div class="flex items-center justify-between px-1 pb-1">
+		<div class="flex items-center justify-between pb-1 pl-1 pr-3">
 			<p class="pl-2 text-xl font-bold">Notebooks</p>
-			<Plus class="ml-auto mr-2 h-5 w-5 shrink-0" />
+			<NotebookAction.Create />
 		</div>
 		<ScrollArea class="h-[15rem] w-full p-2">
 			<Sidebar.Menu>
