@@ -1,173 +1,244 @@
 <script lang="ts">
-	import { onMount } from 'svelte';
-	import { quintOut } from 'svelte/easing';
-	import { slide } from 'svelte/transition';
+	import { Input } from '$lib/components/ui/input';
+	import ScrollArea from '$lib/components/ui/scroll-area/scroll-area.svelte';
+	import { Skeleton } from '$lib/components/ui/skeleton';
+	import * as Table from '$lib/components/ui/table/index.js';
 
-	import Editor from '$lib/components/Blocks/Block/index.svelte';
-	import { DBWorkerService } from '$lib/db/worker/service';
-	import type { DBEngine, DBInfo, SuccessResponseData } from '$lib/db/worker/types';
 	import { PostgreSQL, sql, SQLite, StandardSQL } from '@codemirror/lang-sql';
 
+	import type { DBEngine, ErrorResponseData, SuccessResponseData } from '$lib/db/worker/types';
+
+	import { DBWorkerService } from '$lib/db/worker/service';
+	import { onMount } from 'svelte';
+	import SelectDB from '../../SelectDB.svelte';
+	import { Actions, Editor } from '../Cell';
+
+	import { dev } from '$app/environment';
 	import PostgreSQLIcon from '$lib/assets/db/engines/postgresql.svg?raw';
 	import SQLiteIcon from '$lib/assets/db/engines/sqlite.svg?raw';
-	import SpinnerIcon from '$lib/assets/spinner.svg?raw';
+	import { Button } from '$lib/components/ui/button';
+	import { ChevronDown, PaintbrushVertical } from 'lucide-svelte';
 
-	interface CodeBlockProps {
+	interface CodeEditorProps {
 		id: string;
+		name: string;
+		position: number;
 		class?: string;
-		dbName?: string;
-		engine?: DBEngine;
+		dbName: string;
+		engine: DBEngine;
 		query: string;
-		result: Omit<SuccessResponseData['EXEC_QUERY'], 'id'>;
-		ondelete: VoidFunction;
+		result?: Omit<SuccessResponseData['EXEC_QUERY'], 'id'>;
+		error?: Omit<ErrorResponseData['EXEC_QUERY'], 'id'>;
+		moveUpCell: (position: number) => void;
+		moveDownCell: (position: number) => void;
+		copyCell: (position: number) => void;
+		removeCell: (position: number) => void;
 	}
+
+	const DEFAULT_RESULT = { data: { rows: [], cols: [] }, elapsed: 0 };
 
 	let {
 		id,
+		name = $bindable(''),
+		position,
 		class: className,
 		query = $bindable(''),
-		result = $bindable({ data: [], elapsed: 0 }),
 		dbName = $bindable(''),
 		engine = $bindable(),
-		ondelete = $bindable<VoidFunction>()
-	}: CodeBlockProps = $props();
+		result = $bindable(DEFAULT_RESULT),
+		error = $bindable(),
+		moveUpCell,
+		moveDownCell,
+		copyCell,
+		removeCell
+	}: CodeEditorProps = $props();
 
-	let customExtensions = [
+	const customExtensions = [
 		sql({
 			upperCaseKeywords: true,
 			dialect: engine === 'pgsql' ? PostgreSQL : engine === 'sqlite' ? SQLite : StandardSQL
 		})
 	];
 
-	let isOpen = $state(false);
+	let dbWorkerService: DBWorkerService;
 
-	let dbWorkerService = DBWorkerService.getInstance();
-	let activeDBs: DBInfo[] = $state([]);
-	let loading: boolean = $state(true);
-	const unsubscribe = dbWorkerService.responses.subscribe((response) => {
-		loading = response.status === 'LOADING' && response.command === 'GET_ACTIVE_DBS';
-		if (response.status === 'SUCCESS') {
-			if (response.command === 'GET_ACTIVE_DBS') {
-				loading = false;
-				activeDBs = response.data.activeDBs;
-			} else if (response.command === 'EXEC_QUERY' && response.data.id === id) {
-				result = {
-					data: response.data.data,
-					elapsed: response.data.elapsed
-				};
-			} else if (response.command === 'FORMAT_QUERY' && response.data.id === id) {
-				query = response.data.query;
-			}
-		} else if (response.status === 'ERROR') {
-			if (response.command === 'GET_ACTIVE_DBS') {
-				console.error(response.data);
-			} else if (response.command === 'EXEC_QUERY') {
-				console.error(response.data);
-			} else if (response.command === 'FORMAT_QUERY') {
-				console.error(response.data);
-			}
-		}
-	});
+	let open = $state(false);
+	let isRunning = $state(false);
 
 	onMount(() => {
-		dbWorkerService.sendMessage({ command: 'GET_ACTIVE_DBS' });
-	});
+		dbWorkerService = DBWorkerService.getInstance();
 
-	() => unsubscribe();
+		const unsubscribe = dbWorkerService.responses.subscribe((response) => {
+			if (response.status === 'SUCCESS') {
+				if (response.command === 'EXEC_QUERY' && response.data.id === id) {
+					isRunning = false;
+					result = {
+						data: response.data.data,
+						elapsed: response.data.elapsed
+					};
+				} else if (response.command === 'FORMAT_QUERY' && response.data.id === id) {
+					query = response.data.query;
+				}
+			} else if (response.status === 'ERROR') {
+				if (response.command === 'EXEC_QUERY' && response.data.id === id) {
+					isRunning = false;
+					error = response.data;
+				}
+			}
+		});
+
+		() => unsubscribe();
+	});
 </script>
 
-<div class="rounded-sm border border-gray-200 bg-white">
-	<div class="rounded-s-sm border border-gray-200 bg-white px-4 py-2">
-		<div class="flex gap-4">
-			{#if loading}
-				<button
-					disabled
-					type="button"
-					class="inline-flex items-center rounded-lg border-gray-200 bg-white px-4 py-2 text-sm font-medium text-gray-900 hover:bg-gray-100 hover:text-blue-700 focus:z-10 focus:text-blue-700 focus:ring-2 focus:ring-blue-700 dark:border-gray-700 dark:bg-gray-800 dark:text-white dark:hover:bg-gray-700 dark:hover:text-white dark:focus:text-white dark:focus:ring-blue-500"
-				>
-					<span class="me-3 inline h-4 w-4 animate-spin text-white">{@html SpinnerIcon}</span>
-					Loading...
-				</button>
-			{:else}
-				<button
-					type="button"
-					disabled={activeDBs.length === 0}
-					class="inline-flex items-center rounded-lg border-gray-200 bg-white px-4 py-2 text-sm font-medium text-gray-900 hover:bg-gray-100 hover:text-blue-700 focus:z-10 focus:text-blue-700 focus:ring-2 focus:ring-blue-700 disabled:cursor-not-allowed dark:border-gray-700 dark:bg-gray-800 dark:text-white dark:hover:bg-gray-700 dark:hover:text-white dark:focus:text-white dark:focus:ring-blue-500"
-					onclick={() => (isOpen = !isOpen)}
-				>
-					{#if engine === 'pgsql'}
-						<span class="h-8 w-10" aria-hidden="true">{@html PostgreSQLIcon}</span>
-					{:else if engine === 'sqlite'}
-						<span class="h-8 w-10" aria-hidden="true">{@html SQLiteIcon}</span>
-					{/if}
-					{dbName}
-					<span class="ml-2 transition-transform duration-200 {isOpen ? 'rotate-180' : ''}">
-						▼
-					</span>
-				</button>
-			{/if}
+{#snippet actions()}
+	<Button
+		variant="secondary"
+		size="icon"
+		class="border-none bg-transparent shadow-none"
+		onclick={() =>
+			dbWorkerService.sendMessage({
+				command: 'FORMAT_QUERY',
+				args: { id, engine: engine, query: query }
+			})}
+	>
+		<PaintbrushVertical />
+	</Button>
+{/snippet}
 
-			<button
-				disabled={activeDBs.length === 0}
-				class="ml-auto cursor-pointer rounded border-none bg-cyan-700 px-4 py-2 text-white hover:bg-cyan-900 disabled:cursor-not-allowed"
-				onclick={() => {
-					dbWorkerService.sendMessage({ command: 'EXEC_QUERY', args: { id, dbName, query } });
-					result = { data: [], elapsed: 0 };
-				}}>Run</button
+<div class={className}>
+	<Actions
+		moveUp={() => moveUpCell(position)}
+		moveDown={() => moveDownCell(position)}
+		copy={() => copyCell(position)}
+		run={() => {
+			isRunning = true;
+			error = undefined;
+			dbWorkerService.sendMessage({ command: 'EXEC_QUERY', args: { id, dbName, query: query } });
+			result = DEFAULT_RESULT;
+		}}
+		remove={() => removeCell(position)}
+		{actions}
+	>
+		<div class="flex items-center justify-between gap-5">
+			<SelectDB
+				bind:open
+				onSelect={(db) => {
+					dbName = db.name;
+					engine = db.engine;
+				}}
 			>
-			<button
-				class="cursor-pointer rounded border-none bg-cyan-700 px-4 py-2 text-white hover:bg-cyan-900 disabled:cursor-not-allowed"
-				onclick={() => {
-					dbWorkerService.sendMessage({
-						command: 'FORMAT_QUERY',
-						args: { id, engine: engine as DBEngine, query }
-					});
-				}}>Format</button
-			>
-			<button
-				class="cursor-pointer rounded border-none bg-cyan-700 px-4 py-2 text-white hover:bg-cyan-900"
-				onclick={() => ondelete()}>Delete</button
-			>
-		</div>
-
-		{#if isOpen}
-			<ul
-				transition:slide={{ duration: 300, easing: quintOut }}
-				class="absolute z-10 mt-2 w-fit overflow-hidden rounded-md border border-gray-200 bg-white shadow-lg"
-			>
-				{#each activeDBs as database}
-					<button
-						class="flex cursor-pointer items-center space-x-2 px-4 py-2 transition-colors duration-200 hover:bg-gray-100 hover:text-blue-600"
-						onclick={() => {
-							dbName = database.name;
-							engine = database.engine;
-						}}
-					>
-						{#if database.engine === 'pgsql'}
-							<span class="h-8 w-10" aria-hidden="true">{@html PostgreSQLIcon}</span>
-						{:else if database.engine === 'sqlite'}
-							<span class="h-8 w-10" aria-hidden="true">{@html SQLiteIcon}</span>
+				<div class="flex items-center gap-3">
+					<div class="float-left">
+						{#if engine === 'pgsql'}
+							<span class="h-10 w-10" aria-hidden="true">{@html PostgreSQLIcon}</span>
+						{:else if engine === 'sqlite'}
+							<span class="h-10 w-10" aria-hidden="true">{@html SQLiteIcon}</span>
 						{/if}
-						<span class="flex-1 text-sm font-medium text-gray-900">{database.name}</span>
-					</button>
-				{/each}
-			</ul>
-		{/if}
-	</div>
-	<!-- The additional attributes of autocomplete, autocorrect, autocapitalize, and spellcheck
-are to ensure that Grammarly and others like it would not cause issue to this component
-Source: https://stackoverflow.com/questions/254712/disable-spell-checking-on-html-textfields   -->
+					</div>
+					<div class="flex max-w-32">
+						<p class="overflow-hidden text-ellipsis whitespace-nowrap">{dbName}</p>
+						<span class="ml-2 transition-transform duration-200 {open ? 'rotate-180' : ''}">
+							<ChevronDown />
+						</span>
+					</div>
+				</div>
+			</SelectDB>
+
+			<Input type="text" placeholder="Name" class="mr-4 w-1/5" bind:value={name} />
+		</div>
+	</Actions>
 	<Editor
-		autocomplete="off"
-		autocorrect="off"
-		autocapitalize="off"
-		spellcheck="false"
-		class={className}
+		class="w-[400px] transition-[width] duration-300 ease-in-out md:w-[500px] lg:w-[700px] xl:w-[1000px]"
 		bind:content={query}
 		{customExtensions}
 	/>
+	{#if error}
+		<div
+			class="w-[400px] rounded-ee-md rounded-es-md border bg-primary-foreground p-4 text-red-500 transition-[width] duration-300 ease-in-out dark:text-red-600 md:w-[500px] lg:w-[700px] xl:w-[1000px]"
+		>
+			<p class="text-xl font-bold">
+				{error.name
+					.toLocaleLowerCase()
+					.split('_')
+					.map((word) => word.charAt(0).toUpperCase() + word.slice(1))
+					.join(' ')}
+			</p>
+			<div class="pl-2">
+				<p class="text-lg">{error.message}</p>
+				{#if dev}
+					<pre class="text-sm">{error.stack}</pre>
+				{/if}
+			</div>
+		</div>
+	{/if}
+	<ScrollArea
+		class={`${result.data.rows.length < 10 ? 'max-h-96' : 'h-96'} ${error && 'hidden'} w-[400px] rounded-ee-md rounded-es-md bg-primary-foreground p-5 transition-[width] duration-300 ease-in-out md:w-[500px] lg:w-[700px] xl:w-[1000px]`}
+		orientation="both"
+	>
+		<Table.Root
+			class={`${!isRunning && result.data.cols.length === 0 && 'hidden'} min-w-full border border-gray-300 bg-gray-100 p-6 dark:border-gray-600 dark:bg-gray-800`}
+		>
+			<Table.Header>
+				<Table.Row class="bg-green-600 text-white">
+					{#if isRunning}
+						{#each { length: 8 }}
+							<Table.Head
+								class="border border-gray-300 px-4 py-2 text-left font-bold dark:border-gray-600"
+							>
+								<Skeleton class="ml-auto bg-slate-100 p-2 dark:bg-slate-600" />
+							</Table.Head>
+						{/each}
+					{:else}
+						{#each result.data.cols as col}
+							<Table.Head
+								class="border border-gray-300 px-4 py-2 text-left font-bold dark:border-gray-600"
+							>
+								<p class="text-lg font-bold text-white">{col.name}</p>
+								<span class="text-xs text-gray-200">{col.type} </span>
+							</Table.Head>
+						{/each}
+						<Table.Head
+							class="w-1/2 border border-gray-300 px-4 py-2 text-center dark:border-gray-600"
+						/>
+					{/if}
+				</Table.Row>
+			</Table.Header>
+			<Table.Body>
+				{#if isRunning}
+					{#each { length: 4 }}
+						<Table.Row
+							class="odd:bg-gray-100 even:bg-white odd:hover:bg-blue-200 even:hover:bg-blue-100 odd:dark:bg-gray-700 even:dark:bg-gray-800 odd:dark:hover:bg-blue-500 even:dark:hover:bg-blue-600"
+						>
+							{#each { length: 8 }}
+								<Table.Cell
+									class="border border-gray-300 px-4 py-2 text-gray-800 dark:border-gray-600 dark:text-gray-200"
+								>
+									<Skeleton class="ml-auto bg-slate-200 p-1 dark:bg-gray-400" />
+								</Table.Cell>
+							{/each}
+						</Table.Row>
+					{/each}
+				{:else}
+					{#each result.data.rows as row}
+						<Table.Row
+							class="odd:bg-gray-100 even:bg-white odd:hover:bg-blue-200 even:hover:bg-blue-100 odd:dark:bg-gray-700 even:dark:bg-gray-800 odd:dark:hover:bg-blue-500 even:dark:hover:bg-blue-600"
+						>
+							{#each row as cell}
+								<Table.Cell
+									class="border border-gray-300 px-4 py-2 text-gray-800 dark:border-gray-600 dark:text-gray-200"
+								>
+									{cell}
+								</Table.Cell>
+							{/each}
 
-	<div class={!result ? 'hidden' : ''}>
-		{JSON.stringify(result)}
-	</div>
+							<Table.Cell
+								class="border border-gray-300 px-4 py-2 text-gray-800 dark:border-gray-600 dark:text-gray-200"
+							/>
+						</Table.Row>
+					{/each}
+				{/if}
+			</Table.Body>
+		</Table.Root>
+	</ScrollArea>
 </div>

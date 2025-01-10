@@ -1,3 +1,5 @@
+import type { QueryResult } from "../engines/types";
+
 /** Supported database engines */
 export enum DBEngine {
 	PGSQL = 'pgsql',
@@ -47,7 +49,7 @@ export interface SuccessResponseData {
 	GET_AVAILABLE_DBS: { availableDBs: DBInfo[] };
 	CREATE_DB: { dbName: string };
 	LOAD_DB: { dbName: string };
-	EXEC_QUERY: { id: string; data: unknown[]; elapsed: number };
+	EXEC_QUERY: { id: string; data: QueryResult; elapsed: number };
 	CLOSE_DB: { dbName: string };
 	TERMINATE_DB: { dbName: string };
 	CREATE_DEMO: { dbName: string };

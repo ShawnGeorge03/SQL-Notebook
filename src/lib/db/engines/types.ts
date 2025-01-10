@@ -12,7 +12,7 @@ export enum NotebookType {
 }
 
 export type QueryResult = {
-	rows: unknown[];
+	rows: unknown[][];
 	cols: { name: string; type: NotebookType }[];
 };
 
@@ -23,6 +23,6 @@ export type QueryResult = {
  */
 export interface DBStrategy {
 	init(): Promise<void>;
-	exec(query: string): Promise<QueryResult[]>;
+	exec(query: string): Promise<QueryResult>;
 	close(): Promise<void>;
 }
