@@ -122,7 +122,12 @@
 				</div>
 			</SelectDB>
 
-			<Input type="text" placeholder="Name" class="mr-4 w-1/5" bind:value={name} />
+			<Input
+				type="text"
+				placeholder="Name"
+				class="mr-4 w-1/5 bg-primary-foreground"
+				bind:value={name}
+			/>
 		</div>
 
 		{#snippet actions()}
@@ -181,18 +186,18 @@
 		</div>
 	{/if}
 	<ScrollArea
-		class={`${result.data.rows.length < 10 ? 'max-h-96' : 'h-96'} ${error && 'hidden'} w-[400px] rounded-ee-md rounded-es-md bg-primary-foreground p-5 transition-[width] duration-300 ease-in-out md:w-[500px] lg:w-[700px] xl:w-[1000px]`}
+		class={`${result.data.rows.length < 10 ? 'max-h-96' : 'h-96'} ${error && 'hidden'} w-[400px] rounded-ee-md rounded-es-md bg-accent p-5 transition-[width] duration-300 ease-in-out md:w-[500px] lg:w-[700px] xl:w-[1000px]`}
 		orientation="both"
 	>
 		<Table.Root
 			class={`${!isRunning && result.data.cols.length === 0 && 'hidden'} min-w-full border border-gray-300 bg-gray-100 p-6 dark:border-gray-600 dark:bg-gray-800`}
 		>
 			<Table.Header>
-				<Table.Row class="bg-green-600 text-white">
+				<Table.Row class="bg-gray-800 dark:bg-secondary dark:text-secondary-foreground">
 					{#if isRunning}
 						{#each { length: 8 }}
 							<Table.Head
-								class="border border-gray-300 px-4 py-2 text-left font-bold dark:border-gray-600"
+								class="border border-gray-300 px-4 py-2 text-left font-semibold dark:border-gray-600"
 							>
 								<Skeleton class="ml-auto bg-slate-100 p-2 dark:bg-slate-600" />
 							</Table.Head>

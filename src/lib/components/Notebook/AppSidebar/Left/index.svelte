@@ -59,10 +59,10 @@
 </script>
 
 <aside
-	class="sticky top-0 col-span-1 h-screen w-[250px] overflow-y-hidden bg-sidebar px-1 py-4 text-sidebar-foreground max-sm:hidden"
+	class="sticky top-0 col-span-1 h-screen w-[250px] overflow-y-hidden border-2 border-sidebar-border bg-sidebar text-sidebar-foreground max-sm:hidden"
 >
-	<div class="invisible h-[3.45rem] w-full border-b border-sidebar-border"></div>
-	<div class="h-fit max-h-[19.5rem] w-full border-b border-t border-sidebar-border pt-2">
+	<div class="h-[4.55rem] w-full border-b border-sidebar-border"></div>
+	<div class="h-fit max-h-[19.5rem] w-full border-b-2 border-t border-sidebar-border pt-2">
 		<div class="flex items-center justify-between pb-1 pl-1 pr-3">
 			<p class="pl-2 text-xl font-bold">Notebooks</p>
 			<NotebookAction.Create />

@@ -86,8 +86,8 @@
 
 <div class="grid grid-cols-1 sm:grid-cols-[auto_1fr]">
 	<AppSidebar.Left {notebookID} />
-	<main class="bg-green-500">
-		<header class="sticky top-0 z-20 bg-red-500 p-4 pb-14">
+	<main class="bg-background">
+		<header class="sticky top-0 z-20 border-b-2 border-r-2 border-t-2 bg-sidebar p-4 pb-14">
 			{#if notebookExists}
 				<div class="float-left flex justify-end gap-4">
 					<CreateCell.QueryCell position={cells.length} {addNewCell} />
@@ -145,8 +145,8 @@
 			{:else if loading}
 				{#each { length: 6 }}
 					<div class="w-[400px] py-4 md:w-[500px] lg:w-[700px] xl:w-[1000px]">
-						<div class="h-10 rounded-t-xl bg-primary-foreground"></div>
-						<div class="flex flex-col gap-4 bg-white p-6 py-4 dark:bg-blue-950">
+						<div class="h-10 rounded-t-xl bg-muted"></div>
+						<div class="flex flex-col gap-4 bg-white p-6 py-4 dark:bg-slate-800">
 							{#each { length: 4 }, i}
 								<Skeleton
 									class={cn('h-4', {
@@ -158,7 +158,7 @@
 								/>
 							{/each}
 						</div>
-						<div class="h-10 rounded-b-xl bg-primary-foreground"></div>
+						<div class="h-10 rounded-b-xl bg-muted"></div>
 					</div>
 				{/each}
 			{:else}

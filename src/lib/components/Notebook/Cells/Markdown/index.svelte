@@ -1,14 +1,14 @@
 <script lang="ts">
 	import { cn } from '$lib/utils';
 	import { markdown } from '@codemirror/lang-markdown';
-	import { marked } from 'marked';
 	import DOMPurify from 'dompurify';
-	import { Play, Pen } from 'lucide-svelte';
+	import { Pen, Play } from 'lucide-svelte';
+	import { marked } from 'marked';
 
-	import { Actions, Editor, type BaseEditorProps } from '../Cell';
-	import './github-markdown.css';
-	import Button from '$lib/components/ui/button/button.svelte';
 	import MarkdownIcon from '$lib/assets/notebook/actions/markdown.svg?raw';
+	import Button from '$lib/components/ui/button/button.svelte';
+	import { Actions, Editor } from '../Cell';
+	import './github-markdown.css';
 
 	let editable = $state(false);
 	let markdownDiv: HTMLDivElement;
@@ -91,7 +91,7 @@
 	>
 		{@html MarkdownIcon}
 		<div
-			class="rounded-md pt-2"
+			class=" rounded-md pt-2"
 			onkeydown={handleKeydown}
 			role="button"
 			tabindex="0"
@@ -100,7 +100,7 @@
 			{#if editable}
 				<Editor bind:content customExtensions={[markdown()]} />
 			{:else}
-				<div class="markdown-body h-[18.5rem] overflow-y-scroll p-4">
+				<div class="markdown-body p-4">
 					{#await sanitizedContent()}
 						<p>Loading...</p>
 					{:then sanitizedContent}

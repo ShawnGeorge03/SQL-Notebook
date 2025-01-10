@@ -63,16 +63,16 @@
 				<p class="col-span-3">
 					{#if database.system === 'pglite'}
 						<Button
+							class="pl-0"
 							variant="link"
-							size="icon"
 							href="https://pglite.dev/"
 							target="_blank"
 							rel="noopener noreferrer">PGLite</Button
 						>
 					{:else if database.system === 'wa-sqlite'}
 						<Button
+							class="pl-0"
 							variant="link"
-							size="icon"
 							href="https://github.com/rhashimoto/wa-sqlite"
 							target="_blank"
 							rel="noopener noreferrer">wa-sqlite</Button
