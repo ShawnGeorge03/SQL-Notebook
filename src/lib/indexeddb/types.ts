@@ -18,8 +18,6 @@ export type Database =
 	| (BaseDatabase & { engine: DBEngine.PGSQL; system: 'pglite' })
 	| (BaseDatabase & { engine: DBEngine.SQLITE; system: 'wa-sqlite' });
 
-export type Project = BaseTable & { notebookIDs: number[] };
-
 type QueryCell = {
 	id: string;
 	cellType: 'query';
