@@ -36,3 +36,15 @@ npm run build
 You can preview the production build with `npm run preview`.
 
 > To deploy your app, you may need to install an [adapter](https://svelte.dev/docs/kit/adapters) for your target environment.
+
+## License
+
+This project is licensed under [The Unlicense](https://unlicense.org/).
+
+You are free to copy, modify, publish, use, compile, sell, or distribute this software, either in source code form or as a compiled binary, for any purpose, commercial or non-commercial, and by any means.
+
+For more information, see the [LICENSE](./LICENSE) file.
+
+### Third-Party Licenses
+
+This project uses third-party libraries that are licensed under their respective terms. See the `NOTICE` file for details. Run `pnpm run licenses ls` to generate a list of dependencies and their licenses.
