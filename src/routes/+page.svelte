@@ -170,17 +170,17 @@
 						<span class="h-6 w-6 text-blue-600 dark:text-blue-400" aria-hidden="true">
 							<svg
 								xmlns="http://www.w3.org/2000/svg"
+								viewBox="0 0 24 24"
 								fill="none"
 								stroke="#60a5fa"
-								viewBox="0 0 24 24"
 							>
 								<path
 									stroke-linecap="round"
 									stroke-linejoin="round"
 									stroke-width="2"
-									d="M8 9l3 3-3 3m5 0h3M5 20h14
-									a2 2 0 002-2V6a2 2 0 00-2-2H5
-									a2 2 0 00-2 2v12a2 2 0 002 2z"
+									d="M4 7v10c0 2.21 3.582 4 8 4s8-1.79 8-4V7M4 7c0 2.21 3.582 4 8 4s8-1.79 8-4
+                              M4 7c0-2.21 3.582-4 8-4s8 1.79 8 4m0 5
+                              c0 2.21-3.582 4-8 4s-8-1.79-8-4"
 								></path>
 							</svg>
 						</span>
