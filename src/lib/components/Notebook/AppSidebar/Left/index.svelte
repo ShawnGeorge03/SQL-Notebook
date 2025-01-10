@@ -102,7 +102,9 @@
 									{/snippet}
 								</DropdownMenu.Item>
 								<DropdownMenu.Item>
-									<Info /> Info
+									{#snippet child()}
+										<NotebookAction.Info {notebook} />
+									{/snippet}
 								</DropdownMenu.Item>
 							</DropdownMenu.Content>
 						</Sidebar.MenuItem>
