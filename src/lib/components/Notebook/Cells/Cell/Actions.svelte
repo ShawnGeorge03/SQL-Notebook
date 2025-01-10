@@ -9,7 +9,6 @@
 		moveUp: VoidFunction;
 		moveDown: VoidFunction;
 		copy: VoidFunction;
-		run: VoidFunction;
 		remove: VoidFunction;
 		actions?: Snippet;
 		children?: Snippet;
@@ -20,7 +19,6 @@
 		moveUp,
 		moveDown,
 		copy,
-		run,
 		remove,
 		actions,
 		children
@@ -29,7 +27,7 @@
 
 <div
 	class={cn(
-		'group relative w-[400px] rounded-t-xl bg-primary-foreground py-2 pl-3 transition-[width] duration-300 ease-in-out md:w-[500px] lg:w-[700px] xl:w-[1000px]',
+		'group relative h-fit w-[400px] rounded-t-xl bg-primary-foreground p-3 transition-[width] duration-300 ease-in-out md:w-[500px] lg:w-[700px] xl:w-[1000px]',
 		className
 	)}
 >
@@ -59,14 +57,6 @@
 			onclick={copy}
 		>
 			<Copy />
-		</Button>
-		<Button
-			variant="secondary"
-			size="icon"
-			class="border-none bg-transparent shadow-none"
-			onclick={run}
-		>
-			<Play />
 		</Button>
 
 		{@render actions?.()}
