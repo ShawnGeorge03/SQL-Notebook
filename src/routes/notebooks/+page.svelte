@@ -144,7 +144,7 @@
 					/>
 				{/each}
 			{:else if !loading && !notebookExists}
-				<h1 class="text-3xl font-bold">Welcom to your project!</h1>
+				<h1 class="text-3xl font-bold">Welcome to your project!</h1>
 				<p class="text-xl">You can start by creating or opening a notebook in the left sidebar</p>
 			{:else}
 				{#each { length: 6 }}
